@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>System Temporarily Down</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-950 text-white flex flex-col justify-center items-center h-screen px-4 text-center">
+
+  <div class="max-w-md">
+    <h1 class="text-4xl sm:text-5xl font-bold mb-4 text-red-400">🚫 System Temporarily Down</h1>
+    <p class="text-lg sm:text-xl text-gray-300 mb-6">
+      We're currently performing scheduled maintenance or experiencing high traffic. Please try again later.
+    </p>
+
+    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-red-500 border-opacity-40 mx-auto mb-6"></div>
+
+    <button onclick="window.location.href='dashboard.html'"
+            class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded transition">
+      Return to Dashboard
+    </button>
+  </div>
+
+</body>
+</html>

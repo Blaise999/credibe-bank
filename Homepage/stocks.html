@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Trade stocks with Credibe’s quirky platform and AI-driven insights.">
+    <title>Stocks - Credibe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+</head>
+<body class="bg-[#1a1a1a] text-gray-200 font-['Inter','Poppins',sans-serif]">
+    <!-- Navbar -->
+    <header class="flex justify-between items-center px-4 sm:px-8 py-4 bg-[#2d2d2d] shadow-lg sticky top-0 z-50">
+        <div class="flex items-center space-x-2">
+            <span class="text-2xl">🏦</span>
+            <span class="text-xl sm:text-2xl font-bold text-cyan-600">Credibe</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button class="bg-cyan-600 text-white px-4 py-2 rounded-full font-bold hover:shadow-lg hover:bg-cyan-700 transition-all">Open Account</button>
+            <button class="border-2 border-cyan-600 text-cyan-600 px-4 py-2 rounded-full font-bold hover:shadow-lg hover:bg-cyan-600 hover:text-white transition-all">Login</button>
+            <div class="menu-btn text-2xl sm:hidden cursor-pointer">☰</div>
+        </div>
+        <nav id="mobile-menu" class="hidden sm:hidden absolute top-16 left-0 w-full bg-[#2d2d2d] p-4 shadow-lg">
+            <ul class="flex flex-col space-y-2">
+                <li><button class="block text-gray-200 hover:text-cyan-600">Savings</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Checking</button></li>
+                <li><a href="loans.html" class="block text-gray-200 hover:text-cyan-600">Personal Loans</a></li>
+                <li><a href="loans.html" class="block text-gray-200 hover:text-cyan-600">Business Loans</a></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Merchant Services</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">International Transfers</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Treasury Management</button></li>
+                <li><a href="loans.html" class="block text-gray-200 hover:text-cyan-600">Mortgage Loans</a></li>
+                <li><a href="loans.html" class="block text-gray-200 hover:text-cyan-600">Auto Loans</a></li>
+                <li><a href="loans.html" class="block text-gray-200 hover:text-cyan-600">Student Loans</a></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Stocks</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Bonds</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Mutual Funds</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Retirement Plans</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">About Us</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Careers</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero with Ticker -->
+    <section class="relative w-full h-[60vh] sm:h-[80vh] min-h-[400px] parallax-section bg-[url('https://images.unsplash.com/photo-1611162618472-14d7d9a46133')] bg-cover bg-center">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="absolute top-4 w-full overflow-hidden">
+            <div class="ticker flex space-x-4 animate-[ticker_20s_linear_infinite]">
+                <span class="ticker-item text-cyan-400">AAPL +2.3%</span>
+                <span class="ticker-item text-cyan-400">TSLA -1.1%</span>
+                <span class="ticker-item text-cyan-400">GOOGL +0.8%</span>
+                <span class="ticker-item text-cyan-400">AMZN +1.5%</span>
+            </div>
+        </div>
+        <div class="absolute inset-0 flex items-center justify-center px-4 py-16">
+            <div class="glass-card bg-white/10 backdrop-blur-md p-8 rounded-xl shadow-lg max-w-md w-full text-center fade-in">
+                <h1 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-cyan-600 to-cyan-400 bg-clip-text text-transparent mb-4">Trade Stocks Like a Rockstar</h1>
+                <p class="text-gray-400 mb-6">Dive into the market with AI-driven insights and zero commissions.</p>
+                <button class="bg-cyan-600 text-white px-6 py-3 rounded-full font-bold hover:shadow-lg hover:bg-cyan-700 transition-all">Start Trading</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stock Options -->
+    <section class="py-20 px-4 sm:px-8 bg-[#2d2d2d]">
+        <h2 class="text-3xl sm:text-4xl font-bold text-center bg-gradient-to-r from-cyan-600 to-cyan-400 bg-clip-text text-transparent mb-12">Pick Your Market Adventure</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div class="tilt-card glass-card bg-white/10 backdrop-blur-md p-6 rounded-xl shadow-lg transition-transform duration-300 fade-in animate-[orbit_3s_infinite]">
+                <h3 class="text-xl font-semibold text-cyan-600 mb-2">Tech Stocks</h3>
+                <p class="text-gray-400">Invest in the future with giants like Apple and Tesla.</p>
+            </div>
+            <div class="tilt-card glass-card bg-white/10 backdrop-blur-md p-6 rounded-xl shadow-lg transition-transform duration-300 fade-in animate-[orbit_3s_infinite_0.5s]">
+                <h3 class="text-xl font-semibold text-cyan-600 mb-2">Green Energy</h3>
+                <p class="text-gray-400">Power up with sustainable companies driving change.</p>
+            </div>
+            <div class="tilt-card glass-card bg-white/10 backdrop-blur-md p-6 rounded-xl shadow-lg transition-transform duration-300 fade-in animate-[orbit_3s_infinite_1s]">
+                <h3 class="text-xl font-semibold text-cyan-600 mb-2">Blue Chips</h3>
+                <p class="text-gray-400">Stable giants for steady returns.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Risk-Reward Slider -->
+    <section class="py-20 px-4 sm:px-8 bg-gradient-to-b from-[#2d2d2d] to-[#1a1a1a]">
+        <h2 class="text-3xl sm:text-4xl font-bold text-center bg-gradient-to-r from-cyan-600 to-cyan-400 bg-clip-text text-transparent mb-12">Balance Your Risk</h2>
+        <div class="max-w-4xl mx-auto glass-card bg-white/10 backdrop-blur-md p-8 rounded-xl shadow-lg fade-in">
+            <input type="range" min="0" max="100" value="50" class="w-full h-2 bg-cyan-600/50 rounded-lg cursor-pointer">
+            <div class="flex justify-between mt-4">
+                <span class="text-gray-400">Low Risk (Safe)</span>
+                <span class="text-gray-400">High Risk (High Reward)</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQs -->
+    <section class="py-20 px-4 sm:px-8 bg-[#2d2d2d]">
+        <h2 class="text-3xl sm:text-4xl font-bold text-center bg-gradient-to-r from-cyan-600 to-cyan-400 bg-clip-text text-transparent mb-12">Stock Market FAQs</h2>
+        <div class="max-w-3xl mx-auto space-y-4">
+            <div class="glass-card bg-white/10 backdrop-blur-md p-4 rounded-xl shadow-lg fade-in">
+                <button class="faq-toggle text-xl font-semibold text-cyan-600 w-full text-left">Are there trading fees?</button>
+                <div class="text-gray-400 mt-2 max-h-0 overflow-hidden transition-all duration-300">Zero commissions on all trades!</div>
+            </div>
+            <div class="glass-card bg-white/10 backdrop-blur-md p-4 rounded-xl shadow-lg fade-in">
+                <button class="faq-toggle text-xl font-semibold text-cyan-600 w-full text-left">What’s the minimum investment?</button>
+                <div class="text-gray-400 mt-2 max-h-0 overflow-hidden transition-all duration-300">Start with just €50.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#1a1a1a] py-12 px-4 sm:px-8 text-center">
+        <div class="flex flex-wrap justify-center gap-8 sm:gap-20 mb-8">
+            <div>
+                <h4 class="text-xl font-semibold mb-4">Personal</h4>
+                <button class="block text-cyan-400 hover:underline mb-2">Savings</button>
+                <button class="block text-cyan-400 hover:underline mb-2">Checking</button>
+                <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Personal Loans</a>
+            </div>
+            <div>
+                <h4 class="text-xl font-semibold mb-4">Business</h4>
+                <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Business Loans</a>
+                <button class="block text-cyan-400 hover:underline mb-2">Merchant Services</button>
+                <button class="block text-cyan-400 hover:underline mb-2">International Transfers</button>
+                <button class="block text-cyan-400 hover:underline mb-2">Treasury Management</button>
+            </div>
+            <div>
+                <h4 class="text-xl font-semibold mb-4">Loans</h4>
+                <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Mortgage Loans</a>
+                <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Auto Loans</a>
+                <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Student Loans</a>
+            </div>
+            <div>
+                <h4 class="text-xl font-semibold mb-4">Investments</h4>
+                <button class="block text-cyan-400 hover:underline mb-2">Stocks</button>
+                <button class="block text-cyan-400 hover:underline mb-2">Bonds</button>
+                <button class="block text-cyan-400 hover:underline mb-2">Mutual Funds</button>
+                <button class="block text-cyan-400 hover:underline mb-2">Retirement Plans</button>
+            </div>
+            <div>
+                <h4 class="text-xl font-semibold mb-4">Overview</h4>
+                <button class="block text-cyan-400 hover:underline mb-2">About Us</button>
+                <button class="block text-cyan-400 hover:underline mb-2">Careers</button>
+            </div>
+        </div>
+        <div class="border-t border-gray-700 pt-6 text-sm">
+            <p>© 2025 Credibe. All rights reserved. <button class="text-cyan-400 hover:underline">Privacy Policy</button> | <button class="text-cyan-400 hover:underline">Terms of Service</button></p>
+        </div>
+    </footer>
+
+    <!-- Live Chat -->
+    <div class="live-chat fixed bottom-4 right-4 z-50">
+        <button class="chat-toggle bg-cyan-600 text-white px-6 py-3 rounded-full font-bold hover:shadow-lg hover:bg-cyan-700 transition-all">Chat with Us</button>
+        <div class="chat-box hidden bg-[#2d2d2d]/95 backdrop-blur-md p-6 rounded-xl shadow-lg mt-2 w-80">
+            <p class="text-gray-200 mb-4">How can we assist you today?</p>
+            <input type="text" placeholder="Type your message..." class="w-full p-3 bg-[#3a3a3a] border border-gray-700 rounded-lg text-gray-200 mb-4 focus:outline-none focus:border-cyan-600">
+            <button class="chat-send bg-cyan-600 text-white px-4 py-2 rounded-lg w-full font-bold hover:bg-cyan-700 transition-all">Send</button>
+        </div>
+    </div>
+
+    <script src="Newpage.js"></script>
+    <style>
+        .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+        .tilt-card { transition: transform 0.3s ease; }
+        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        @keyframes orbit { 0% { transform: translateY(0); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0); } }
+        .animate-ticker { animation: ticker 20s linear infinite; }
+        .animate-orbit { animation: orbit 3s infinite; }
+    </style>
+</body>
+</html>

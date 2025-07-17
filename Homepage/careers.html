@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Join Credibe’s innovative team and build your career in banking.">
+    <title>Careers - Credibe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+</head>
+<body class="bg-[#1a1a1a] text-gray-200 font-['Inter','Poppins',sans-serif]">
+    <!-- Navbar -->
+    <header class="flex justify-between items-center px-4 sm:px-8 py-4 bg-[#2d2d2d] shadow-lg sticky top-0 z-50">
+        <div class="flex items-center space-x-2">
+            <span class="text-2xl">🏦</span>
+            <span class="text-xl sm:text-2xl font-bold text-cyan-600">Credibe</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <a href="registration.html" class="bg-cyan-600 text-white px-4 py-2 rounded-full font-bold hover:shadow-lg hover:bg-cyan-700 transition-all">Open Account</a>
+            <a href="login.html" class="border-2 border-cyan-600 text-cyan-600 px-4 py-2 rounded-full font-bold hover:shadow-lg hover:bg-cyan-600 hover:text-white transition-all">Login</a>
+            <div class="menu-btn text-2xl sm:hidden cursor-pointer">☰</div>
+        </div>
+        <nav id="mobile-menu" class="hidden sm:hidden absolute top-16 left-0 w-full bg-[#2d2d2d] p-4 shadow-lg">
+            <ul class="flex flex-col space-y-2">
+                <li><a href="savings.html" class="block text-gray-200 hover:text-cyan-600">Savings</a></li>
+                <!-- Add other menu items -->
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="py-20 px-4 sm:px-8 bg-[#2d2d2d]">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            <div class="glass-card bg-white/10 backdrop-blur-md p-8 rounded-xl shadow-lg fade-in">
+                <h1 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-cyan-600 to-cyan-400 bg-clip-text text-transparent mb-4">Join Our Team</h1>
+                <p class="text-gray-400 mb-6">Build your career with Credibe, a leader in innovative banking.</p>
+                <a href="registration.html" class="bg-cyan-600 text-white px-4 py-2 rounded-full font-bold hover:shadow-lg hover:bg-cyan-700 transition-all">Apply Now</a>
+            </div>
+            <div class="relative">
+                <img src="" alt="Careers Hero" class="w-full h-64 sm:h-80 object-cover rounded-xl brightness-75">
+                <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Job Openings -->
+    <section class="py-20 px-4 sm:px-8 bg-gradient-to-b from-[#2d2d2d] to-[#1a1a1a]">
+        <h2 class="text-3xl sm:text-4xl font-bold text-center bg-gradient-to-r from-cyan-600 to-cyan-400 bg-clip-text text-transparent mb-12">Open Positions</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div class="glass-card bg-white/10 backdrop-blur-md p-8 rounded-xl shadow-lg hover:-translate-y-2 transition-all fade-in">
+                <h3 class="text-2xl font-semibold text-cyan-600 mb-4">Software Engineer</h3>
+                <p class="text-gray-400 mb-6">Develop cutting-edge banking solutions.</p>
+                <a href="registration.html" class="bg-cyan-600 text-white px-4 py-2 rounded-full font-bold hover:shadow-lg hover:bg-cyan-700 transition-all">Apply Now</a>
+            </div>
+            <div class="glass-card bg-[#2d2d2d] p-8 rounded-xl shadow-lg hover:-translate-y-2 transition-all fade-in">
+                <h3 class="text-2xl font-semibold text-cyan-600 mb-4">Customer Success Manager</h3>
+                <p class="text-gray-400 mb-6">Support clients with top-tier service.</p>
+                <a href="registration.html" class="bg-cyan-600 text-white px-4 py-2 rounded-full font-bold hover:shadow-lg hover:bg-cyan-700 transition-all">Apply Now</a>
+            </div>
+            <div class="glass-card bg-white/10 backdrop-blur-md p-8 rounded-xl shadow-lg hover:-translate-y-2 transition-all fade-in">
+                <h3 class="text-2xl font-semibold text-cyan-600 mb-4">Data Analyst</h3>
+                <p class="text-gray-400 mb-6">Analyze financial trends to drive insights.</p>
+                <a href="registration.html" class="bg-cyan-600 text-white px-4 py-2 rounded-full font-bold hover:shadow-lg hover:bg-cyan-700 transition-all">Apply Now</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="swiper-container py-20 px-4 sm:px-8 bg-[#2d2d2d] relative">
+        <h2 class="text-3xl sm:text-4xl font-bold text-center bg-gradient-to-r from-cyan-600 to-cyan-400 bg-clip-text text-transparent mb-12">What Our Team Says</h2>
+        <div class="swiper-wrapper max-w-4xl mx-auto">
+            <div class="swiper-slide glass-card bg-white/10 backdrop-blur-md p-8 rounded-xl shadow-lg flex flex-col sm:flex-row items-center gap-6">
+                <img src="[YOUR_IMAGE_SRC]" alt="Team Member" class="w-24 h-24 rounded-full border-2 border-cyan-600">
+                <div>
+                    <p class="text-gray-400 italic mb-4">"Working at Credibe has been a game-changer for my career."</p>
+                    <h4 class="text-lg font-semibold text-white">Jane Doe, Software Engineer</h4>
+                </div>
+            </div>
+        </div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+    </section>
+
+     <!-- Footer -->
+    <footer class="bg-[#1a1a1a] py-12 px-4 sm:px-8 text-center">
+    <div class="flex flex-wrap justify-center gap-8 sm:gap-20 mb-8">
+        <div>
+            <h4 class="text-xl font-semibold mb-4">Personal</h4>
+            <button class="block text-cyan-400 hover:underline mb-2">Savings</button>
+            <button class="block text-cyan-400 hover:underline mb-2">Checking</button>
+            <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Personal Loans</a>
+        </div>
+        <div>
+            <h4 class="text-xl font-semibold mb-4">Business</h4>
+            <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Business Loans</a>
+            <button class="block text-cyan-400 hover:underline mb-2">Merchant Services</button>
+            <button class="block text-cyan-400 hover:underline mb-2">International Transfers</button>
+            <button class="block text-cyan-400 hover:underline mb-2">Treasury Management</button>
+        </div>
+        <div>
+            <h4 class="text-xl font-semibold mb-4">Loans</h4>
+            <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Mortgage Loans</a>
+            <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Auto Loans</a>
+            <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Student Loans</a>
+        </div>
+        <div>
+            <h4 class="text-xl font-semibold mb-4">Investments</h4>
+            <button class="block text-cyan-400 hover:underline mb-2">Stocks</button>
+            <button class="block text-cyan-400 hover:underline mb-2">Bonds</button>
+            <button class="block text-cyan-400 hover:underline mb-2">Mutual Funds</button>
+            <button class="block text-cyan-400 hover:underline mb-2">Retirement Plans</button>
+        </div>
+        <div>
+            <h4 class="text-xl font-semibold mb-4">Overview</h4>
+            <button class="block text-cyan-400 hover:underline mb-2">About Us</button>
+            <button class="block text-cyan-400 hover:underline mb-2">Careers</button>
+        </div>
+    </div>
+    <div class="border-t border-gray-700 pt-6 text-sm">
+        <p>© 2025 Credibe. All rights reserved. <button class="text-cyan-400 hover:underline">Privacy Policy</button> | <button class="text-cyan-400 hover:underline">Terms of Service</button></p>
+    </div>
+</footer>
+    <!-- Live Chat -->
+    <div class="live-chat fixed bottom-4 right-4 z-50">
+        <button class="chat-toggle bg-cyan-600 text-white px-6 py-3 rounded-full font-bold hover:shadow-lg hover:bg-cyan-700 transition-all">Chat with Us</button>
+        <div class="chat-box hidden bg-[#2d2d2d]/95 backdrop-blur-md p-6 rounded-xl shadow-lg mt-2 w-80">
+            <p class="text-gray-200 mb-4">How can we assist you today?</p>
+            <input type="text" placeholder="Type your message..." class="w-full p-3 bg-[#3a3a3a] border border-gray-700 rounded-lg text-gray-200 mb-4 focus:outline-none focus:border-cyan-600">
+            <button class="chat-send bg-cyan-600 text-white px-4 py-2 rounded-lg w-full font-bold hover:bg-cyan-700 transition-all">Send</button>
+        </div>
+    </div>
+
+    <script src="Newpage.js"></script>
+    <style>
+        .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</body>
+</html>

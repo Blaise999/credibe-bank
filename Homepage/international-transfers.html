@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Send money internationally with Credibe’s low fees and cosmic speed.">
+    <title>🌍 International Transfers - Credibe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.0/dist/vanilla-tilt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+        .gradient-border {
+            border: 2px solid transparent;
+            background: linear-gradient(45deg, #00b4d8, #00d4ff, #00b4d8) border-box;
+            background-size: 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+        .gradient-border:hover { background: linear-gradient(45deg, #00d4ff, #00b4d8, #00d4ff) border-box; }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .map-path { fill: #2d2d2d; transition: fill 1s ease-in-out; }
+        input:focus + span, select:focus + span, input[type="radio"]:checked + span { opacity: 1 !important; }
+        .currency-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .currency-card:hover { transform: translateY(-5px); box-shadow: 0 4px 20px rgba(0, 180, 216, 0.3); }
+    </style>
+     <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    html {
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+    }
+    body {
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+    </style>
+</head>
+<body class="bg-[#1a1a1a] text-[#e0e0e0] min-h-screen">
+    <!-- Navbar -->
+  <header class="bg-[#2d2d2d] p-2 sm:p-4 sticky top-0 z-50 w-full flex items-center justify-between flex-wrap">
+  <!-- Logo -->
+  <a href="../index.html" class="text-2xl sm:text-3xl font-bold text-[#00b4d8] whitespace-nowrap">
+    🏦 Credibe
+  </a>
+
+  <!-- Right Side: Dashboard + Hamburger -->
+  <div class="flex items-center gap-2 mt-2 sm:mt-0">
+    <a href="../dashboard.html" class="bg-[#00b4d8] text-white px-3 sm:px-4 py-1 sm:py-2 rounded-lg font-bold hover:bg-[#00b4d8]/90 transition-all text-sm sm:text-base whitespace-nowrap">
+      Dashboard
+    </a>
+    <button id="menu-toggle" class="text-2xl text-white focus:outline-none md:hidden">
+      ☰
+    </button>
+  </div>
+
+  <!-- Mobile Nav -->
+  <nav id="mobile-menu" class="fixed top-[4rem] left-0 w-64 bg-[#2d2d2d] h-full p-4 space-y-4 transform -translate-x-full transition-transform duration-300 ease-in-out z-50 md:hidden">
+    <a href="../index.html" class="block rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition text-sm sm:text-base p-2">Home</a>
+    <a href="../dashboard.html" class="block rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition text-sm sm:text-base p-2">Dashboard</a>
+    <a href="international-transfers.html" class="block rounded-lg bg-[#3a3a3a] text-[#00b4d8] text-sm sm:text-base p-2">International Transfers</a>
+  </nav>
+</header>
+
+
+    <!-- Overview Section -->
+    <section class="relative w-full h-[50vh] sm:h-[70vh] bg-[url('https://images.unsplash.com/photo-1523741543316-bdeed047ff6c')] bg-cover bg-center">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="absolute inset-0 flex items-center justify-start px-4 sm:px-8 py-16">
+            <div class="bg-white/10 backdrop-blur-md p-6 sm:p-8 rounded-xl shadow-lg max-w-md w-full fade-in tilt-card">
+                <h1 class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#00b4d8] to-[#00d4ff] bg-clip-text text-transparent mb-4">Send Money Internationally with Ease</h1>
+                <p class="text-[#bbb] mb-6 text-sm sm:text-base">Low fees, real-time rates, and fast delivery across 150+ countries.</p>
+                <div class="flex flex-wrap gap-2 sm:gap-4">
+                    <span class="text-xl sm:text-2xl" title="United States">🇺🇸</span>
+                    <span class="text-xl sm:text-2xl" title="United Kingdom">🇬🇧</span>
+                    <span class="text-xl sm:text-2xl" title="Brazil">BR</span>
+                    <span class="text-xl sm:text-2xl" title="India">🇮🇳</span>
+                </div>
+            </div>
+            <div class="absolute right-8 top-1/2 transform -translate-y-1/2">
+                <svg viewBox="0 0 200 100" class="w-48 h-24 fade-in">
+                    <path class="map-path" d="M10,50 C50,20 150,20 190,50" fill="none" stroke="#00b4d8" stroke-width="3"/>
+                    <circle cx="10" cy="50" r="5" fill="#00b4d8"/>
+                    <circle cx="190" cy="50" r="5" fill="#00b4d8"/>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+   <!-- REPLACE THE ORIGINAL TRANSFER FORM SECTION WITH THIS -->
+<section class="py-12 sm:py-20 px-4 sm:px-8 bg-[#2d2d2d]">
+  <div class="max-w-3xl mx-auto text-center">
+    <h2 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-[#00b4d8] to-[#00d4ff] bg-clip-text text-transparent mb-4 sm:mb-6">
+      Start Sending Internationally
+    </h2>
+    <p class="text-[#bbb] text-sm sm:text-base mb-8 max-w-xl mx-auto">
+      Join thousands of users moving money across the globe with Credibe’s secure and fast transfers.
+    </p>
+
+    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 sm:p-10 drop-shadow-md w-full">
+      <h3 class="text-xl sm:text-2xl font-semibold text-white mb-4">Log in to continue</h3>
+      <p class="text-[#bbb] text-sm sm:text-base mb-6">Access your dashboard to initiate international transfers, view rates, and manage your beneficiaries.</p>
+
+      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <a href="../login.html" class="bg-[#00b4d8] hover:bg-[#00b4d8]/90 transition text-white px-6 py-3 rounded-full font-semibold text-sm sm:text-base">Log In</a>
+        <a href="../register.html" class="border-2 border-[#00b4d8] text-[#00b4d8] hover:bg-[#00b4d8]/20 transition px-6 py-3 rounded-full font-semibold text-sm sm:text-base">Create an Account</a>
+      </div>
+
+      <div class="mt-8">
+        <p class="text-xs text-[#777]">Need help? <a href="../support.html" class="text-[#00b4d8] hover:underline">Contact support</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <!-- Supported Currencies & Destinations -->
+    <section class="py-12 sm:py-20 px-4 sm:px-8 bg-[#1a1a1a]">
+        <h2 class="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-[#00b4d8] to-[#00d4ff] bg-clip-text text-transparent mb-8 sm:mb-12">Supported Currencies & Destinations</h2>
+        <div class="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div class="bg-white/10 backdrop-blur-md p-4 rounded-lg text-center currency-card fade-in tilt-card">
+                <span class="text-xl sm:text-2xl">€</span>
+                <h3 class="text-[#e0e0e0] font-semibold mt-2 text-sm sm:text-base">EUR</h3>
+                <p class="text-[#bbb] text-xs sm:text-sm">Europe, Global</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md p-4 rounded-lg text-center currency-card fade-in tilt-card">
+                <span class="text-xl sm:text-2xl">$</span>
+                <h3 class="text-[#e0e0e0] font-semibold mt-2 text-sm sm:text-base">USD</h3>
+                <p class="text-[#bbb] text-xs sm:text-sm">USA, Global</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md p-4 rounded-lg text-center currency-card fade-in tilt-card">
+                <span class="text-xl sm:text-2xl">£</span>
+                <h3 class="text-[#e0e0e0] font-semibold mt-2 text-sm sm:text-base">GBP</h3>
+                <p class="text-[#bbb] text-xs sm:text-sm">UK, Global</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md p-4 rounded-lg text-center currency-card fade-in tilt-card">
+                <span class="text-xl sm:text-2xl">₦</span>
+                <h3 class="text-[#e0e0e0] font-semibold mt-2 text-sm sm:text-base">NGN</h3>
+                <p class="text-[#bbb] text-xs sm:text-sm">Nigeria</p>
+            </div>
+        </div>
+        <div class="mt-8 text-center">
+            <p class="text-[#bbb] text-sm sm:text-base mb-4">Delivery Methods:</p>
+            <div class="flex flex-wrap justify-center gap-2 sm:gap-4">
+                <span class="bg-[#00b4d8]/20 text-[#00b4d8] px-2 sm:px-3 py-1 rounded text-xs sm:text-sm">Bank Transfer</span>
+                <span class="bg-[#00b4d8]/20 text-[#00b4d8] px-2 sm:px-3 py-1 rounded text-xs sm:text-sm">Mobile Wallet</span>
+                <span class="bg-[#00b4d8]/20 text-[#00b4d8] px-2 sm:px-3 py-1 rounded text-xs sm:text-sm">Cash Pickup</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Transfer Speed -->
+    <section class="py-12 sm:py-20 px-4 sm:px-8 bg-[#2d2d2d]">
+        <h2 class="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-[#00b4d8] to-[#00d4ff] bg-clip-text text-transparent mb-8 sm:mb-12">Transfer Speed</h2>
+        <p class="text-center text-[#bbb] text-sm sm:text-base mb-6">Most transfers arrive within 1–2 business days.</p>
+        <div class="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+            <div class="bg-white/10 backdrop-blur-md p-4 rounded-lg text-center fade-in tilt-card">
+                <span class="text-2xl sm:text-3xl">🚀</span>
+                <h3 class="text-[#e0e0e0] font-semibold mt-2 text-sm sm:text-base">Instant</h3>
+                <p class="text-[#bbb] text-xs sm:text-sm">Same-day delivery (Express)</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md p-4 rounded-lg text-center fade-in tilt-card">
+                <span class="text-2xl sm:text-3xl">⏱</span>
+                <h3 class="text-[#e0e0e0] font-semibold mt-2 text-sm sm:text-base">1–2 Days</h3>
+                <p class="text-[#bbb] text-xs sm:text-sm">Standard delivery</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md p-4 rounded-lg text-center fade-in tilt-card">
+                <span class="text-2xl sm:text-3xl">📦</span>
+                <h3 class="text-[#e0e0e0] font-semibold mt-2 text-sm sm:text-base">Up to 5 Days</h3>
+                <p class="text-[#bbb] text-xs sm:text-sm">Remote destinations</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fees & Exchange Rates -->
+    <section class="py-12 sm:py-20 px-4 sm:px-8 bg-[#1a1a1a]">
+        <h2 class="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-[#00b4d8] to-[#00d4ff] bg-clip-text text-transparent mb-8 sm:mb-12">Fees & Exchange Rates</h2>
+        <p class="text-center text-[#bbb] text-sm sm:text-base mb-6">Transparent fees starting at €0.99</p>
+        <div class="max-w-md mx-auto bg-white/10 backdrop-blur-md p-4 sm:p-6 rounded-lg sm:rounded-2xl drop-shadow-md fade-in">
+            <div class="text-center">
+                <p class="text-[#e0e0e0] text-base sm:text-lg font-semibold">€1000 ➝ $1,067 USD</p>
+                <p class="text-[#bbb] text-sm sm:text-base">Exchange Rate: 1 EUR = 1.067 USD</p>
+                <p class="text-[#bbb] text-sm sm:text-base">Transfer Fee: €4.50</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Compliance & Security -->
+    <section class="py-12 sm:py-20 px-4 sm:px-8 bg-[#2d2d2d]">
+        <h2 class="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-[#00b4d8] to-[#00d4ff] bg-clip-text text-transparent mb-8 sm:mb-12">Compliance & Security</h2>
+        <div class="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <div class="bg-white/10 backdrop-blur-md p-4 rounded-lg fade-in tilt-card">
+                <h3 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">KYC/AML Compliance</h3>
+                <p class="text-[#bbb] text-xs sm:text-sm">We adhere to strict Know Your Customer (KYC) and Anti-Money Laundering (AML) regulations to ensure secure and compliant transactions.</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md p-4 rounded-lg fade-in tilt-card">
+                <h3 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">Encrypted Transfers</h3>
+                <p class="text-[#bbb] text-xs sm:text-sm">All transactions are protected with end-to-end encryption, safeguarding your financial data.</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md p-4 rounded-lg fade-in tilt-card">
+                <h3 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">EU Financial Regulations</h3>
+                <p class="text-[#bbb] text-xs sm:text-sm">Fully compliant with EU financial standards, including GDPR and PSD2, for secure and transparent banking.</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md p-4 rounded-lg fade-in tilt-card">
+                <h3 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">Trusted Payment Rails</h3>
+                <p class="text-[#bbb] text-xs sm:text-sm">Partnered with SEPA and SWIFT networks for reliable and fast international transfers.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#2d2d2d] p-2 sm:p-4 text-center text-[#bbb] text-xs sm:text-sm w-full mt-auto">
+        © 2025 Credibe. All rights reserved. | <a href="#" class="text-[#00b4d8] hover:underline">Privacy</a> | <a href="#" class="text-[#00b4d8] hover:underline">Terms</a> | <a href="#" class="text-[#00b4d8] hover:underline">Support</a>
+    </footer>
+
+    <script src="international-transfers.js"></script>
+</body>
+</html>

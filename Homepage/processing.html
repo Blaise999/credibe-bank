@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Processing...</title>
+  <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+</head>
+<body class="flex flex-col justify-center items-center h-screen bg-gray-900 text-white text-center px-4">
+  <h1 class="text-3xl sm:text-4xl font-bold mb-4">Processing Your Request</h1>
+  <p class="text-lg text-gray-300 mb-6">Hang tight while we process your transaction...</p>
+  <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-400 border-opacity-50"></div>
+
+  <script type="module">
+  (async () => {
+    const token = localStorage.getItem('userToken');
+    const action = JSON.parse(localStorage.getItem('pendingAction'));
+
+    setTimeout(async () => {
+      if (!action || !token) return window.location.href = 'dashboard.html';
+
+      const endpoint = action.type === 'crypto'
+        ? 'http://localhost:3000/api/crypto/buy'
+        : 'http://localhost:3000/api/bills/pay';
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(action.data)
+        });
+
+        const result = await res.json();
+
+        if (res.ok) {
+          alert('✅ Your request has been submitted and is pending approval.');
+        } else {
+          alert(result.error || '❌ Failed to process request.');
+        }
+      } catch (err) {
+        alert('❌ Network error. Try again.');
+        console.error('Processing error:', err);
+      } finally {
+        localStorage.removeItem('pendingAction');
+        window.location.href = 'dashboard.html';
+      }
+    }, 4000);
+  })();
+</script>
+
+
+</body>
+</html>

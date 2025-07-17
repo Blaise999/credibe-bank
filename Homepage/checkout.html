@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Credibe | Checkout</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col justify-center items-center">
+
+  <div class="w-full max-w-md p-6 bg-gray-800 rounded-lg shadow-lg">
+    <h1 class="text-3xl font-bold text-center text-cyan-400 mb-6">Transfer Checkout</h1>
+
+    <form id="checkout-form" class="space-y-4">
+      <div>
+        <label class="block text-sm mb-1">Recipient IBAN</label>
+        <input type="text" id="iban" class="w-full px-4 py-2 rounded bg-gray-700 text-white outline-none" required />
+      </div>
+
+      <div>
+        <label class="block text-sm mb-1">Amount (€)</label>
+        <input type="number" id="amount" class="w-full px-4 py-2 rounded bg-gray-700 text-white outline-none" required />
+      </div>
+
+      <div>
+        <label class="block text-sm mb-1">Reason</label>
+        <input type="text" id="reason" class="w-full px-4 py-2 rounded bg-gray-700 text-white outline-none" />
+      </div>
+
+      <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 transition-all px-4 py-2 rounded text-white font-semibold">
+        Continue to Payment
+      </button>
+    </form>
+
+    <p id="error-msg" class="text-red-400 mt-4 text-center hidden"></p>
+  </div>
+
+  <script>
+    const form = document.getElementById("checkout-form");
+    const errorMsg = document.getElementById("error-msg");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const recipientIban = document.getElementById("iban").value;
+      const amount = document.getElementById("amount").value;
+      const reason = document.getElementById("reason").value;
+
+      try {
+        const token = localStorage.getItem("token"); // Make sure you're storing the token here after login
+
+        const res = await fetch("http://localhost:5000/api/transfer/initiate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token,
+          },
+          body: JSON.stringify({ recipientIban, amount, reason }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          const stripe = Stripe("pk_test_YourStripePublicKey"); // 🔁 Replace with your public key
+          await stripe.redirectToCheckout({ sessionId: data.transfer.stripeSessionId || data.clientSecret });
+        } else {
+          errorMsg.textContent = data.error || "Something went wrong.";
+          errorMsg.classList.remove("hidden");
+        }
+      } catch (err) {
+        errorMsg.textContent = "⚠️ Network error or server down.";
+        errorMsg.classList.remove("hidden");
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>

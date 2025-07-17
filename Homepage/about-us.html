@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discover Credibe’s mission, tech-driven culture, and quirky journey in revolutionizing banking.">
+    <title>About Us - Credibe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+</head>
+<body class="bg-[#1a1a1a] text-gray-200 font-['Inter','Poppins',sans-serif]">
+    <style>
+    html {
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+    }
+    body {
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+</style>
+    <!-- Navbar -->
+    <header class="flex justify-between items-center px-4 sm:px-8 py-4 bg-[#2d2d2d] shadow-lg sticky top-0 z-50">
+        <div class="flex items-center space-x-2">
+            <span class="text-2xl">🏦</span>
+            <span class="text-xl sm:text-2xl font-bold text-cyan-600">Credibe</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button class="bg-cyan-600 text-white px-4 py-2 rounded-full font-bold hover:shadow-lg hover:bg-cyan-700 transition-all">Open Account</button>
+            <button class="border-2 border-cyan-600 text-cyan-600 px-4 py-2 rounded-full font-bold hover:shadow-lg hover:bg-cyan-600 hover:text-white transition-all">Login</button>
+            <div class="menu-btn text-2xl sm:hidden cursor-pointer">☰</div>
+        </div>
+        <nav id="mobile-menu" class="hidden sm:hidden absolute top-16 left-0 w-full bg-[#2d2d2d] p-4 shadow-lg">
+            <ul class="flex flex-col space-y-2">
+                <li><button class="block text-gray-200 hover:text-cyan-600">Savings</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Checking</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Personal Loans</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Business Loans</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Merchant Services</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">International Transfers</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Treasury Management</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Mortgage Loans</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Auto Loans</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Stocks</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Bonds</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Mutual Funds</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Retirement Plans</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">About Us</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Careers</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section with Stats -->
+    <section class="relative w-full h-[70vh] sm:h-[90vh] min-h-[400px] parallax-section bg-[url('https://i.pinimg.com/736x/1d/60/1d/1d601d2173c1df0b61ead1547ede9544.jpg')] bg-cover bg-center">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4 py-16">
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-cyan-600 to-cyan-400 bg-clip-text text-transparent">We Are Credibe</h1>
+            <p class="text-lg sm:text-xl text-white mt-4 max-w-2xl">A tech-driven bank with a knack for breaking molds and building futures.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-12 max-w-4xl">
+                <div class="glass-card bg-white/10 backdrop-blur-md p-6 rounded-xl shadow-lg fade-in">
+                    <h3 class="text-4xl font-bold text-cyan-600 stat-counter" data-target="1000000">720, 921</h3>
+                    <p class="text-gray-400 mt-2">Happy Customers</p>
+                </div>
+                <div class="glass-card bg-white/10 backdrop-blur-md p-6 rounded-xl shadow-lg fade-in">
+                    <h3 class="text-4xl font-bold text-cyan-600 stat-counter" data-target="50">22</h3>
+                    <p class="text-gray-400 mt-2">Countries Served</p>
+                </div>
+                <div class="glass-card bg-white/10 backdrop-blur-md p-6 rounded-xl shadow-lg fade-in">
+                    <h3 class="text-4xl font-bold text-cyan-600 stat-counter" data-target="10">21</h3>
+                    <p class="text-gray-400 mt-2">Years of Innovation</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline Section -->
+    <section class="py-20 px-4 sm:px-8 bg-[#2d2d2d]">
+        <h2 class="text-3xl sm:text-4xl font-bold text-center bg-gradient-to-r from-cyan-600 to-cyan-400 bg-clip-text text-transparent mb-12">Our Quirky Journey</h2>
+        <div class="max-w-3xl mx-auto relative">
+            <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-cyan-600/50"></div>
+            <div class="space-y-12">
+                <div class="glass-card bg-white/10 backdrop-blur-md p-6 rounded-xl shadow-lg hover:-translate-y-2 transition-all fade-in relative ml-8 sm:ml-16 group">
+                    <div class="absolute -left-12 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-cyan-600 rounded-full"></div>
+                    <h3 class="text-xl font-semibold text-white mb-2">2004: The Spark</h3>
+                    <p class="text-gray-400 group-hover:text-white transition-colors">Founded in a tiny Berlin café, fueled by espresso and a dream to rethink banking.</p>
+                </div>
+                <div class="glass-card bg-white/10 backdrop-blur-md p-6 rounded-xl shadow-lg hover:-translate-y-2 transition-all fade-in relative mr-8 sm:mr-16 text-right group">
+                    <div class="absolute -right-12 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-cyan-600 rounded-full"></div>
+                    <h3 class="text-xl font-semibold text-white mb-2">2018: AI Revolution</h3>
+                    <p class="text-gray-400 group-hover:text-white transition-colors">Launched our first AI-driven loan approval system, nicknamed “LoanBot” by our team.</p>
+                </div>
+                <div class="glass-card bg-white/10 backdrop-blur-md p-6 rounded-xl shadow-lg hover:-translate-y-2 transition-all fade-in relative ml-8 sm:ml-16 group">
+                    <div class="absolute -left-12 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-cyan-600 rounded-full"></div>
+                    <h3 class="text-xl font-semibold text-white mb-2">2022: Community Impact</h3>
+                    <p class="text-gray-400 group-hover:text-white transition-colors">Donated €1M to financial literacy programs and hosted the first Credibe Hackathon.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+   <!-- Enhanced Team Section -->
+<section class="py-20 px-4 sm:px-8 bg-gradient-to-b from-[#2d2d2d] to-[#1a1a1a]">
+  <h2 class="text-4xl sm:text-5xl font-bold text-center bg-gradient-to-r from-cyan-500 to-blue-400 bg-clip-text text-transparent mb-16">Meet the Minds Behind Credibe</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-7xl mx-auto">
+    
+    <!-- Team Member 1 -->
+    <div class="relative bg-white/10 backdrop-blur-xl p-6 rounded-3xl shadow-2xl group hover:scale-[1.02] transition-all duration-500 border border-cyan-600/30">
+      <div class="absolute top-0 left-0 w-full h-full rounded-3xl opacity-0 group-hover:opacity-10 transition-all duration-500 bg-cyan-400 blur-2xl"></div>
+      <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Lena Müller" class="w-28 h-28 rounded-full mx-auto mb-4 border-4 border-cyan-500 shadow-lg">
+      <h3 class="text-2xl font-semibold text-white text-center">Lena Müller</h3>
+      <p class="text-cyan-400 text-center mb-2">Chief Technology Officer</p>
+      <p class="text-sm text-gray-300 text-center px-2">Lena oversees Credibe's entire tech infrastructure. With 15+ years in fintech and a PhD in AI systems, she transforms vision into secure, scalable architecture.</p>
+      <div class="mt-4 flex justify-center space-x-4 text-cyan-500">
+        <a href="#" class="hover:text-white transition"><i class="fab fa-linkedin"></i></a>
+        <a href="#" class="hover:text-white transition"><i class="fab fa-twitter"></i></a>
+      </div>
+    </div>
+
+    <!-- Team Member 2 -->
+    <div class="relative bg-white/10 backdrop-blur-xl p-6 rounded-3xl shadow-2xl group hover:scale-[1.02] transition-all duration-500 border border-cyan-600/30">
+      <div class="absolute top-0 left-0 w-full h-full rounded-3xl opacity-0 group-hover:opacity-10 transition-all duration-500 bg-blue-500 blur-2xl"></div>
+      <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Carlos Vega" class="w-28 h-28 rounded-full mx-auto mb-4 border-4 border-cyan-500 shadow-lg">
+      <h3 class="text-2xl font-semibold text-white text-center">Carlos Vega</h3>
+      <p class="text-cyan-400 text-center mb-2">Chief Financial Officer</p>
+      <p class="text-sm text-gray-300 text-center px-2">Carlos brings over two decades of corporate finance leadership. He’s built models for global scalability and raised over $120M in growth funding for Credibe’s expansion.</p>
+      <div class="mt-4 flex justify-center space-x-4 text-cyan-500">
+        <a href="#" class="hover:text-white transition"><i class="fab fa-linkedin"></i></a>
+        <a href="#" class="hover:text-white transition"><i class="fab fa-twitter"></i></a>
+      </div>
+    </div>
+
+    <!-- Team Member 3 -->
+    <div class="relative bg-white/10 backdrop-blur-xl p-6 rounded-3xl shadow-2xl group hover:scale-[1.02] transition-all duration-500 border border-cyan-600/30">
+      <div class="absolute top-0 left-0 w-full h-full rounded-3xl opacity-0 group-hover:opacity-10 transition-all duration-500 bg-indigo-500 blur-2xl"></div>
+      <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Maya Dlamini" class="w-28 h-28 rounded-full mx-auto mb-4 border-4 border-cyan-500 shadow-lg">
+      <h3 class="text-2xl font-semibold text-white text-center">Maya Dlamini</h3>
+      <p class="text-cyan-400 text-center mb-2">Head of Customer Experience</p>
+      <p class="text-sm text-gray-300 text-center px-2">Maya crafts the user journey from login to loan approval. Her research in behavioral economics helps Credibe deliver banking that feels intuitive, personal, and joyful.</p>
+      <div class="mt-4 flex justify-center space-x-4 text-cyan-500">
+        <a href="#" class="hover:text-white transition"><i class="fab fa-linkedin"></i></a>
+        <a href="#" class="hover:text-white transition"><i class="fab fa-twitter"></i></a>
+      </div>
+    </div>
+
+  </div>
+</section>
+>
+
+    <!-- Values Section -->
+    <section class="py-20 px-4 sm:px-8 bg-[#2d2d2d]">
+        <h2 class="text-3xl sm:text-4xl font-bold text-center bg-gradient-to-r from-cyan-600 to-cyan-400 bg-clip-text text-transparent mb-12">What Drives Us</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div class="rotate-card relative h-48 bg-white/10 backdrop-blur-md rounded-xl shadow-lg transition-transform duration-500">
+                <div class="card-front absolute inset-0 p-6 flex flex-col justify-center text-center">
+                    <h3 class="text-xl font-semibold text-white mb-2">Disruption</h3>
+                    <p class="text-gray-400">We challenge the status quo with bold ideas.</p>
+                </div>
+                <div class="card-back absolute inset-0 p-6 flex flex-col justify-center text-center opacity-0 bg-cyan-600/20">
+                    <p class="text-gray-200">From AI loans to blockchain savings, we’re rewriting the banking rulebook.</p>
+                </div>
+            </div>
+            <div class="rotate-card relative h-48 bg-white/10 backdrop-blur-md rounded-xl shadow-lg transition-transform duration-500">
+                <div class="card-front absolute inset-0 p-6 flex flex-col justify-center text-center">
+                    <h3 class="text-xl font-semibold text-white mb-2">Community</h3>
+                    <p class="text-gray-400">We empower people, not just profits.</p>
+                </div>
+                <div class="card-back absolute inset-0 p-6 flex flex-col justify-center text-center opacity-0 bg-cyan-600/20">
+                    <p class="text-gray-200">Our financial literacy programs reach 10,000+ students annually.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#1a1a1a] py-12 px-4 sm:px-8 text-center">
+    <div class="flex flex-wrap justify-center gap-8 sm:gap-20 mb-8">
+        <div>
+            <h4 class="text-xl font-semibold mb-4">Personal</h4>
+            <button class="block text-cyan-400 hover:underline mb-2">Savings</button>
+            <button class="block text-cyan-400 hover:underline mb-2">Checking</button>
+            <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Personal Loans</a>
+        </div>
+        <div>
+            <h4 class="text-xl font-semibold mb-4">Business</h4>
+            <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Business Loans</a>
+            <button class="block text-cyan-400 hover:underline mb-2">Merchant Services</button>
+            <button class="block text-cyan-400 hover:underline mb-2">International Transfers</button>
+            <button class="block text-cyan-400 hover:underline mb-2">Treasury Management</button>
+        </div>
+        <div>
+            <h4 class="text-xl font-semibold mb-4">Loans</h4>
+            <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Mortgage Loans</a>
+            <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Auto Loans</a>
+            <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Student Loans</a>
+        </div>
+        <div>
+            <h4 class="text-xl font-semibold mb-4">Investments</h4>
+            <button class="block text-cyan-400 hover:underline mb-2">Stocks</button>
+            <button class="block text-cyan-400 hover:underline mb-2">Bonds</button>
+            <button class="block text-cyan-400 hover:underline mb-2">Mutual Funds</button>
+            <button class="block text-cyan-400 hover:underline mb-2">Retirement Plans</button>
+        </div>
+        <div>
+            <h4 class="text-xl font-semibold mb-4">Overview</h4>
+            <button class="block text-cyan-400 hover:underline mb-2">About Us</button>
+            <button class="block text-cyan-400 hover:underline mb-2">Careers</button>
+        </div>
+    </div>
+    <div class="border-t border-gray-700 pt-6 text-sm">
+        <p>© 2025 Credibe. All rights reserved. <button class="text-cyan-400 hover:underline">Privacy Policy</button> | <button class="text-cyan-400 hover:underline">Terms of Service</button></p>
+    </div>
+</footer>
+    <!-- Live Chat -->
+    <div class="live-chat fixed bottom-4 right-4 z-50">
+        <button class="chat-toggle bg-cyan-600 text-white px-6 py-3 rounded-full font-bold hover:shadow-lg hover:bg-cyan-700 transition-all">Chat with Us</button>
+        <div class="chat-box hidden bg-[#2d2d2d]/95 backdrop-blur-md p-6 rounded-xl shadow-lg mt-2 w-80">
+            <p class="text-gray-200 mb-4">How can we assist you today?</p>
+            <input type="text" placeholder="Type your message..." class="w-full p-3 bg-[#3a3a3a] border border-gray-700 rounded-lg text-gray-200 mb-4 focus:outline-none focus:border-cyan-600">
+            <button class="chat-send bg-cyan-600 text-white px-4 py-2 rounded-lg w-full font-bold hover:bg-cyan-700 transition-all">Send</button>
+        </div>
+    </div>
+
+    <script src="Newpage.js"></script>
+    <style>
+        .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+        .rotate-card { perspective: 1000px; }
+        .card-front, .card-back { backface-visibility: hidden; transition: opacity 0.5s ease; }
+    </style>
+</body>
+</html>

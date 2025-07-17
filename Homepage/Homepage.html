@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Credibe - Seamless banking solutions for personal and business needs.">
+    <title>🏦 Credibe - Homepage</title>
+    <link rel="stylesheet" href="Homepage.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Swiper.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <style>
+        body { font-family: 'Poppins', sans-serif; background: #1a1a1a; color: #e0e0e0; }
+        .dropdown-menu { display: none; }
+        .dropdown:hover .dropdown-menu { display: block; }
+        .dropdown-menu-mobile { display: none; }
+        .dropdown-menu-mobile.show { display: block; }
+        .swiper-button-prev, .swiper-button-next { color: #00b4d8; }
+        .action-card, .service-card, .promo-slide, .badge-card { 
+            background: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(10px); 
+            border-radius: 1rem; 
+            transition: transform 0.3s ease, box-shadow 0.3s ease; 
+        }
+        .action-card:hover, .service-card:hover { transform: translateY(-5px); box-shadow: 0 4px 20px rgba(0, 180, 216, 0.3); }
+        .btn-link, .cta-button { 
+            display: inline-block; 
+            padding: 0.5rem 1rem; 
+            background: linear-gradient(45deg, #00b4d8, #00d4ff); 
+            color: white; 
+            border-radius: 0.5rem; 
+            text-decoration: none; 
+            transition: background 0.3s ease; 
+        }
+        .btn-link:hover, .cta-button:hover { background: linear-gradient(45deg, #0096b2, #00b4d8); }
+        .chat-box { display: none; background: #2d2d2d; padding: 1rem; border-radius: 0.5rem; }
+        .chat-toggle { background: #00b4d8; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; }
+        .chat-send { background: #00b4d8; color: white; padding: 0.5rem; border-radius: 0.5rem; }
+   
+   /* Swiper arrow styles */
+.swiper-container .swiper-button-prev,
+.swiper-container .swiper-button-next {
+  color: #00b4d8 !important;
+  width: 44px !important;
+  height: 44px !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  border-radius: 50% !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Mobile: Position arrows below hero text */
+@media (max-width: 640px) {
+  .swiper-container .swiper-button-prev {
+    left: 12px !important;
+    top: auto !important;
+    bottom: 15% !important; /* Just below hero content */
+    transform: none !important;
+  }
+
+  .swiper-container .swiper-button-next {
+    right: 12px !important;
+    top: auto !important;
+    bottom: 15% !important; /* Just below hero content */
+    transform: none !important;
+  }
+
+  /* Ensure hero content is above arrows */
+  .hero .swiper-slide .relative.z-10 {
+    z-index: 20 !important;
+  }
+}
+   </style>
+</head>
+<body>
+  <header class="w-full fixed top-0 z-[200] bg-[#2d2d2d]/80 backdrop-blur-md shadow-lg px-4 sm:px-8 py-4 flex items-center justify-between">
+    <div class="logo flex items-center text-2xl sm:text-3xl font-bold text-[#00b4d8]">
+        <span class="mr-2"></span>
+           <span class="text-2xl">🏦</span>
+        <span class="logo-text md:inline">Credibe</span>
+    </div>
+    <nav class="flex items-center">
+        <ul class="hidden md:flex items-center justify-between max-w-7xl w-full space-x-10">
+                <li class="dropdown relative">
+                    <a href="#" class="dropdown-toggle text-sm sm:text-base hover:text-[#00b4d8] transition">Personal</a>
+                    <ul class="dropdown-menu absolute top-full left-0 bg-[#2d2d2d] min-w-[200px] rounded-lg shadow-lg">
+                        <li><a href="registration.html" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">Open an Account</a></li>
+                        <li><a href="savings.html" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">Savings Accounts</a></li>
+                        <li><a href="checkings.html" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">Checking Accounts</a></li>
+                        <li><a href="login.html?from=loan" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">Personal Loans</a></li>
+                        <li><a href="login.html#dashboard.html#transfers-page" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">Money Transfers</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown relative">
+                    <a href="#" class="dropdown-toggle text-sm sm:text-base hover:text-[#00b4d8] transition">Business</a>
+                    <ul class="dropdown-menu absolute top-full left-0 bg-[#2d2d2d] min-w-[200px] rounded-lg shadow-lg">
+                        <li><a href="corporate-accounts.html" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">Corporate Accounts</a></li>
+                        <li><a href="login.html?from=loan" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">Business Loans</a></li>
+                        <li><a href="merchant-services.html" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">Merchant Services</a></li>
+                        <li><a href="international-transfers.html" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">International Transfers</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown relative">
+                    <a href="#" class="dropdown-toggle text-sm sm:text-base hover:text-[#00b4d8] transition">Loans</a>
+                    <ul class="dropdown-menu absolute top-full left-0 bg-[#2d2d2d] min-w-[200px] rounded-lg shadow-lg">
+                        <li><a href="login.html?from=loan" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">Personal Loans</a></li>
+                        <li><a href="login.html?from=loan" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">Auto Loans</a></li>
+                        <li><a href="login.html?from=loan" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">Mortgage Loans</a></li>
+                        <li><a href="login.html?from=loan" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">Business Loans</a></li>
+                        <li><a href="login.html?from=loan" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">Student Loans</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown relative">
+                    <a href="#" class="dropdown-toggle text-sm sm:text-base hover:text-[#00b4d8] transition">Investments</a>
+                    <ul class="dropdown-menu absolute top-full left-0 bg-[#2d2d2d] min-w-[200px] rounded-lg shadow-lg">
+                        <li><a href="mutual-funds.html" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">Mutual Funds</a></li>
+                        <li><a href="retirement-plans.html" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">Retirement Plans</a></li>
+                        
+                    </ul>
+                </li>
+                <li class="dropdown relative">
+                    <a href="#" class="dropdown-toggle text-sm sm:text-base hover:text-[#00b4d8] transition">Overview</a>
+                    <ul class="dropdown-menu absolute top-full left-0 bg-[#2d2d2d] min-w-[200px] rounded-lg shadow-lg">
+                        <li><a href="about-us.html" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">Our Story</a></li>
+                        <li><a href="careers.html" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">Careers</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown relative">
+                    <a href="#" class="dropdown-toggle text-sm sm:text-base hover:text-[#00b4d8] transition">Support</a>
+                    <ul class="dropdown-menu absolute top-full left-0 bg-[#2d2d2d] min-w-[200px] rounded-lg shadow-lg">
+
+                        <li><a href="Fraud.html" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">Report Fraud</a></li>
+                        <li><a href="faq.html" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">FAQs</a></li>
+                        <li><a href="livechat.html" class="block px-4 py-2 text-sm hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition">Live Chat</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="auth-buttons flex items-center gap-x-2 md:gap-x-4 md:hidden">
+                <a href="login.html" class="btn secondary px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-full bg-[#00b4d8] hover:bg-[#0096b2] transition">Login</a>
+            </div>
+            <div class="auth-buttons hidden md:flex items-center gap-x-4">
+                <a href="login.html" class="btn secondary px-3 sm:px-4 py-1 sm:py-2 text-sm sm:text-base rounded-full bg-[#00b4d8] hover:bg-[#0096b2] transition">Login</a>
+            </div>
+        </nav>
+    </header>
+
+  <!-- ✅ Mobile Drawer Menu (Full Version) -->
+<div id="mobile-menu" class="fixed top-0 right-0 w-[85%] sm:w-[350px] h-full bg-[#2d2d2d] text-white shadow-xl z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto">
+  <div class="flex justify-between items-center px-4 py-4 border-b border-gray-700">
+    <div class="text-lg font-semibold text-white">Menu</div>
+    <button id="close-mobile-menu" class="text-white text-3xl font-bold">&times;</button>
+
+  </div>
+  <ul class="divide-y divide-gray-700">
+
+    <!-- Personal Banking -->
+    <li class="group">
+      <button class="w-full text-left px-4 py-3 font-semibold text-[#00b4d8] dropdown-mobile-toggle">Personal Banking</button>
+      <ul class="dropdown-mobile-content hidden px-6 pb-4 space-y-2">
+        <li><a href="registration.html">Open an Account</a></li>
+        <li><a href="accounts.html">Savings Accounts</a></li>
+        <li><a href="accounts.html">Checking Accounts</a></li>
+        <li><a href="cards.html">Debit Cards</a></li>
+        <li><a href="dashboard.html">Mobile & Online Banking</a></li>
+        <li><a href="login.html?from=loan">Personal Loans</a></li>
+        <li><a href="dashboard.html#transfers-page">Money Transfers</a></li>
+      </ul>
+    </li>
+
+    <!-- Business Banking -->
+    <li class="group">
+      <button class="w-full text-left px-4 py-3 font-semibold text-[#00b4d8] dropdown-mobile-toggle">Business Banking</button>
+      <ul class="dropdown-mobile-content hidden px-6 pb-4 space-y-2">
+        <li><a href="registration.html">Corporate Accounts</a></li>
+        <li><a href="login.html?from=loan">Business Loans</a></li>
+        <li><a href="merchant-services.html">Merchant Services</a></li>
+        <li><a href="international-transfers.html">International Transfers</a></li>
+      </ul>
+    </li>
+
+    <!-- Loans -->
+    <li class="group">
+      <button class="w-full text-left px-4 py-3 font-semibold text-[#00b4d8] dropdown-mobile-toggle">Loans</button>
+      <ul class="dropdown-mobile-content hidden px-6 pb-4 space-y-2">
+        <li><a href="login.html?from=loan">Personal Loans</a></li>
+        <li><a href="login.html?from=loan">Auto Loans</a></li>
+        <li><a href="login.html?from=loan">Mortgage Loans</a></li>
+        <li><a href="login.html?from=loan">Business Loans</a></li>
+        <li><a href="login.html?from=loan">Student Loans</a></li>
+      </ul>
+    </li>
+
+    <!-- Investments -->
+    <li class="group">
+      <button class="w-full text-left px-4 py-3 font-semibold text-[#00b4d8] dropdown-mobile-toggle">Investments</button>
+      <ul class="dropdown-mobile-content hidden px-6 pb-4 space-y-2">
+        <li><a href="investments.html">Fixed Deposits</a></li>
+        <li><a href="mutual-funds.html">Mutual Funds</a></li>
+        <li><a href="investments.html">Wealth Management</a></li>
+        <li><a href="investments.html">Retirement Plans</a></li>
+        <li><a href="investments.html">Investment Advisory</a></li>
+      </ul>
+    </li>
+
+    <!-- About Us -->
+    <li class="group">
+      <button class="w-full text-left px-4 py-3 font-semibold text-[#00b4d8] dropdown-mobile-toggle">About Us</button>
+      <ul class="dropdown-mobile-content hidden px-6 pb-4 space-y-2">
+        <li><a href="about.html">Our Story</a></li>
+        <li><a href="careers.html">Careers</a></li>
+      </ul>
+    </li>
+
+    <!-- Support -->
+    <li class="group">
+      <button class="w-full text-left px-4 py-3 font-semibold text-[#00b4d8] dropdown-mobile-toggle">Support</button>
+      <ul class="dropdown-mobile-content hidden px-6 pb-4 space-y-2">
+        <li><a href="support.html">Help Center</a></li>
+        <li><a href="support.html#contact">Contact Us</a></li>
+        <li><a href="support.html#fraud">Report Fraud</a></li>
+        <li><a href="support.html#faqs">FAQs</a></li>
+        <li><a href="#live-chat">Live Chat</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <div class="p-4 mt-4">
+    <a href="registration.html" class="block text-center w-full py-3 rounded-full bg-[#00b4d8] text-white font-semibold hover:bg-[#009ec1] transition">Apply for an Account</a>
+  </div>
+</div>
+    </nav>
+
+    <!-- Hero Carousel -->
+   <section class="hero relative w-full min-h-[60vh] md:min-h-screen overflow-hidden">
+  <div class="swiper-container">
+    <div class="swiper-wrapper">
+                <style>
+  @media (max-width: 768px) {
+    .hero {
+      padding-top: 4.5rem; /* Adjust to match your header height (py-4 = 1rem top + 1rem bottom, plus line height) */
+    }
+  }
+</style>
+
+                <!-- Slide 1 -->
+                <div class="swiper-slide relative">
+                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('hero-bg.jpg');"></div>
+                    <div class="absolute inset-0 bg-black opacity-50"></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 py-16 md:py-24">
+                        <h1 class="font-bold text-3xl sm:text-4xl md:text-5xl text-white mb-4">Empowering Your Financial Future</h1>
+                        <p class="font-light text-base sm:text-lg md:text-xl text-white mb-6 max-w-2xl">Seamless banking solutions across Europe and beyond with cutting-edge technology.</p>
+                        <a href="registration.html" class="btn primary px-6 py-3 text-base sm:text-lg rounded-full bg-[#00b4d8] text-white hover:bg-[#0096b2] transition">Open an Account</a>
+                    </div>
+                </div>
+                <!-- Slide 2 -->
+                <div class="swiper-slide relative">
+                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');"></div>
+                    <div class="absolute inset-0 bg-black opacity-50"></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 py-16 md:py-24">
+                        <h1 class="font-bold text-3xl sm:text-4xl md:text-5xl text-white mb-4">Smarter Loans, Built for You</h1>
+                        <p class="font-light text-base sm:text-lg md:text-xl text-white mb-6 max-w-2xl">Get access to instant personal, business, or mortgage loans with transparent rates and flexible repayment.</p>
+                        <a href="login.html?from=loan" class="btn primary px-6 py-3 text-base sm:text-lg rounded-full bg-[#00b4d8] text-white hover:bg-[#0096b2] transition">Apply for a Loan</a>
+                    </div>
+                </div>
+                <!-- Slide 3 -->
+                <div class="swiper-slide relative">
+                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('slide.png');"></div>
+                    <div class="absolute inset-0 bg-black opacity-50"></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 py-16 md:py-24">
+                        <h1 class="font-bold text-3xl sm:text-4xl md:text-5xl text-white mb-4">All Your Money, One Clean View</h1>
+                        <p class="font-light text-base sm:text-lg md:text-xl text-white mb-6 max-w-2xl">Track spending, set goals, automate savings, and manage all your accounts from one sleek dashboard.</p>
+                        <a href="login.html" class="btn primary px-6 py-3 text-base sm:text-lg rounded-full bg-[#00b4d8] text-white hover:bg-[#0096b2] transition">Explore Dashboard</a>
+                    </div>
+                </div>
+                <!-- Slide 4 -->
+                <div class="swiper-slide relative">
+                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');"></div>
+                    <div class="absolute inset-0 bg-black opacity-50"></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 py-16 md:py-24">
+                        <h1 class="font-bold text-3xl sm:text-4xl md:text-5xl text-white mb-4">Borderless Banking for Everyone</h1>
+                        <p class="font-light text-base sm:text-lg md:text-xl text-white mb-6 max-w-2xl">Send and receive money internationally with zero hidden fees — powered by real-time FX rates.</p>
+                        <a href="international-transfers.html" class="btn primary px-6 py-3 text-base sm:text-lg rounded-full bg-[#00b4d8] text-white hover:bg-[#0096b2] transition">Send Money Now</a>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
+        </div>
+    </section>
+
+    <!-- Quick Access -->
+    <section class="quick-access py-12 sm:py-20 px-4 sm:px-8">
+        <h2 class="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-[#00b4d8] to-[#00d4ff] bg-clip-text text-transparent mb-8 sm:mb-12">Quick Actions</h2>
+        <div class="action-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto">
+            <a href="login.html" class="action-card p-4 text-center">
+                <h3 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">View Balance</h3>
+                <p class="text-[#bbb] text-xs sm:text-sm">Check your account balance instantly.</p>
+            </a>
+            <a href="login.html#dashboard.html#transfers-page" class="action-card p-4 text-center">
+                <h3 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">Transfer Funds</h3>
+                <p class="text-[#bbb] text-xs sm:text-sm">Move money securely between accounts.</p>
+            </a>
+            <a href="login.html#loan.html" class="action-card p-4 text-center">
+                <h3 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">Apply for Loan</h3>
+                <p class="text-[#bbb] text-xs sm:text-sm">Get started with our loan options.</p>
+            </a>
+            <a href="registration.html" class="action-card p-4 text-center">
+                <h3 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">Open Account</h3>
+                <p class="text-[#bbb] text-xs sm:text-sm">Join Credibe in minutes.</p>
+            </a>
+        </div>
+    </section>
+
+ <section class="py-16 bg-[#1a1a1a] text-white">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-10">Our Services</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      
+      <!-- Savings Account -->
+      <div class="relative h-72 rounded-2xl overflow-hidden shadow-lg group">
+        <img src="savings.jpg" alt="Savings Account" class="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition duration-500">
+        <div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-between p-6">
+          <div>
+            <h3 class="text-xl font-bold">Savings Account</h3>
+            <p class="text-sm">Savings, Checking & More</p>
+          </div>
+          <a href="savings.html" class="inline-block bg-[#00b4d8] text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#009ec1] transition">Explore</a>
+        </div>
+      </div>
+
+      <!-- Home Loan -->
+      <div class="relative h-72 rounded-2xl overflow-hidden shadow-lg group">
+        <img src="mortgage.jpg" alt="Home Loan" class="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition duration-500">
+        <div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-between p-6">
+          <div>
+            <h3 class="text-xl font-bold">Home Loan</h3>
+            <p class="text-sm">Mortgage, Auto & Personal</p>
+          </div>
+          <a href="login.html" class="inline-block bg-[#00b4d8] text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#009ec1] transition">Explore</a>
+        </div>
+      </div>
+
+      <!-- Merchants -->
+      <div class="relative h-72 rounded-2xl overflow-hidden shadow-lg group">
+        <img src="merchant.jpg" alt="Credit Card" class="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition duration-500">
+        <div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-between p-6">
+          <div>
+            <h3 class="text-xl font-bold">Merchant Services</h3>
+            <p class="text-sm">Smart Payment Solutions for Your Business</p>
+          </div>
+          <a href="merchant-services.html" class="inline-block bg-[#00b4d8] text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#009ec1] transition">Explore</a>
+        </div>
+      </div>
+
+      <!-- Investment -->
+      <div class="relative h-72 rounded-2xl overflow-hidden shadow-lg group">
+        <img src="investment.jpg" alt="Investments" class="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition duration-500">
+        <div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-between p-6">
+          <div>
+            <h3 class="text-xl font-bold">Investments</h3>
+            <p class="text-sm">Mutual Funds & Advisory</p>
+          </div>
+          <a href="mutual-funds.html" class="inline-block bg-[#00b4d8] text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#009ec1] transition">Explore</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+    <!-- SwiperJS CDN (include once in your HTML head if not already) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+
+<section class="py-20 bg-[#111827] text-white">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-10">Special Promotions</h2>
+
+    <div class="swiper promoSwiper">
+      <div class="swiper-wrapper">
+
+        <!-- Slide 1 -->
+        <div class="swiper-slide">
+          <div class="relative h-96 w-full rounded-2xl overflow-hidden shadow-xl group">
+            <img src="promo1.jpg" alt="Promo 1" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700">
+            <div class="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex flex-col justify-between p-6">
+              <div>
+                <h3 class="text-2xl font-bold mb-2">Zero Fee Transfers</h3>
+                <p class="text-sm text-gray-200">Enjoy unlimited local transfers with no extra charges.</p>
+              </div>
+              <a href="login.html" class="self-start mt-6 px-5 py-2 bg-[#00b4d8] rounded-full font-semibold hover:bg-[#009ec1] transition">Explore</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="swiper-slide">
+          <div class="relative h-96 w-full rounded-2xl overflow-hidden shadow-xl group">
+            <img src="promo3.jpg" alt="Promo 2" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700">
+            <div class="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex flex-col justify-between p-6">
+              <div>
+                <h3 class="text-2xl font-bold mb-2">Low Interest Loans</h3>
+                <p class="text-sm text-gray-200">Apply today and enjoy reduced interest on personal loans.</p>
+              </div>
+              <a href="login.html" class="self-start mt-6 px-5 py-2 bg-[#00b4d8] rounded-full font-semibold hover:bg-[#009ec1] transition">Explore</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="swiper-slide">
+          <div class="relative h-96 w-full rounded-2xl overflow-hidden shadow-xl group">
+            <img src="promo2.jpg" alt="Promo 3" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700">
+            <div class="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex flex-col justify-between p-6">
+              <div>
+                <h3 class="text-2xl font-bold mb-2">New Investment Plans</h3>
+                <p class="text-sm text-gray-200">Diversify your portfolio with high-yield investment plans.</p>
+              </div>
+              <a href="login.html" class="self-start mt-6 px-5 py-2 bg-[#00b4d8] rounded-full font-semibold hover:bg-[#009ec1] transition">Explore</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="flex justify-center gap-4 mt-6">
+        <button class="swiper-button-prev text-white text-3xl">&larr;</button>
+        <button class="swiper-button-next text-white text-3xl">&rarr;</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Initialize Swiper -->
+<script>
+  const promoSwiper = new Swiper('.promoSwiper', {
+    loop: true,
+    slidesPerView: 1,
+    spaceBetween: 30,
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },
+    autoplay: {
+      delay: 5000,
+      disableOnInteraction: false,
+    },
+    speed: 900,
+  });
+</script>
+
+
+   <!-- Trust & Security -->
+<section class="py-16 bg-gradient-to-b from-[#1f1f1f] to-[#121212] text-white text-center">
+  <h2 class="text-3xl sm:text-4xl font-bold mb-10">Your Security, Our Priority</h2>
+  <div class="flex flex-wrap justify-center gap-6 px-4">
+    
+    <!-- SSL Secured -->
+    <div class="bg-[#00b4d8] shadow-md rounded-full px-6 py-3 flex items-center space-x-3 transition transform hover:scale-105">
+      <img src="https://cdn-icons-png.flaticon.com/512/726/726488.png" alt="SSL" class="w-8 h-8 rounded-full bg-white p-1">
+      <span class="text-lg font-medium text-white">SSL Secured</span>
+    </div>
+
+    <!-- FSCS Protected -->
+    <div class="bg-[#00b4d8] shadow-md rounded-full px-6 py-3 flex items-center space-x-3 transition transform hover:scale-105">
+      <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="FSCS" class="w-8 h-8 rounded-full bg-white p-1">
+      <span class="text-lg font-medium text-white">FSCS Protected</span>
+    </div>
+
+    <!-- ISO Certified -->
+    <div class="bg-[#00b4d8] shadow-md rounded-full px-6 py-3 flex items-center space-x-3 transition transform hover:scale-105">
+      <img src="https://cdn-icons-png.flaticon.com/512/892/892339.png" alt="ISO" class="w-8 h-8 rounded-full bg-white p-1">
+      <span class="text-lg font-medium text-white">ISO 27001 Certified</span>
+    </div>
+
+    <!-- Award Winning -->
+    <div class="bg-[#00b4d8] shadow-md rounded-full px-6 py-3 flex items-center space-x-3 transition transform hover:scale-105">
+      <img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png" alt="Award" class="w-8 h-8 rounded-full bg-white p-1">
+      <span class="text-lg font-medium text-white">Award-Winning Bank 2025</span>
+    </div>
+
+  </div>
+</section>
+
+
+    <!-- Testimonials -->
+    <section class="testimonials py-12 sm:py-20 px-4 sm:px-8">
+        <h2 class="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-[#00b4d8] to-[#00d4ff] bg-clip-text text-transparent mb-8 sm:mb-12">What Our Customers Say</h2>
+        <div class="testimonial-slider max-w-4xl mx-auto">
+            <div class="testimonial-slide active">
+                <img src="friends5.jpg" alt="Customer 1" class="testimonial-img rounded-full w-16 h-16 mb-2">
+                <div class="testimonial-content p-4">
+                    <p class="text-[#bbb] text-xs sm:text-sm">"Credibe helped me secure a business loan within days — the process was fast, transparent, and stress-free. Their support team even guided me through the documentation. I’m now expanding my second branch."</p>
+                    <h4 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">Emma L.</h4>
+                </div>
+            </div>
+            <div class="testimonial-slide">
+                <img src="friends7.jpg" alt="Customer 2" class="testimonial-img rounded-full w-16 h-16 mb-2">
+                <div class="testimonial-content p-4">
+                    <p class="text-[#bbb] text-xs sm:text-sm">"I switched to Credibe for their international transfers, and it’s been the best decision. My payments to suppliers in Europe are faster and cheaper than ever."</p>
+                    <h4 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">James K.</h4>
+                </div>
+            </div>
+            <div class="testimonial-slide">
+                <img src="friends8.jpg" alt="Customer 3" class="testimonial-img rounded-full w-16 h-16 mb-2">
+                <div class="testimonial-content p-4">
+                    <p class="text-[#bbb] text-xs sm:text-sm">"Credibe's web platform helped me automate payroll for my consultancy without writing a single email. Seamless, secure, and efficient."</p>
+                    <h4 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">Sophia M.</h4>
+                </div>
+            </div>
+        </div>
+        <div class="slider-controls flex justify-center gap-4 mt-4">
+            <button class="slider-prev bg-[#00b4d8] text-white rounded-full w-8 h-8 flex items-center justify-center">←</button>
+            <button class="slider-next bg-[#00b4d8] text-white rounded-full w-8 h-8 flex items-center justify-center">→</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#2d2d2d] p-4 sm:p-6 text-center text-[#bbb] text-xs sm:text-sm">
+        <div class="footer-top max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-4">
+            <div class="footer-section">
+                <h4 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">Download App</h4>
+                <a href="https://www.apple.com/app-store/" class="block text-[#00b4d8] hover:underline">App Store</a>
+                <a href="https://play.google.com/store" class="block text-[#00b4d8] hover:underline">Google Play</a>
+            </div>
+            <div class="footer-section">
+                <h4 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">Contact</h4>
+                <p>Email: <a href="mailto:support@credibe.com" class="text-[#00b4d8] hover:underline">support@credibe.com</a></p>
+                <p>Phone: <a href="tel:+44800123456" class="text-[#00b4d8] hover:underline">+44 800 123 456</a></p>
+            </div>
+            <div class="footer-section">
+                <h4 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">Follow Us</h4>
+                <a href="https://www.facebook.com" class="block text-[#00b4d8] hover:underline">Facebook</a>
+                <a href="https://www.twitter.com" class="block text-[#00b4d8] hover:underline">Twitter</a>
+                <a href="https://www.linkedin.com" class="block text-[#00b4d8] hover:underline">LinkedIn</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 Credibe. All rights reserved. | <a href="privacy.html" class="text-[#00b4d8] hover:underline">Privacy Policy</a> | <a href="terms.html" class="text-[#00b4d8] hover:underline">Terms</a></p>
+        </div>
+    </footer>
+
+    <!-- Live Chat -->
+    <div class="live-chat fixed bottom-4 right-4" id="liveChat">
+        <button class="chat-toggle" onclick="toggleChat()">💬 Live Chat</button>
+        <div class="chat-box" id="chatBox">
+            <p class="text-[#bbb] text-sm">Welcome to Credibe Chat! How can we assist you today?</p>
+            <input type="text" placeholder="Type your message..." class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-3 py-2 text-sm mt-2">
+            <button class="chat-send mt-2">Send</button>
+        </div>
+    </div>
+
+    <!-- Swiper.js Script -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="Homepage.js"></script>
+</body>
+</html>

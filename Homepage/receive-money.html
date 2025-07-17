@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>📥 Receive Money - Credibe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .gradient-border {
+            border: 2px solid transparent;
+            background: linear-gradient(45deg, #00b4d8, #00d4ff, #00b4d8) border-box;
+            background-size: 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+        .gradient-border:hover { background: linear-gradient(45deg, #00d4ff, #00b4d8, #00d4ff) border-box; }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .progress-bar {
+            background: linear-gradient(to right, #00b4d8 50%, #444 50%);
+            background-size: 200% 100%;
+            animation: progress 2s linear infinite;
+        }
+        @keyframes progress {
+            0% { background-position: 100% 0; }
+            100% { background-position: 0 0; }
+        }
+    </style>
+</head>
+<body class="bg-[#1a1a1a] text-[#e0e0e0] min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-[#1f2937] p-4 sm:p-6 shadow-md">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                <span>📥 Receive Money</span>
+            </h1>
+            <a href="dashboard.html" class="text-[#00b4d8] hover:underline text-sm sm:text-base">Back to Dashboard</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-2xl mx-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
+        <!-- IBAN Display Section -->
+        <div class="bg-[#1f2937] text-[#e0e0e0] p-4 sm:p-6 rounded-xl shadow-md">
+            <h3 class="text-lg sm:text-xl font-bold mb-2">Your Bank Transfer Details</h3>
+            <p class="text-[#bbb] text-sm mb-3">Share these details to receive funds into your wallet.</p>
+            <div class="bg-[#1a1a1a]/50 p-3 rounded-lg font-mono tracking-wider text-base sm:text-lg flex items-center justify-between">
+                <span id="iban" class="text-[#00b4d8]">DE89370400440512345678</span>
+                <button id="copy-iban" class="bg-[#00b4d8] text-white text-sm px-3 py-1 rounded-lg hover:bg-[#00b4d8]/90 transition-all gradient-border">Copy IBAN</button>
+            </div>
+            <p class="text-yellow-400 text-sm mt-2">Make sure the sender adds your <strong>email or username</strong> as payment reference.</p>
+        </div>
+
+        <!-- Instructions to Sender -->
+        <div class="bg-[#1f2937] p-4 sm:p-6 rounded-xl shadow-md text-[#e0e0e0]">
+            <h4 class="text-base sm:text-lg font-semibold mb-2">Instructions for the Sender</h4>
+            <ul class="text-[#bbb] text-sm list-disc list-inside space-y-1">
+                <li>Transfer funds via SEPA or international bank transfer</li>
+                <li>Use the IBAN above</li>
+                <li>Include <strong>your email or username</strong> in the reference field</li>
+                <li>Funds will appear within 24 hours after verification</li>
+            </ul>
+        </div>
+
+        <!-- Status Info (Trust Builder) -->
+        <div class="bg-[#2a3b4c] border-l-4 border-[#00b4d8] p-4 text-[#e0e0e0] text-sm rounded-lg">
+            <p>✅ Your account is enabled to receive third-party bank payments.</p>
+            <p>🔒 All transactions are verified and protected by Credibe's security team.</p>
+        </div>
+
+        <!-- Optional: Awaiting Transfer Progress Bar -->
+        <div class="bg-[#1f2937] p-4 sm:p-6 rounded-xl shadow-md text-[#e0e0e0]">
+            <h4 class="text-base sm:text-lg font-semibold mb-2">Transfer Status</h4>
+            <p class="text-[#bbb] text-sm mb-2">Awaiting incoming transfer...</p>
+            <div class="w-full bg-[#444] h-2 rounded-full overflow-hidden">
+                <div class="progress-bar h-full w-1/2 rounded-full"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

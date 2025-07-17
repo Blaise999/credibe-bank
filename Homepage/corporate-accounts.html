@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Manage your business finances with Credibe’s corporate accounts.">
+    <title>Corporate Accounts - Credibe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 180, 216, 0.3);
+        }
+      .gradient-text {
+    background: linear-gradient(90deg, #00b4d8, #00d4ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent; /* Required for Chrome/Safari */
+    background-clip: text;                /* Optional fallback */
+    color: transparent;                   /* Required for consistent fallback */
+    display: inline-block;                /* Helps on inline elements */
+}
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+ <!-- Simplified Header -->
+<header class="w-full fixed top-0 z-50 bg-[#2d2d2d]/80 backdrop-blur-md shadow-lg px-4 sm:px-8 py-4 flex items-center justify-between">
+  <!-- Logo + Name -->
+  <div class="flex items-center text-2xl sm:text-3xl font-bold text-[#00b4d8]">
+    <span class="text-3xl mr-2">🏦</span>
+    <span>Credibe</span>
+  </div>
+
+  <!-- Login Button -->
+  <a href="login.html" class="px-4 py-2 text-sm sm:text-base rounded-full bg-[#00b4d8] hover:bg-[#0096b2] transition text-white font-semibold">
+    Login
+  </a>
+</header>
+
+    <!-- Mobile Drawer Menu -->
+    <div id="mobile-menu" class="fixed top-0 right-0 w-[85%] sm:w-[350px] h-full bg-[#2d2d2d] text-white shadow-xl z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto">
+        <div class="flex justify-between items-center px-4 py-4 border-b border-gray-700">
+            <div class="text-lg font-semibold text-white">Menu</div>
+            <button id="close-mobile-menu" class="text-white text-3xl font-bold">×</button>
+        </div>
+        <ul class="divide-y divide-gray-700">
+            <li class="group">
+                <button class="w-full text-left px-4 py-3 font-semibold text-[#00b4d8] dropdown-mobile-toggle">Personal Banking</button>
+                <ul class="dropdown-menu-mobile hidden px-6 pb-4 space-y-2">
+                    <li><a href="registration.html">Open an Account</a></li>
+                    <li><a href="accounts.html">Savings Accounts</a></li>
+                    <li><a href="accounts.html">Checking Accounts</a></li>
+                    <li><a href="cards.html">Debit Cards</a></li>
+                    <li><a href="dashboard.html">Mobile & Online Banking</a></li>
+                    <li><a href="login.html?from=loan">Personal Loans</a></li>
+                    <li><a href="dashboard.html#transfers-page">Money Transfers</a></li>
+                </ul>
+            </li>
+            <!-- Other mobile menu items unchanged -->
+        </ul>
+        <div class="p-4 mt-4">
+            <a href="registration.html" class="block text-center w-full py-3 rounded-full bg-[#00b4d8] text-white font-semibold hover:bg-[#009ec1] transition">Apply for an Account</a>
+        </div>
+    </div>
+
+  <!-- Hero Section -->
+<section class="relative min-h-[70vh] bg-cover bg-center flex items-center justify-center" style="background-image: url('gf.jpg')">
+    <div class="absolute inset-0 bg-black/50"></div>
+    <div class="relative z-10 text-center px-4 py-16 max-w-4xl mx-auto">
+        <h1 class="gradient-text text-4xl sm:text-5xl md:text-6xl font-bold mb-6">Corporate Accounts</h1>
+        <p class="text-lg sm:text-xl text-white mb-8">Streamline your business finances with tailored corporate solutions designed for efficiency and growth.</p>
+        <a href="registration.html" class="inline-block px-6 py-3 text-lg font-semibold text-white bg-gradient-to-r from-[#00b4d8] to-[#00d4ff] rounded-full hover:from-[#0096b2] hover:to-[#00b4d8] transition">Open Account</a>
+    </div>
+</section>
+
+    <!-- Features Section -->
+    <section class="py-20 px-4 sm:px-8 bg-[#1a1a1a]">
+        <h2 class="gradient-text text-3xl sm:text-4xl font-bold text-center mb-12">Corporate Banking Solutions</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-6xl mx-auto">
+            <div class="glass-card p-6 rounded-xl fade-in">
+                <img src="co.jpg" alt="Bulk Payments" class="w-full h-48 object-cover rounded-lg mb-4" loading="lazy">
+                <h3 class="text-2xl font-semibold text-[#00b4d8] mb-4">Bulk Payments</h3>
+                <p class="text-[#bbb] mb-6">Effortlessly process multiple payments for payroll and suppliers with a single click, saving time and reducing errors.</p>
+                <a href="registration.html" class="inline-block px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-[#00b4d8] to-[#00d4ff] rounded-full hover:from-[#0096b2] hover:to-[#00b4d8] transition">Learn More</a>
+            </div>
+            <div class="glass-card p-6 rounded-xl fade-in">
+                <img src="co2.jpg" alt="Multi-User Access" class="w-full h-48 object-cover rounded-lg mb-4" loading="lazy">
+                <h3 class="text-2xl font-semibold text-[#00b4d8] mb-4">Multi-User Access</h3>
+                <p class="text-[#bbb] mb-6">Securely manage accounts with customizable team permissions for seamless collaboration.</p>
+                <a href="registration.html" class="inline-block px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-[#00b4d8] to-[#00d4ff] rounded-full hover:from-[#0096b2] hover:to-[#00b4d8] transition">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="relative py-20 px-4 sm:px-8 bg-cover bg-center bg-fixed" style="background-image: url('https://images.unsplash.com/photo-1497366215005-1d2a6a3e8b9f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')">
+        <div class="absolute inset-0 bg-black/60"></div>
+        <div class="relative z-10 text-center max-w-6xl mx-auto">
+            <h2 class="gradient-text text-3xl sm:text-4xl font-bold mb-12">Why Choose Credibe for Business?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-card p-6 rounded-xl fade-in">
+                    <h3 class="text-xl font-semibold text-[#e0e0e0] mb-4">Scalable Solutions</h3>
+                    <p class="text-[#bbb]">Flexible accounts designed to grow with businesses of all sizes, from startups to enterprises.</p>
+                </div>
+                <div class="glass-card p-6 rounded-xl fade-in">
+                    <h3 class="text-xl font-semibold text-[#e0e0e0] mb-4">Real-Time Analytics</h3>
+                    <p class="text-[#bbb]">Monitor cash flow and financial performance with advanced, real-time reporting tools.</p>
+                </div>
+                <div class="glass-card p-6 rounded-xl fade-in">
+                    <h3 class="text-xl font-semibold text-[#e0e0e0] mb-4">Dedicated Support</h3>
+                    <p class="text-[#bbb]">Access 24/7 business banking support with a dedicated account manager.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonial Section -->
+    <section class="py-20 px-4 sm:px-8 bg-[#262626]">
+        <h2 class="gradient-text text-3xl sm:text-4xl font-bold text-center mb-12">Trusted by Businesses</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <div class="glass-card p-6 rounded-xl fade-in flex flex-col items-center">
+                <img src="D.jpg" alt="Customer" class="w-16 h-16 rounded-full mb-4">
+                <p class="text-[#bbb] mb-4 text-center">"Credibe’s corporate accounts simplified our payroll process, saving us hours every week."</p>
+                <p class="text-[#00b4d8] font-semibold">TechCorp</p>
+            </div>
+            <div class="glass-card p-6 rounded-xl fade-in flex flex-col items-center">
+                <img src="c.jpg" alt="Customer" class="w-16 h-16 rounded-full mb-4">
+                <p class="text-[#bbb] mb-4 text-center">"Multi-user access is a game-changer for our team’s financial operations."</p>
+                <p class="text-[#00b4d8] font-semibold">RetailPro</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer (Copied from Homepage.html) -->
+    <footer class="bg-[#2d2d2d] p-4 sm:p-6 text-center text-[#bbb] text-xs sm:text-sm">
+        <div class="footer-top max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-4">
+            <div class="footer-section">
+                <h4 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">Download App</h4>
+                <a href="https://www.apple.com/app-store/" class="block text-[#00b4d8] hover:underline">App Store</a>
+                <a href="https://play.google.com/store" class="block text-[#00b4d8] hover:underline">Google Play</a>
+            </div>
+            <div class="footer-section">
+                <h4 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">Contact</h4>
+                <p>Email: <a href="mailto:support@credibe.com" class="text-[#00b4d8] hover:underline">support@credibe.com</a></p>
+                <p>Phone: <a href="tel:+44800123456" class="text-[#00b4d8] hover:underline">+44 800 123 456</a></p>
+            </div>
+            <div class="footer-section">
+                <h4 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">Follow Us</h4>
+                <a href="https://www.facebook.com" class="block text-[#00b4d8] hover:underline">Facebook</a>
+                <a href="https://www.twitter.com" class="block text-[#00b4d8] hover:underline">Twitter</a>
+                <a href="https://www.linkedin.com" class="block text-[#00b4d8] hover:underline">LinkedIn</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 Credibe. All rights reserved. | <a href="privacy.html" class="text-[#00b4d8] hover:underline">Privacy Policy</a> | <a href="terms.html" class="text-[#00b4d8] hover:underline">Terms</a></p>
+        </div>
+    </footer>
+
+    <script src="Newpage.js"></script>
+    <script>
+        // Fade-in effect
+        const fadeIns = document.querySelectorAll('.fade-in');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry); // Stop observing once visible
+                }
+            });
+        }, { threshold: 0.1 });
+        fadeIns.forEach(el => observer.observe(el));
+
+        // Mobile menu toggle (from Homepage.js)
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const closeMenuBtn = document.getElementById('close-mobile-menu');
+
+        if (menuToggle && mobileMenu) {
+            menuToggle.addEventListener('click', () => {
+                mobileMenu.classList.remove('translate-x-full');
+                mobileMenu.classList.add('open');
+            });
+        }
+
+        if (closeMenuBtn && mobileMenu) {
+            closeMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.add('translate-x-full');
+                mobileMenu.classList.remove('open');
+                const dropdowns = mobileMenu.querySelectorAll('.dropdown-menu-mobile');
+                dropdowns.forEach((d) => {
+                    d.classList.add('hidden');
+                    d.classList.remove('block');
+                });
+            });
+        }
+
+        // Dropdown toggles (mobile)
+        const dropdownToggles = document.querySelectorAll('.dropdown-mobile-toggle');
+        dropdownToggles.forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                if (window.innerWidth < 768) {
+                    e.preventDefault();
+                    const dropdownMenu = toggle.nextElementSibling;
+                    document.querySelectorAll('.dropdown-menu-mobile').forEach(menu => {
+                        if (menu !== dropdownMenu) {
+                            menu.classList.add('hidden');
+                            menu.classList.remove('block');
+                        }
+                    });
+                    dropdownMenu.classList.toggle('hidden');
+                    dropdownMenu.classList.toggle('block');
+                }
+            });
+        });
+
+        // Auto reset on resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768 && mobileMenu) {
+                mobileMenu.classList.add('translate-x-full');
+                mobileMenu.classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html>

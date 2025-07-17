@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>💳 Add Money - Credibe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .gradient-border {
+            border: 2px solid transparent;
+            background: linear-gradient(45deg, #00b4d8, #00d4ff, #00b4d8) border-box;
+            background-size: 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+        .gradient-border:hover {
+            background: linear-gradient(45deg, #00d4ff, #00b4d8, #00d4ff) border-box;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body class="bg-[#1a1a1a] text-[#e0e0e0] min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-[#2d2d2d] p-4 text-center sticky top-0 z-50 flex justify-between items-center w-full">
+        <a href="./dashboard.html" class="text-lg sm:text-xl font-semibold text-[#00b4d8] flex items-center gap-2">
+            <span>← Back to Dashboard</span>
+            <span class="text-2xl">💰</span>
+        </a>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 sm:p-6 w-full flex justify-center">
+        <div class="w-full max-w-lg space-y-4 sm:space-y-6">
+            <!-- Page Title -->
+            <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-4 sm:mb-6">💳 Add Money to Your Wallet</h1>
+
+            <!-- Section 1: Fake IBAN -->
+            <div class="bg-[#1f2937] shadow-md rounded-xl p-4 sm:p-6">
+                <h2 class="text-xl sm:text-2xl font-semibold text-[#e0e0e0] mb-1 sm:mb-2">Your Bank Transfer Details</h2>
+                <p class="text-[#bbb] text-sm sm:text-base">Send from your other bank account</p>
+                <div class="mt-4 bg-[#2d2d2d] rounded-lg p-4 font-mono text-lg sm:text-xl text-[#e0e0e0] tracking-widest">
+                    IBAN: DE89 3704 0044 05<span id="user-id" class="text-[#00b4d8]"></span>
+                </div>
+                <p class="text-sm sm:text-base text-[#bbb] mt-2">⚠️ Add your <strong>username or email</strong> as payment reference</p>
+                <p class="text-sm sm:text-base text-[#bbb] mt-2">Note: IBAN is for identification only. Funds are routed via licensed payment partners.</p>
+            </div>
+
+            <!-- Section 2: Stripe Instruction Block -->
+            <div class="bg-[#1f2937]/50 border border-[#00b4d8]/20 rounded-xl p-4 sm:p-5">
+                <h3 class="text-base sm:text-lg font-bold text-[#e0e0e0] mb-1 sm:mb-2">Prefer Card or Instant Transfer?</h3>
+                <p class="text-sm sm:text-base text-[#bbb] mb-3">Use our secured Stripe link to fund your wallet instantly:</p>
+                <a href="https://your-stripe-checkout-link.com" class="inline-block bg-[#00b4d8] hover:bg-[#00b4d8]/90 text-white text-sm sm:text-base px-4 py-2 rounded-lg gradient-border">
+                    Fund with Stripe →
+                </a>
+            </div>
+
+            <!-- Section 3: How It Works -->
+            <div class="bg-[#1f2937] shadow-sm rounded-xl p-4 sm:p-5">
+                <h4 class="text-base sm:text-lg font-semibold text-[#e0e0e0] mb-2">How It Works</h4>
+                <ul class="list-disc list-inside text-sm sm:text-base text-[#bbb]">
+                    <li>Send money to the IBAN shown above</li>
+                    <li>Add your email or username as the transfer reference</li>
+                    <li>Once we confirm your payment, your balance will update</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#2d2d2d] p-2 sm:p-4 text-center text-[#bbb] text-xs sm:text-sm w-full mt-auto">
+        © 2025 Credibe. All rights reserved. | <a href="#" class="text-[#00b4d8] hover:underline">Privacy</a> | <a href="#" class="text-[#00b4d8] hover:underline">Terms</a> | <a href="#" class="text-[#00b4d8] hover:underline">Support</a>
+    </footer>
+
+    <script>
+        // Generate Fake IBAN
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mock userId (replace with actual user ID from your auth system)
+            const userId = '12345678'; // Example user ID
+            const iban = `DE89 3704 0044 05${userId.padStart(8, '0')}`;
+            document.getElementById('user-id').textContent = userId.padStart(8, '0');
+            console.log(`Generated IBAN: ${iban}`);
+        });
+    </script>
+</body>
+</html>

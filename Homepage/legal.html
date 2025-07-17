@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explore Credibe’s commitment to legal and compliance standards.">
+    <title>Legal & Compliance - Credibe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'credibe-blue': '#00b4d8',
+                        'credibe-dark': '#1a1a1a',
+                    },
+                    animation: {
+                        'vault-glow': 'vaultGlow 4s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        vaultGlow: {
+                            '0%, 100%': { boxShadow: '0 0 10px rgba(0, 180, 216, 0.5)' },
+                            '50%': { boxShadow: '0 0 20px rgba(0, 180, 216, 0.8)' },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-credibe-dark text-gray-200 font-poppins">
+    <!-- Header -->
+    <header class="w-full fixed top-0 z-50 bg-[#2d2d2d]/80 backdrop-blur-md shadow-lg px-4 sm:px-8 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+            <span class="text-2xl">🏦</span>
+            <span class="text-xl sm:text-2xl font-bold text-credibe-blue">Credibe</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <a href="login.html" class="bg-credibe-blue text-white px-4 py-2 rounded-full font-bold hover:bg-[#0096b2] transition-all sm:flex">Login</a>
+            <button class="menu-btn text-2xl sm:hidden cursor-pointer">☰</button>
+        </div>
+        <nav id="mobile-menu" class="hidden absolute top-16 left-0 w-full bg-[#2d2d2d] p-4 shadow-lg sm:hidden">
+            <ul class="flex flex-col space-y-2">
+                <li><a href="login.html" class="block text-gray-200 hover:text-credibe-blue">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+        body {
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+    </style>
+
+    <!-- Hero Section: Digital Vault -->
+    <section class="relative min-h-[80vh] bg-cover bg-center flex items-center justify-center" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')">
+        <div class="absolute inset-0 bg-black/70"></div>
+        <div class="relative z-10 text-center px-4 py-16 max-w-4xl mx-auto">
+            <h1 class="bg-gradient-to-r from-credibe-blue to-[#00d4ff] bg-clip-text text-transparent text-5xl sm:text-6xl font-bold mb-6">Legal & Compliance Vault</h1>
+            <p class="text-lg sm:text-2xl text-white mb-8">Discover Credibe’s commitment to transparency and regulatory excellence.</p>
+        </div>
+    </section>
+
+    <!-- Compliance Timeline -->
+    <section class="py-20 px-4 sm:px-8 bg-credibe-dark">
+        <h2 class="bg-gradient-to-r from-credibe-blue to-[#00d4ff] bg-clip-text text-transparent text-3xl sm:text-4xl font-bold text-center mb-12">Our Compliance Journey</h2>
+        <div class="max-w-3xl mx-auto space-y-8">
+            <div class="timeline-item flex items-start fade-in">
+                <div class="timeline-circle bg-credibe-blue w-8 h-8 rounded-full mr-4 mt-2 border-2 border-[#00d4ff] animate-pulse"></div>
+                <div class="timeline-content bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-lg flex-1">
+                    <h3 class="text-xl font-semibold text-credibe-blue mb-2">GDPR Compliance</h3>
+                    <p class="text-gray-400">Fully compliant with EU data protection laws since 2018.</p>
+                </div>
+            </div>
+            <div class="timeline-item flex items-start fade-in">
+                <div class="timeline-circle bg-credibe-blue w-8 h-8 rounded-full mr-4 mt-2 border-2 border-[#00d4ff] animate-pulse"></div>
+                <div class="timeline-content bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-lg flex-1">
+                    <h3 class="text-xl font-semibold text-credibe-blue mb-2">Anti-Money Laundering</h3>
+                    <p class="text-gray-400">Robust AML policies enforced to ensure financial integrity.</p>
+                </div>
+            </div>
+            <div class="timeline-item flex items-start fade-in">
+                <div class="timeline-circle bg-credibe-blue w-8 h-8 rounded-full mr-4 mt-2 border-2 border-[#00d4ff] animate-pulse"></div>
+                <div class="timeline-content bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-lg flex-1">
+                    <h3 class="text-xl font-semibold text-credibe-blue mb-2">Regulatory Audits</h3>
+                    <p class="text-gray-400">Annual audits by EU regulators to maintain transparency.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Compliance Details -->
+    <section class="py-20 px-4 sm:px-8 bg-[#2d2d2d]">
+        <h2 class="bg-gradient-to-r from-credibe-blue to-[#00d4ff] bg-clip-text text-transparent text-3xl sm:text-4xl font-bold text-center mb-12">Our Commitments</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div class="gradient-border bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-xl fade-in animate-vault-glow">
+                <h3 class="text-xl font-semibold text-credibe-blue mb-4">Data Privacy</h3>
+                <p class="text-gray-400">Your data is protected with end-to-end encryption and strict access controls.</p>
+            </div>
+            <div class="gradient-border bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-xl fade-in animate-vault-glow">
+                <h3 class="text-xl font-semibold text-credibe-blue mb-4">Ethical Banking</h3>
+                <p class="text-gray-400">We adhere to ethical standards, ensuring fair and transparent practices.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#2d2d2d] py-12 px-4 sm:px-8 text-center text-gray-400 text-sm">
+        <div class="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6 mb-4">
+            <div>
+                <h4 class="text-gray-200 font-semibold text-base mb-2">Download App</h4>
+                <button class="block text-credibe-blue hover:underline">App Store</button>
+                <button class="block text-credibe-blue hover:underline">Google Play</button>
+            </div>
+            <div>
+                <h4 class="text-gray-200 font-semibold text-base mb-2">Contact</h4>
+                <p>Email: <button class="text-credibe-blue hover:underline">support@credibe.com</button></p>
+                <p>Phone: <button class="text-credibe-blue hover:underline">+44 800 123 456</button></p>
+            </div>
+            <div>
+                <h4 class="text-gray-200 font-semibold text-base mb-2">Follow Us</h4>
+                <button class="block text-credibe-blue hover:underline">Facebook</button>
+                <button class="block text-credibe-blue hover:underline">Twitter</button>
+                <button class="block text-credibe-blue hover:underline">LinkedIn</button>
+            </div>
+        </div>
+        <p>© 2025 Credibe. All rights reserved. | <button class="text-credibe-blue hover:underline">Privacy Policy</button> | <button class="text-credibe-blue hover:underline">Terms</button></p>
+    </footer>
+
+    <script src="Newpage.js"></script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Get comprehensive support for all your banking needs with Credibe.">
+    <title>Support - Credibe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
+</head>
+<body class="bg-[#1a1a1a] text-[#e0e0e0] font-poppins">
+    <!-- Header (Copied from Homepage.html) -->
+    <header class="w-full fixed top-0 z-50 bg-[#2d2d2d]/80 backdrop-blur-md shadow-lg px-4 sm:px-8 py-4 flex items-center justify-between">
+        <div class="logo flex items-center text-2xl sm:text-3xl font-bold text-[#00b4d8]">
+            <span class="mr-2"></span>
+             <span class="text-2xl">🏦</span>
+            <span class="logo-text md:inline">Credibe</span>
+        </div>
+        <nav class="flex items-center">
+            <ul class="hidden md:flex items-center justify-between max-w-7xl w-full space-x-10">
+                <!-- Other dropdowns unchanged -->
+            </ul>
+            <div class="auth-buttons flex items-center gap-x-2 md:gap-x-4">
+                <a href="login.html" class="btn secondary px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-full bg-[#00b4d8] hover:bg-[#0096b2] transition md:hidden">Login</a>
+                <a href="login.html" class="btn secondary px-3 sm:px-4 py-1 sm:py-2 text-sm sm:text-base rounded-full bg-[#00b4d8] hover:bg-[#0096b2] transition hidden md:flex">Login</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mobile Drawer Menu -->
+    <div id="mobile-menu" class="fixed top-0 right-0 w-[85%] sm:w-[350px] h-full bg-[#2d2d2d] text-white shadow-xl z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto">
+        <div class="flex justify-between items-center px-4 py-4 border-b border-gray-700">
+            <div class="text-lg font-semibold text-white">Menu</div>
+            <button id="close-mobile-menu" class="text-white text-3xl font-bold">×</button>
+        </div>
+        <ul class="divide-y divide-gray-700">
+            <li class="group">
+                <button class="w-full text-left px-4 py-3 font-semibold text-[#00b4d8] dropdown-mobile-toggle">Personal Banking</button>
+                <ul class="dropdown-menu-mobile hidden px-6 pb-4 space-y-2">
+                    <li><a href="registration.html">Open an Account</a></li>
+                    <li><a href="accounts.html">Savings Accounts</a></li>
+                    <li><a href="accounts.html">Checking Accounts</a></li>
+                    <li><a href="cards.html">Debit Cards</a></li>
+                    <li><a href="dashboard.html">Mobile & Online Banking</a></li>
+                    <li><a href="login.html?from=loan">Personal Loans</a></li>
+                    <li><a href="dashboard.html#transfers-page">Money Transfers</a></li>
+                </ul>
+            </li>
+            <!-- Other mobile menu items unchanged -->
+        </ul>
+        <div class="p-4 mt-4">
+            <a href="registration.html" class="block text-center w-full py-3 rounded-full bg-[#00b4d8] text-white font-semibold hover:bg-[#009ec1] transition">Apply for an Account</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-[80vh] bg-cover bg-center flex items-center justify-center" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')">
+        <div class="absolute inset-0 bg-black/60"></div>
+        <div class="relative z-10 text-center px-4 py-16 max-w-4xl mx-auto">
+            <div class="relative inline-block mb-8">
+                <div class="absolute inset-0 bg-gradient-to-r from-[#00b4d8] to-[#00d4ff] rounded-full animate-pulse opacity-50 blur-xl"></div>
+                <h1 class="relative text-4xl sm:text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#00b4d8] to-[#00d4ff]">
+                    Your Support Hub
+                </h1>
+            </div>
+            <p class="text-lg sm:text-xl text-white mb-8">Access a world of support tailored to your banking needs with Credibe.</p>
+            <a href="#support-options" class="inline-block px-6 py-3 text-lg font-semibold text-white bg-gradient-to-r from-[#00b4d8] to-[#00d4ff] rounded-full hover:from-[#0096b2] hover:to-[#00b4d8] transition">Get Help Now</a>
+        </div>
+    </section>
+
+    <!-- Support Options Section -->
+    <section id="support-options" class="py-20 px-4 sm:px-8 bg-[#1a1a1a]">
+        <h2 class="text-3xl sm:text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-[#00b4d8] to-[#00d4ff] mb-12">Explore Support Options</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            <div class="tilt-card bg-[#2d2d2d]/50 backdrop-blur-md border border-[#00b4d8]/20 rounded-xl p-6 fade-in relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-[#00b4d8]/20 to-transparent opacity-0 hover:opacity-100 transition-opacity"></div>
+                <h3 class="text-xl font-semibold text-[#00b4d8] mb-4">Live Chat</h3>
+                <p class="text-[#bbb] mb-6">Connect instantly with our support team for real-time assistance.</p>
+                <a href="live-chat.html" class="inline-block px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-[#00b4d8] to-[#00d4ff] rounded-full hover:from-[#0096b2] hover:to-[#00b4d8] transition">Start Chat</a>
+            </div>
+            <div class="tilt-card bg-[#2d2d2d]/50 backdrop-blur-md border border-[#00b4d8]/20 rounded-xl p-6 fade-in relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-[#00b4d8]/20 to-transparent opacity-0 hover:opacity-100 transition-opacity"></div>
+                <h3 class="text-xl font-semibold text-[#00b4d8] mb-4">Help Center</h3>
+                <p class="text-[#bbb] mb-6">Browse articles and guides for self-service solutions.</p>
+                <a href="help-center.html" class="inline-block px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-[#00b4d8] to-[#00d4ff] rounded-full hover:from-[#0096b2] hover:to-[#00b4d8] transition">Visit Help Center</a>
+            </div>
+            <div class="tilt-card bg-[#2d2d2d]/50 backdrop-blur-md border border-[#00b4d8]/20 rounded-xl p-6 fade-in relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-[#00b4d8]/20 to-transparent opacity-0 hover:opacity-100 transition-opacity"></div>
+                <h3 class="text-xl font-semibold text-[#00b4d8] mb-4">Contact Us</h3>
+                <p class="text-[#bbb] mb-6">Reach out via phone, email, or form for personalized support.</p>
+                <a href="contact-us.html" class="inline-block px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-[#00b4d8] to-[#00d4ff] rounded-full hover:from-[#0096b2] hover:to-[#00b4d8] transition">Contact Now</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#2d2d2d] p-4 sm:p-6 text-center text-[#bbb] text-xs sm:text-sm">
+        <div class="footer-top max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-4">
+            <div class="footer-section">
+                <h4 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">Download App</h4>
+                <a href="https://www.apple.com/app-store/" class="block text-[#00b4d8] hover:underline">App Store</a>
+                <a href="https://play.google.com/store" class="block text-[#00b4d8] hover:underline">Google Play</a>
+            </div>
+            <div class="footer-section">
+                <h4 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">Contact</h4>
+                <p>Email: <a href="mailto:support@credibe.com" class="text-[#00b4d8] hover:underline">support@credibe.com</a></p>
+                <p>Phone: <a href="tel:+44800123456" class="text-[#00b4d8] hover:underline">+44 800 123 456</a></p>
+            </div>
+            <div class="footer-section">
+                <h4 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">Follow Us</h4>
+                <a href="https://www.facebook.com" class="block text-[#00b4d8] hover:underline">Facebook</a>
+                <a href="https://www.twitter.com" class="block text-[#00b4d8] hover:underline">Twitter</a>
+                <a href="https://www.linkedin.com" class="block text-[#00b4d8] hover:underline">LinkedIn</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 Credibe. All rights reserved. | <a href="privacy.html" class="text-[#00b4d8] hover:underline">Privacy Policy</a> | <a href="terms.html" class="text-[#00b4d8] hover:underline">Terms</a></p>
+        </div>
+    </footer>
+
+    <script src="Newpage.js"></script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🏦 Credibe - Transfer Pending</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .gradient-border {
+            border: 2px solid transparent;
+            background: linear-gradient(45deg, #00b4d8, #00d4ff, #00b4d8) border-box;
+            background-size: 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+        .gradient-border:hover {
+            background: linear-gradient(45deg, #00d4ff, #00b4d8, #00d4ff) border-box;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-[#1a1a1a] text-[#e0e0e0] min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-[#2d2d2d] p-4 text-center sticky top-0 z-50 flex justify-between items-center w-full">
+        <a href="dashboard.html" class="text-3xl font-bold text-[#00b4d8]">🏦 Credibe</a>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 flex justify-center items-center">
+        <div class="bg-[#1f2937]/50 backdrop-blur-md p-6 rounded-2xl drop-shadow-md max-w-md w-full fade-in" id="pending-container">
+            <h1 class="text-2xl font-bold text-[#e0e0e0] mb-4">Transfer Pending</h1>
+            <p class="text-[#bbb] mb-4">Your transfer has been submitted and is awaiting approval. You will be notified once it is processed.</p>
+            <div class="space-y-4">
+                <div>
+                    <span class="text-[#00b4d8] font-semibold">Recipient Name:</span>
+                    <span id="recipient-name" class="ml-2">Loading...</span>
+                </div>
+                <div>
+                    <span class="text-[#00b4d8] font-semibold">Recipient IBAN:</span>
+                    <span id="recipient-iban" class="ml-2">Loading...</span>
+                </div>
+                <div>
+                    <span class="text-[#00b4d8] font-semibold">Amount:</span>
+                    <span id="amount" class="ml-2">Loading...</span>
+                </div>
+                <div>
+                    <span class="text-[#00b4d8] font-semibold">Purpose:</span>
+                    <span id="purpose" class="ml-2">Loading...</span>
+                </div>
+                <div>
+                    <span class="text-[#00b4d8] font-semibold">Reference:</span>
+                    <span id="reference" class="ml-2">None</span>
+                </div>
+                <div>
+                    <span class="text-[#00b4d8] font-semibold">Transfer ID:</span>
+                    <span id="transfer-id" class="ml-2">Loading...</span>
+                </div>
+            </div>
+            <a href="dashboard.html" class="mt-6 block w-full bg-[#00b4d8] text-white rounded-lg px-4 py-2 text-base hover:bg-[#00b4d8]/90 transition-all text-center gradient-border">Return to Dashboard</a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#2d2d2d] p-4 text-center text-[#bbb] text-sm w-full mt-auto">
+        © 2025 Credibe. All rights reserved. | <a href="#" class="text-[#00b4d8] hover:underline">Privacy</a> | <a href="#" class="text-[#00b4d8] hover:underline">Terms</a> | <a href="#" class="text-[#00b4d8] hover:underline">Support</a>
+    </footer>
+
+    <script>
+        // Check for user token
+        const token = localStorage.getItem("userToken");
+        if (!token) {
+            alert("You must be logged in to view this page.");
+            window.location.href = "login.html";
+        }
+
+        // Load transfer details from localStorage
+        document.addEventListener("DOMContentLoaded", () => {
+            const pendingTransfer = JSON.parse(localStorage.getItem('pendingTransfer') || '{}');
+            if (!pendingTransfer.transferId) {
+                alert('No pending transfer found. Redirecting to dashboard.');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            document.getElementById('recipient-name').textContent = pendingTransfer.recipientName || 'N/A';
+            document.getElementById('recipient-iban').textContent = pendingTransfer.recipientIban || 'N/A';
+            document.getElementById('amount').textContent = `€${parseFloat(pendingTransfer.amount || 0).toFixed(2)}`;
+            document.getElementById('purpose').textContent = pendingTransfer.purpose || 'Transfer';
+            document.getElementById('reference').textContent = pendingTransfer.reference || 'None';
+            document.getElementById('transfer-id').textContent = pendingTransfer.transferId || 'N/A';
+
+            // Apply fade-in effect
+            const container = document.getElementById('pending-container');
+            container.classList.add('visible');
+
+            // Clear pending transfer from localStorage to prevent reuse
+            localStorage.removeItem('pendingTransfer');
+        });
+    </script>
+</body>
+</html>

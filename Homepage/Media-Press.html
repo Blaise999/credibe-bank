@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dive into Credibe’s retro-futuristic press arcade.">
+    <title>Media & Press - Credibe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'credibe-blue': '#00b4d8',
+                        'credibe-dark': '#1a1a1a',
+                    },
+                    animation: {
+                        'glitch': 'glitch 0.3s ease-in-out infinite',
+                        'neon-flicker': 'neonFlicker 2s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        glitch: {
+                            '0%': { transform: 'translate(0)' },
+                            '20%': { transform: 'translate(-2px, 2px)' },
+                            '40%': { transform: 'translate(2px, -2px)' },
+                            '60%': { transform: 'translate(-1px, 1px)' },
+                            '80%': { transform: 'translate(1px, -1px)' },
+                            '100%': { transform: 'translate(0)' },
+                        },
+                        neonFlicker: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0.7' },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-credibe-dark text-gray-200 font-poppins">
+    <!-- Header -->
+    <header class="w-full fixed top-0 z-50 bg-[#2d2d2d]/80 backdrop-blur-md shadow-lg px-4 sm:px-8 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+            <span class="text-2xl">🏦</span>
+            <span class="text-xl sm:text-2xl font-bold text-credibe-blue">Credibe</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <a href="login.html" class="bg-credibe-blue text-white px-4 py-2 rounded-full font-bold hover:bg-[#0096b2] transition-all sm:flex">Login</a>
+            <button class="menu-btn text-2xl sm:hidden cursor-pointer">☰</button>
+        </div>
+        <nav id="mobile-menu" class="hidden absolute top-16 left-0 w-full bg-[#2d2d2d] p-4 shadow-lg sm:hidden">
+            <ul class="flex flex-col space-y-2">
+                <li><a href="login.html" class="block text-gray-200 hover:text-credibe-blue">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+        body {
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+    </style>
+
+    <!-- Hero Section: Cyber Arcade -->
+    <section class="relative min-h-[90vh] flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1546484396-fb3fc3a8d1e3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center">
+        <div class="absolute inset-0 bg-black/70 animate-neon-flicker"></div>
+        <div class="relative z-10 text-center px-4 py-16 max-w-4xl mx-auto">
+            <h1 class="bg-gradient-to-r from-credibe-blue to-[#00d4ff] bg-clip-text text-transparent text-5xl sm:text-7xl font-bold mb-6 animate-glitch">Press Arcade</h1>
+            <p class="text-lg sm:text-2xl text-white mb-8">Step into our neon-lit newsroom for the latest Credibe updates.</p>
+        </div>
+    </section>
+
+    <!-- Press Releases: Pixelated Cards -->
+    <section class="py-20 px-4 sm:px-8 bg-credibe-dark relative">
+        <div class="absolute inset-0 bg-gradient-to-br from-credibe-blue/20 to-[#00d4ff]/20 opacity-50 animate-neon-flicker"></div>
+        <h2 class="bg-gradient-to-r from-credibe-blue to-[#00d4ff] bg-clip-text text-transparent text-3xl sm:text-4xl font-bold text-center mb-12 relative z-10">Latest News Blips</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto relative z-10">
+            <div class="gradient-border bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-lg fade-in group hover:animate-glitch">
+                <h3 class="text-xl font-semibold text-credibe-blue mb-4 pulse-badge">Mobile App 2.0</h3>
+                <p class="text-gray-400 mb-4">Launched with AI budgeting and instant transfers, now live on all platforms.</p>
+                <p class="text-gray-500 text-sm">March 15, 2025</p>
+            </div>
+            <div class="gradient-border bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-lg fade-in group hover:animate-glitch">
+                <h3 class="text-xl font-semibold text-credibe-blue mb-4 pulse-badge">Top Bank Award</h3>
+                <p class="text-gray-400 mb-4">Credibe named 2025’s most innovative bank by Finance Weekly.</p>
+                <p class="text-gray-500 text-sm">February 10, 2025</p>
+            </div>
+            <div class="gradient-border bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-lg fade-in group hover:animate-glitch">
+                <h3 class="text-xl font-semibold text-credibe-blue mb-4 pulse-badge">Eco Banking</h3>
+                <p class="text-gray-400 mb-4">Partnered with GreenTech to fund sustainable projects across Europe.</p>
+                <p class="text-gray-500 text-sm">January 20, 2025</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#2d2d2d] py-12 px-4 sm:px-8 text-center text-gray-400 text-sm">
+        <div class="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6 mb-4">
+            <div>
+                <h4 class="text-gray-200 font-semibold text-base mb-2">Download App</h4>
+                <button class="block text-credibe-blue hover:underline">App Store</button>
+                <button class="block text-credibe-blue hover:underline">Google Play</button>
+            </div>
+            <div>
+                <h4 class="text-gray-200 font-semibold text-base mb-2">Contact</h4>
+                <p>Email: <button class="text-credibe-blue hover:underline">support@credibe.com</button></p>
+                <p>Phone: <button class="text-credibe-blue hover:underline">+44 800 123 456</button></p>
+            </div>
+            <div>
+                <h4 class="text-gray-200 font-semibold text-base mb-2">Follow Us</h4>
+                <button class="block text-credibe-blue hover:underline">Facebook</button>
+                <button class="block text-credibe-blue hover:underline">Twitter</button>
+                <button class="block text-credibe-blue hover:underline">LinkedIn</button>
+            </div>
+        </div>
+        <p>© 2025 Credibe. All rights reserved. | <button class="text-credibe-blue hover:underline">Privacy Policy</button> | <button class="text-credibe-blue hover:underline">Terms</button></p>
+    </footer>
+
+    <script src="Newpage.js"></script>
+</body>
+</html>

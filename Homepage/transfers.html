@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Send money globally with Credibe’s fast and secure transfer services.">
+    <title>Money Transfers - Credibe</title>
+    <link rel="stylesheet" href="../Homepage.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="bg-[#2d2d2d] p-4 sm:p-6 sticky top-0 z-50 flex items-center justify-between">
+        <!-- Copy from savings.html -->
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero relative w-full min-h-[60vh] bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')">
+        <div class="overlay"></div>
+        <div class="content flex flex-col items-center justify-center h-full text-center px-4 py-16">
+            <h1 class="gradient-text text-4xl sm:text-5xl md:text-6xl font-bold mb-6">Global Money Transfers</h1>
+            <p class="text-lg sm:text-xl text-white mb-8 max-w-3xl">Send money anywhere with zero fees and real-time exchange rates.</p>
+            <a href="#transfer-form" class="btn primary text-lg">Start Transfer</a>
+        </div>
+    </section>
+
+    <!-- Transfer Form -->
+    <section class="transfers py-20 px-4 sm:px-8">
+        <h2 class="gradient-text text-4xl font-bold text-center mb-12">Send Money Now</h2>
+        <div class="max-w-4xl mx-auto glass-card p-8 fade-in">
+            <form id="transfer-form" class="space-y-6">
+                <div>
+                    <label class="block text-[#e0e0e0] mb-2">Recipient Account</label>
+                    <input type="text" placeholder="Enter IBAN or Account Number" class="w-full p-3 rounded" required>
+                </div>
+                <div>
+                    <label class="block text-[#e0e0e0] mb-2">Amount</label>
+                    <input type="number" placeholder="0.00" class="w-full p-3 rounded" required>
+                </div>
+                <div>
+                    <label class="block text-[#e0e0e0] mb-2">Currency</label>
+                    <select class="w-full p-3 rounded">
+                        <option>EUR</option>
+                        <option>USD</option>
+                        <option>GBP</option>
+                        <option>NGN</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[#e0e0e0] mb-2">Message (Optional)</label>
+                    <textarea class="w-full p-3 rounded" rows="4" placeholder="Add a note"></textarea>
+                </div>
+                <button type="submit" class="btn primary w-full p-3 text-lg">Send Money</button>
+            </form>
+            <p class="text-[#bbb] mt-4 text-center">Zero fees on international transfers with real-time FX rates.</p>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="parallax-section py-20 px-4 sm:px-8" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')">
+        <div class="overlay"></div>
+        <div class="relative z-10 text-center">
+            <h2 class="gradient-text text-4xl font-bold mb-12">Why Transfer with Credibe?</h2>
+            <div class="grid max-w-6xl mx-auto">
+                <div class="glass-card p-6 fade-in">
+                    <h3 class="text-xl font-semibold text-[#e0e0e0] mb-4">Zero Fees</h3>
+                    <p class="text-[#bbb]">No hidden costs for international transfers.</p>
+                </div>
+                <div class="glass-card p-6 fade-in">
+                    <h3 class="text-xl font-semibold text-[#e0e0e0] mb-4">Real-Time Rates</h3>
+                    <p class="text-[#bbb]">Get the best exchange rates instantly.</p>
+                </div>
+                <div class="glass-card p-6 fade-in">
+                    <h3 class="text-xl font-semibold text-[#e0e0e0] mb-4">Secure</h3>
+                    <p class="text-[#bbb]">Encrypted transfers with IBAN/SWIFT support.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats py-20 px-4 sm:px-8 bg-[#262626] text-center">
+        <h2 class="gradient-text text-4xl font-bold mb-12">Transfer Stats</h2>
+        <div class="grid max-w-6xl mx-auto">
+            <div class="glass-card p-6 fade-in">
+                <h3 class="text-3xl font-bold text-[#00b4d8] mb-2">1M+</h3>
+                <p class="text-[#bbb]">Transfers Processed</p>
+            </div>
+            <div class="glass-card p-6 fade-in">
+                <h3 class="text-3xl font-bold text-[#00b4d8] mb-2">180+</h3>
+                <p class="text-[#bbb]">Countries Supported</p>
+            </div>
+            <div class="glass-card p-6 fade-in">
+                <h3 class="text-3xl font-bold text-[#00b4d8] mb-2">24/7</h3>
+                <p class="text-[#bbb]">Transfer Availability</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#1a1a1a] py-12 px-4 sm:px-8 text-center">
+        <!-- Copy from savings.html -->
+    </footer>
+
+    <script src="../Homepage.js"></script>
+    <script>
+        // Fade-in effect
+        const fadeIns = document.querySelectorAll('.fade-in');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+        fadeIns.forEach(el => observer.observe(el));
+
+        // Dummy form submission
+        document.getElementById('transfer-form').addEventListener('submit', e => {
+            e.preventDefault();
+            alert('Transfer submitted successfully! (Demo)');
+        });
+    </script>
+</body>
+</html>
+
+

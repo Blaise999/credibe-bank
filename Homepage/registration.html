@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credibe - Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    html {
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+    }
+    body {
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+    </style>
+</head>
+<body class="bg-[#1a1a1a] text-[#e0e0e0] min-h-screen">
+  <!-- HEADER -->
+  <header class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-5 bg-[#2d2d2d] shadow-lg sticky top-0 z-50 gap-4 sm:gap-0">
+    <!-- Logo -->
+    <a href="Homepage.html" class="text-3xl font-bold text-[#00b4d8] flex items-center justify-center sm:justify-start">
+      🏦 Credibe
+    </a>
+
+    <!-- Nav Items -->
+    <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-center">
+      <a href="login.html" class="text-[#e0e0e0] border-2 border-[#00b4d8] rounded-full px-4 py-2 hover:bg-[#00b4d8] hover:text-white transition text-sm w-full sm:w-auto text-center">Login</a>
+      <a href="#" class="text-[#e0e0e0] hover:text-[#00b4d8] transition text-sm w-full sm:w-auto text-center">Support</a>
+      <select id="language-switcher" class="bg-[#3a3a3a] text-[#e0e0e0] border border-[#00b4d8] rounded-full px-3 py-1 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] text-sm w-full sm:w-auto">
+        <option value="en">English</option>
+        <option value="fr">Français</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- FORM SECTION -->
+  <section class="py-16 px-4 md:px-8 bg-[#2d2d2d]">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-3xl sm:text-4xl font-bold text-[#e0e0e0] mb-6 text-center">
+        Create Your Credibe Account
+      </h1>
+
+      <form id="register-form" method="POST" action="#" class="space-y-6 bg-[#3a3a3a] p-6 sm:p-8 rounded-lg shadow-lg" enctype="multipart/form-data">
+    
+                <!-- Full Name -->
+<div>
+    <label for="full-name" class="block text-[#e0e0e0] mb-2">Full Name</label>
+    <input type="text" id="full-name" name="full_name" class="w-full bg-[#1a1a1a] ..." placeholder="Enter your full name" required>
+    <input type="hidden" id="name">
+</div>
+
+                <!-- Date of Birth -->
+                <div>
+                    <label for="dob" class="block text-[#e0e0e0] mb-2">Date of Birth</label>
+                    <input type="date" id="dob" name="dob" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" required>
+                </div>
+                <!-- Gender -->
+                <div>
+                    <label for="gender" class="block text-[#e0e0e0] mb-2">Gender</label>
+                    <select id="gender" name="gender" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" required>
+                        <option value="" disabled selected>Select gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+               <!-- Email Address -->
+<div>
+    <label for="email" class="block text-[#e0e0e0] mb-2">Email Address</label>
+    <input type="email" id="email" name="email" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter your email" required>
+    <!-- OTP Section -->
+    <div id="otp-section" class="mt-4 hidden">
+        <label for="otp" class="block text-[#e0e0e0] mb-2">Enter OTP</label>
+        <div class="flex gap-2">
+            <input type="text" id="otp" name="otp" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter OTP" maxlength="6">
+        <button type="button" id="send-otp" class="hidden bg-[#00b4d8] text-white rounded-lg px-4 py-2 hover:opacity-90 transition">Send OTP</button>
+        </div>
+        <p id="otp-message" class="mt-2 text-sm text-[#e0e0e0]"></p>
+    </div>
+</div>
+                <!-- Phone Number -->
+                <div>
+                    <label for="phone" class="block text-[#e0e0e0] mb-2">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="+44 123 456 7890" pattern="[0-9\+\-\s]+" required>
+                </div>
+                <!-- Address -->
+                <div>
+                    <label for="address" class="block text-[#e0e0e0] mb-2">Address</label>
+                    <textarea id="address" name="address" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter your full address" rows="4" required></textarea>
+                </div>
+                <!-- National ID or Passport Number -->
+                <div>
+                    <label for="id-number" class="block text-[#e0e0e0] mb-2">National ID or Passport Number</label>
+                    <input type="text" id="id-number" name="id_number" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter ID or passport number" required>
+                </div>
+                <!-- Upload ID Document -->
+                <div>
+                    <label for="id-document" class="block text-[#e0e0e0] mb-2">Upload ID Document</label>
+                    <input type="file" id="id-document" name="id_document" accept=".pdf,.jpg,.png" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" required>
+                </div>
+                <!-- Password -->
+                <div>
+                    <label for="password" class="block text-[#e0e0e0] mb-2">Create Password</label>
+                    <div class="relative">
+                        <input type="password" id="password" name="password" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Create a password" required>
+                        <button type="button" id="toggle-password" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#00b4d8] hover:text-[#87ceeb]">👁️</button>
+                    </div>
+                    <div id="password-strength" class="mt-2 text-sm"></div>
+                </div>
+                <!-- Confirm Password -->
+                <div>
+                    <label for="confirm-password" class="block text-[#e0e0e0] mb-2">Confirm Password</label>
+                    <div class="relative">
+                        <input type="password" id="confirm-password" name="confirm_password" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Confirm your password" required>
+                        <button type="button" id="toggle-confirm-password" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#00b4d8] hover:text-[#87ceeb]">👁️</button>
+                    </div>
+                </div>
+                <!-- Security Question -->
+                <div>
+                    <label for="security-question" class="block text-[#e0e0e0] mb-2">Security Question</label>
+                    <select id="security-question" name="security_question" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" required>
+                        <option value="" disabled selected>Select a security question</option>
+                        <option value="q1">What was the name of your first pet?</option>
+                        <option value="q2">What is your mother's maiden name?</option>
+                        <option value="q3">What was your childhood nickname?</option>
+                    </select>
+                </div>
+                <!-- Security Answer -->
+                <div>
+                    <label for="security-answer" class="block text-[#e0e0e0] mb-2">Security Answer</label>
+                    <input type="text" id="security-answer" name="security_answer" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter your answer" required>
+                </div>
+                <!-- Terms & Conditions -->
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="terms" name="terms" class="h-5 w-5 text-[#00b4d8] bg-[#1a1a1a] border-[#444] rounded focus:ring-[#00b4d8]" required>
+                    <label for="terms" class="text-[#e0e0e0]">I agree to the <a href="#" class="text-[#00b4d8] hover:underline">Terms & Conditions</a></label>
+                </div>
+                <!-- Submit Button -->
+                <div>
+                    <button type="submit" class="w-full bg-[#00b4d8] text-white rounded-lg px-4 py-2 hover:opacity-90 transition">Register</button>
+                </div>
+            </form>
+            <p class="mt-4 text-center text-[#bbb]">Already have an account? <a href="login.html" class="text-[#00b4d8] hover:underline">Log in</a></p>
+        </div>
+        </form>
+    </section>
+
+
+    <footer class="bg-[#1a1a1a] text-[#e0e0e0] py-12 px-4 text-center">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-center gap-8 mb-6">
+            <div>
+                <h4 class="text-xl font-semibold mb-4">Download App</h4>
+                <a href="#" class="block text-[#87ceeb] hover:underline">App Store</a>
+                <a href="#" class="block text-[#87ceeb] hover:underline">Google Play</a>
+            </div>
+            <div>
+                <h4 class="text-xl font-semibold mb-4">Contact</h4>
+                <p>Email: support@credibe.com</p>
+                <p>Phone: +44 800 123 456</p>
+            </div>
+            <div>
+                <h4 class="text-xl font-semibold mb-4">Follow Us</h4>
+                <a href="#" class="block text-[#87ceeb] hover:underline">Facebook</a>
+                <a href="#" class="block text-[#87ceeb] hover:underline">Twitter</a>
+                <a href="#" class="block text-[#87ceeb] hover:underline">LinkedIn</a>
+            </div>
+        </div>
+        <div class="border-t border-[#444] pt-6">
+            <p>© 2025 Credibe. All rights reserved. <a href="#" class="text-[#87ceeb] hover:underline">Privacy Policy</a> | <a href="#" class="text-[#87ceeb] hover:underline">Terms</a></p>
+        </div>
+    </footer>
+
+    <div class="fixed bottom-5 right-5">
+        <button id="chat-toggle" class="bg-[#00b4d8] text-white rounded-full px-6 py-3 shadow-lg hover:opacity-90 transition">💬 Live Chat</button>
+        <div id="chat-box" class="hidden bg-[#2d2d2d] p-5 rounded-lg shadow-lg w-80 mt-2">
+            <p class="mb-4 text-[#e0e0e0]">Welcome to Credibe Chat! How can we assist you today?</p>
+            <input type="text" placeholder="Type your message..." class="w-full bg-[#3a3a3a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 mb-4">
+            <button class="w-full bg-[#00b4d8] text-white rounded-lg px-4 py-2 hover:opacity-90 transition">Send</button>
+        </div>
+    </div>
+
+    <script src="register.js"></script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Invest in Credibe’s mutual funds for diversified, quirky growth.">
+    <title>Mutual Funds - Credibe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.0/dist/vanilla-tilt.min.js"></script>
+</head>
+<body class="bg-[#1a1a1a] text-gray-200 font-['Inter','Poppins',sans-serif]">
+    <style>
+    html {
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+    }
+    body {
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+</style>
+
+    <!-- Navbar -->
+    <header class="flex justify-between items-center px-4 sm:px-8 py-4 bg-[#2d2d2d] shadow-lg sticky top-0 z-50">
+        <div class="flex items-center space-x-2">
+            <span class="text-2xl">🏦</span>
+            <span class="text-xl sm:text-2xl font-bold text-cyan-600">Credibe</span>
+        </div>
+        <div class="flex items-center space-x-4">
+           <a href="registration.html">
+    <button class="bg-cyan-600 text-white px-4 py-2 rounded-full font-bold hover:shadow-lg hover:bg-cyan-700 transition-all">
+        Open Account
+    </button>
+</a>
+<a href="login.html">
+    <button class="border-2 border-cyan-600 text-cyan-600 px-4 py-2 rounded-full font-bold hover:shadow-lg hover:bg-cyan-600 hover:text-white transition-all">
+        Login
+    </button>
+</a>
+
+
+        </div>
+        <nav id="mobile-menu" class="hidden sm:hidden absolute top-16 left-0 w-full bg-[#2d2d2d] p-4 shadow-lg">
+            <ul class="flex flex-col space-y-2">
+                <li><button class="block text-gray-200 hover:text-cyan-600">Savings</button></li>
+                <li><a href="checking.html" class="block text-gray-200 hover:text-cyan-600">Checking</a></li>
+                <li><a href="loans.html" class="block text-gray-200 hover:text-cyan-600">Personal Loans</a></li>
+                <li><a href="loans.html" class="block text-gray-200 hover:text-cyan-600">Business Loans</a></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Merchant Services</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">International Transfers</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Treasury Management</button></li>
+                <li><a href="loans.html" class="block text-gray-200 hover:text-cyan-600">Mortgage Loans</a></li>
+                <li><a href="loans.html" class="block text-gray-200 hover:text-cyan-600">Auto Loans</a></li>
+                <li><a href="loans.html" class="block text-gray-200 hover:text-cyan-600">Student Loans</a></li>
+                <li><a href="stocks.html" class="block text-gray-200 hover:text-cyan-600">Stocks</a></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Bonds</button></li>
+                <li><a href="mutual-funds.html" class="block text-gray-200 hover:text-cyan-600">Mutual Funds</a></li>
+                <li><a href="retirement-plans.html" class="block text-gray-200 hover:text-cyan-600">Retirement Plans</a></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">About Us</button></li>
+                <li><button class="block text-gray-200 hover:text-cyan-600">Careers</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="parallax-section relative w-full h-[70vh] sm:h-[90vh] min-h-[400px] bg-[url('https://i.pinimg.com/736x/1e/54/c1/1e54c170a022fb916691e60123cea843.jpg')] bg-cover bg-center">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="absolute inset-0 flex items-center justify-start px-4 sm:px-8 py-16">
+            <div class="glass-card bg-white/10 backdrop-blur-md p-8 rounded-xl shadow-lg max-w-md w-full fade-in">
+                <h1 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-cyan-600 to-cyan-400 bg-clip-text text-transparent mb-4">Mutual Funds, Galactic Style!</h1>
+                <p class="text-gray-400 mb-6">Diversify your portfolio with Credibe’s quirky funds and stellar returns.</p>
+                <button class="bg-cyan-600 text-white px-6 py-3 rounded-full font-bold hover:shadow-lg hover:bg-cyan-700 transition-all">Invest Now</button>
+            </div>
+            <div class="absolute right-8 top-1/2 transform -translate-y-1/2">
+                <canvas id="particles" class="w-32 h-32"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fund Types Section -->
+    <section class="py-20 px-4 sm:px-8 bg-[#2d2d2d]">
+        <h2 class="text-3xl sm:text-4xl font-bold text-center bg-gradient-to-r from-cyan-600 to-cyan-400 bg-clip-text text-transparent mb-12">Mutual Fund Options</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div class="zoom-card tilt-card bg-white/10 backdrop-blur-md p-6 rounded-xl shadow-lg transition-transform duration-300 gradient-border">
+                <h3 class="text-xl font-semibold text-cyan-600 mb-2">Equity Funds</h3>
+                <p class="text-gray-400 mb-4">Invest in global stocks for high growth. Perfect for cosmic risk-takers!</p>
+                <div class="progress-bar h-2 bg-gray-700 rounded-full" data-width="85"></div>
+            </div>
+            <div class="zoom-card tilt-card bg-white/10 backdrop-blur-md p-6 rounded-xl shadow-lg transition-transform duration-300 gradient-border">
+                <h3 class="text-xl font-semibold text-cyan-600 mb-2">Bond Funds</h3>
+                <p class="text-gray-400 mb-4">Stable returns with lower risk. Your portfolio’s chill space vibe.</p>
+                <div class="progress-bar h-2 bg-gray-700 rounded-full" data-width="60"></div>
+            </div>
+            <div class="zoom-card tilt-card bg-white/10 backdrop-blur-md p-6 rounded-xl shadow-lg transition-transform duration-300 gradient-border">
+                <h3 class="text-xl font-semibold text-cyan-600 mb-2">Balanced Funds</h3>
+                <p class="text-gray-400 mb-4">Mix of stocks and bonds for balanced growth. Like a galactic smoothie!</p>
+                <div class="progress-bar h-2 bg-gray-700 rounded-full" data-width="75"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-20 px-4 sm:px-8 bg-[#1a1a1a]">
+        <h2 class="text-3xl sm:text-4xl font-bold text-center bg-gradient-to-r from-cyan-600 to-cyan-400 bg-clip-text text-transparent mb-12">Mutual Funds FAQs</h2>
+        <div class="max-w-4xl mx-auto space-y-4">
+            <div class="faq-item glass-card bg-white/10 backdrop-blur-md p-6 rounded-xl shadow-lg cursor-pointer fade-in">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-white">What are the fees?</h3>
+                    <svg class="faq-chevron w-6 h-6 text-cyan-600 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                </div>
+                <p class="faq-answer hidden text-gray-400 mt-4">Management fees as low as 0.5% annually. No hidden costs, just starry-eyed returns!</p>
+            </div>
+            <div class="faq-item glass-card bg-white/10 backdrop-blur-md p-6 rounded-xl shadow-lg cursor-pointer fade-in">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-white">How do I start?</h3>
+                    <svg class="faq-chevron w-6 h-6 text-cyan-600 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                </div>
+                <p class="faq-answer hidden text-gray-400 mt-4">Open an account with €1,000 and choose your fund. Our AI guides you like a cosmic map!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#1a1a1a] py-12 px-4 sm:px-8 text-center">
+        <div class="flex flex-wrap justify-center gap-8 sm:gap-20 mb-8">
+            <div>
+                <h4 class="text-xl font-semibold mb-4">Personal</h4>
+                <button class="block text-cyan-400 hover:underline mb-2">Savings</button>
+                <a href="checking.html" class="block text-cyan-400 hover:underline mb-2">Checking</a>
+                <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Personal Loans</a>
+            </div>
+            <div>
+                <h4 class="text-xl font-semibold mb-4">Business</h4>
+                <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Business Loans</a>
+                <button class="block text-cyan-400 hover:underline mb-2">Merchant Services</button>
+                <button class="block text-cyan-400 hover:underline mb-2">International Transfers</button>
+                <button class="block text-cyan-400 hover:underline mb-2">Treasury Management</button>
+            </div>
+            <div>
+                <h4 class="text-xl font-semibold mb-4">Loans</h4>
+                <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Mortgage Loans</a>
+                <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Auto Loans</a>
+                <a href="loans.html" class="block text-cyan-400 hover:underline mb-2">Student Loans</a>
+            </div>
+            <div>
+                <h4 class="text-xl font-semibold mb-4">Investments</h4>
+                <a href="stocks.html" class="block text-cyan-400 hover:underline mb-2">Stocks</a>
+                <button class="block text-cyan-400 hover:underline mb-2">Bonds</button>
+                <a href="mutual-funds.html" class="block text-cyan-400 hover:underline mb-2">Mutual Funds</a>
+                <a href="retirement-plans.html" class="block text-cyan-400 hover:underline mb-2">Retirement Plans</a>
+            </div>
+            <div>
+                <h4 class="text-xl font-semibold mb-4">Overview</h4>
+                <button class="block text-cyan-400 hover:underline mb-2">About Us</button>
+                <button class="block text-cyan-400 hover:underline mb-2">Careers</button>
+            </div>
+        </div>
+        <div class="border-t border-gray-700 pt-6 text-sm">
+            <p>© 2025 Credibe. All rights reserved. <button class="text-cyan-400 hover:underline">Privacy Policy</button> | <button class="text-cyan-400 hover:underline">Terms of Service</button></p>
+        </div>
+    </footer>
+
+    <!-- Live Chat -->
+    <div class="live-chat fixed bottom-4 right-4 z-50">
+        <button class="chat-toggle bg-cyan-600 text-white px-6 py-3 rounded-full font-bold hover:shadow-lg hover:bg-cyan-700 transition-all">Chat with Us</button>
+        <div class="chat-box hidden bg-[#2d2d2d]/95 backdrop-blur-md p-6 rounded-xl shadow-lg mt-2 w-80">
+            <p class="text-gray-200 mb-4">How can we assist you today?</p>
+            <input type="text" placeholder="Type your message..." class="w-full p-3 bg-[#3a3a3a] border border-gray-700 rounded-lg text-gray-200 mb-4 focus:outline-none focus:border-cyan-600">
+            <button class="chat-send bg-cyan-600 text-white px-4 py-2 rounded-lg w-full font-bold hover:bg-cyan-700 transition-all">Send</button>
+        </div>
+    </div>
+
+    <script src="Newpage.js"></script>
+    <style>
+        .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+        .rotate-card { perspective: 1000px; }
+        .card-front, .card-back { backface-visibility: hidden; transition: opacity 0.5s ease; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+       

@@ -1,0 +1,653 @@
+<!-- 👇 Full working AdminDashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard | Credibe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-950 text-white">
+  <div class="min-h-screen flex flex-col">
+
+<script>
+  const token = localStorage.getItem("adminToken");
+  if (!token) {
+    alert("Unauthorized access. Please log in.");
+    window.location.href = "Adminlogin.html";
+  }
+</script>
+
+<header class="bg-gray-900/80 backdrop-blur-sm shadow-md py-4 px-6 flex justify-between items-center">
+  <h1 class="text-2xl font-bold text-cyan-400">Credibe Admin</h1>
+  <span class="text-sm text-white/70">Dashboard</span>
+</header>
+
+<main class="flex-1 p-6 bg-gradient-to-b from-gray-900 to-black">
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white/10 p-4 rounded-xl shadow-md backdrop-blur-md">
+      <h2 class="text-sm font-semibold text-white/70">Total Users</h2>
+      <p id="totalUsers" class="text-2xl font-bold text-white mt-2">0</p>
+    </div>
+    <div class="bg-white/10 p-4 rounded-xl shadow-md backdrop-blur-md">
+      <h2 class="text-sm font-semibold text-white/70">Total Transactions</h2>
+      <p id="totalTxns" class="text-2xl font-bold text-white mt-2">0</p>
+    </div>
+    <div class="bg-white/10 p-4 rounded-xl shadow-md backdrop-blur-md">
+      <h2 class="text-sm font-semibold text-white/70">Total Balance</h2>
+      <p id="totalBalance" class="text-2xl font-bold text-white mt-2">€0.00</p>
+    </div>
+    <div class="bg-white/10 p-4 rounded-xl shadow-md backdrop-blur-md">
+      <h2 class="text-sm font-semibold text-white/70">Blocked Users</h2>
+      <p id="blockedUsers" class="text-2xl font-bold text-white mt-2">0</p>
+    </div>
+  </section>
+
+  <section class="mb-10">
+    <h3 class="text-lg font-bold mb-4">Quick Actions</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+<button onclick="document.getElementById('pendingTransfersTableBody').scrollIntoView({ behavior: 'smooth' })"
+  class="bg-cyan-600 hover:bg-cyan-700 p-4 rounded-xl text-white font-semibold shadow">
+  Approve Transfers
+</button>
+
+<button onclick="document.getElementById('pendingTransfersTableBody').scrollIntoView({ behavior: 'smooth' })"
+  class="bg-red-600 hover:bg-red-700 p-4 rounded-xl text-white font-semibold shadow">
+  Reject Transfers
+</button>
+
+    <button onclick="toggleBlockUserModal()"
+  class="bg-cyan-600 hover:bg-cyan-700 p-4 rounded-xl text-white font-semibold shadow">
+  Block User
+</button>
+
+      <button onclick="toggleNotifyModal()" class="bg-cyan-600 hover:bg-cyan-700 p-4 rounded-xl text-white font-semibold shadow">
+  Send Notification
+</button>
+     <button onclick="toggleEditBalanceModal()"
+  class="bg-cyan-600 hover:bg-cyan-700 p-4 rounded-xl text-white font-semibold shadow">
+  Edit Balance
+</button>
+
+<button onclick="toggleFakeTxnModal()"
+  class="bg-cyan-600 hover:bg-cyan-700 p-4 rounded-xl text-white font-semibold shadow">
+  Inject Fake Transactions
+</button>
+
+
+    </div>
+  </section>
+
+  <section class="mb-12">
+    <h3 class="text-lg font-bold mb-4">All Users</h3>
+    <div class="overflow-x-auto rounded-xl shadow">
+      <table class="w-full text-left bg-white/5">
+        <thead class="bg-white/10 text-sm text-white/70">
+          <tr>
+            <th class="p-3">Email</th>
+            <th class="p-3">Balance</th>
+            <th class="p-3">IBAN</th>
+            <th class="p-3">Status</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody" class="text-white/90 text-sm"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="mb-12">
+    <h3 class="text-lg font-bold mb-4">Pending Transfers</h3>
+    <div class="overflow-x-auto rounded-xl shadow">
+      <table class="w-full text-left bg-white/5">
+        <thead class="bg-white/10 text-sm text-white/70">
+          <tr>
+            <th class="p-3">Sender</th>
+            <th class="p-3">Recipient</th>
+            <th class="p-3">Amount</th>
+            <th class="p-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="pendingTransfersTableBody" class="text-white/90 text-sm"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="mb-12">
+    <h3 class="text-lg font-bold mb-4">Transfer History</h3>
+    <div class="overflow-x-auto rounded-xl shadow">
+      <table class="w-full text-left bg-white/5">
+        <thead class="bg-white/10 text-sm text-white/70">
+          <tr>
+            <th class="p-3">Date</th>
+            <th class="p-3">Sender</th>
+            <th class="p-3">Receiver</th>
+            <th class="p-3">Amount</th>
+            <th class="p-3">Status</th>
+          </tr>
+        </thead>
+        <tbody id="transfer-body" class="text-white/90 text-sm"></tbody>
+      </table>
+    </div>
+  </section>
+  <!-- 🪙 Pending Top-Up Requests -->
+<section class="mb-12">
+  <h3 class="text-lg font-bold mb-4">Pending Top-Ups</h3>
+  <div class="overflow-x-auto rounded-xl shadow">
+    <table class="w-full text-left bg-white/5">
+      <thead class="bg-white/10 text-sm text-white/70">
+        <tr>
+          <th class="p-3">User Email</th>
+          <th class="p-3">Amount</th>
+          <th class="p-3">Date</th>
+          <th class="p-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="topup-body" class="text-white/90 text-sm">
+        <tr><td colspan="4" class="p-4 text-center text-white/40">Loading top-ups...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+</main>
+</div>
+
+<script>
+async function loadTransferHistory() {
+  try {
+    const res = await fetch("http://localhost:3000/api/admin/transfer-history", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    });
+    const data = await res.json();
+    const tableBody = document.getElementById("transfer-body");
+    tableBody.innerHTML = "";
+
+    data.forEach(txn => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td class="p-2 border">${new Date(txn.createdAt).toLocaleString()}</td>
+        <td class="p-2 border">${txn.from?.email || "N/A"}</td>
+        <td class="p-2 border">${txn.to?.email || txn.toEmail || "N/A"}</td>
+        <td class="p-2 border">€${txn.amount}</td>
+        <td class="p-2 border">
+          <span class="px-2 py-1 rounded ${txn.status === "approved" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}">
+            ${txn.status}
+          </span>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
+  } catch (err) {
+    console.error("❌ Failed to load transfers:", err.message);
+  }
+}
+
+async function loadPendingTransfers() {
+  try {
+    const res = await fetch("http://localhost:3000/api/admin/pending-transactions", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    });
+    const data = await res.json();
+    const tbody = document.getElementById("pendingTransfersTableBody");
+    tbody.innerHTML = "";
+
+    if (!Array.isArray(data) || data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-white/40">No pending transfers.</td></tr>`;
+      return;
+    }
+
+    data.forEach(transfer => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td class="p-3 border">${transfer.from?.email || "N/A"}</td>
+        <td class="p-3 border">${transfer.to?.email || "N/A"}</td>
+        <td class="p-3 border">€${transfer.amount.toFixed(2)}</td>
+        <td class="p-3 border">
+          <button onclick="handleTransfer('${transfer._id}', 'approve')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs mr-2">Approve</button>
+          <button onclick="handleTransfer('${transfer._id}', 'reject')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  } catch (err) {
+    console.error("❌ Failed to load pending transfers:", err.message);
+    alert("Error loading pending transfers");
+  }
+}
+
+async function handleTransfer(id, action) {
+  const token = localStorage.getItem("adminToken");
+  if (!token) return alert("Admin not authenticated");
+
+  console.log("📤 Approving/Rejecting:", { transactionId: id, action });
+
+  try {
+    const res = await fetch("http://localhost:3000/api/admin/handle-transaction", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        transactionId: id,
+        action: action
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error("❌ Backend rejected:", data.error);
+      return alert(`Error: ${data.error || "Failed to process transaction"}`);
+    }
+
+    alert(data.message || `Transfer ${action}d successfully`);
+
+    // ✅ Reload UI to reflect changes
+    await loadPendingTransfers();   // remove from pending
+    await loadTransferHistory();    // move to history
+
+  } catch (err) {
+    console.error(`❌ Failed to ${action} transfer:`, err.message);
+    alert(`Error: Failed to ${action} transfer`);
+  }
+}
+
+async function loadPendingTopUps() {
+  try {
+    const res = await fetch("http://localhost:3000/api/admin/topups/pending", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    });
+    const data = await res.json();
+
+    const tbody = document.getElementById("topup-body");
+    tbody.innerHTML = "";
+
+    if (!Array.isArray(data) || data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-white/40">No pending top-ups.</td></tr>`;
+      return;
+    }
+
+    data.forEach(topup => {
+      const date = new Date(topup.createdAt).toLocaleDateString();
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td class="p-3 border">${topup.user?.email || "Unknown"}</td>
+        <td class="p-3 border">€${topup.amount.toFixed(2)}</td>
+        <td class="p-3 border">${date}</td>
+        <td class="p-3 border">
+          <button onclick="handleTopUp('${topup._id}', 'approve')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs mr-2">Approve</button>
+          <button onclick="handleTopUp('${topup._id}', 'reject')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  } catch (err) {
+    console.error("❌ Failed to load top-ups:", err.message);
+  }
+}
+
+async function handleTopUp(id, action) {
+  try {
+    const res = await fetch(`http://localhost:3000/api/admin/topups/${id}/${action}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert(data.message || `Top-up ${action}ed successfully`);
+      loadPendingTopUps(); // Refresh list after action
+    } else {
+      alert(data.error || `Failed to ${action} top-up`);
+    }
+  } catch (err) {
+    console.error(`❌ Failed to ${action} top-up:`, err.message);
+    alert(`Error: Failed to ${action} top-up`);
+  }
+}
+
+// Load data on page load
+document.addEventListener("DOMContentLoaded", () => {
+  loadTransferHistory();
+  loadPendingTopUps();
+  loadPendingTransfers();
+});
+
+function toggleBlockUserModal() {
+  const modal = document.getElementById("blockUserModal");
+  const select = document.getElementById("userSelect");
+
+  if (modal.classList.contains("hidden")) {
+    modal.classList.remove("hidden");
+    fetch("http://localhost:3000/api/admin/users", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    })
+    .then(res => res.json())
+    .then(data => {
+      select.innerHTML = "";
+      data.forEach(user => {
+        const opt = document.createElement("option");
+        opt.value = user._id;
+        opt.textContent = `${user.email} — ${user.isBlocked ? "Blocked" : "Active"}`;
+        select.appendChild(opt);
+      });
+    });
+  } else {
+    modal.classList.add("hidden");
+  }
+}
+
+function blockOrUnblockUser() {
+  const userId = document.getElementById("userSelect").value;
+  if (!userId) return alert("Please select a user");
+
+  fetch(`http://localhost:3000/api/admin/block-user/${userId}`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+  })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.message || "Status updated");
+      toggleBlockUserModal(); // close modal
+      location.reload(); // refresh UI
+    })
+    .catch(err => {
+      console.error("❌ Failed to toggle user:", err.message);
+      alert("Failed to block/unblock user");
+    });
+}
+
+function toggleNotifyModal() {
+  const modal = document.getElementById("notifyModal");
+  const select = document.getElementById("notifyUserSelect");
+
+  if (modal.classList.contains("hidden")) {
+    modal.classList.remove("hidden");
+
+    // Populate user dropdown
+    fetch("http://localhost:3000/api/admin/users", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    })
+      .then(res => res.json())
+      .then(users => {
+        select.innerHTML = "";
+        users.forEach(user => {
+          const opt = document.createElement("option");
+          opt.value = user._id;
+          opt.textContent = user.email;
+          select.appendChild(opt);
+        });
+      });
+  } else {
+    modal.classList.add("hidden");
+  }
+}
+
+function sendNotification() {
+  const userId = document.getElementById("notifyUserSelect").value;
+  const subject = document.getElementById("notifySubject").value;
+  const message = document.getElementById("notifyMessage").value;
+
+  if (!userId || !subject || !message) {
+    return alert("Please fill out all fields");
+  }
+
+  fetch("http://localhost:3000/api/admin/notify", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    ,
+    body: JSON.stringify({ userId, subject, message })
+  })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.message || "Notification sent");
+      toggleNotifyModal(); // Close modal
+    })
+    .catch(err => {
+      console.error("❌ Failed to send notification:", err.message);
+      alert("Error sending notification");
+    });
+}
+
+function toggleEditBalanceModal() {
+  const modal = document.getElementById("editBalanceModal");
+  const select = document.getElementById("editUserSelect");
+
+  if (modal.classList.contains("hidden")) {
+    modal.classList.remove("hidden");
+
+    // Load user list
+    fetch("http://localhost:3000/api/admin/users", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    })
+      .then(res => res.json())
+      .then(users => {
+        select.innerHTML = "";
+        users.forEach(user => {
+          const opt = document.createElement("option");
+          opt.value = user._id;
+          opt.textContent = `${user.email}`;
+          select.appendChild(opt);
+        });
+      });
+  } else {
+    modal.classList.add("hidden");
+  }
+}
+
+function submitBalanceEdit() {
+  const userId = document.getElementById("editUserSelect").value;
+  const totalCredit = parseFloat(document.getElementById("editTotalBalance").value);
+  const savings = parseFloat(document.getElementById("editSavings").value);
+  const credits = parseFloat(document.getElementById("editCredit").value);
+
+  if (!userId) return alert("Select a user");
+  
+  fetch(`http://localhost:3000/api/admin/edit-balance/${userId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    ,
+    body: JSON.stringify({ totalCredit, savings, credits })
+  })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.message || "Balance updated");
+      toggleEditBalanceModal();
+      location.reload();
+    })
+    .catch(err => {
+      console.error("❌ Balance update error:", err.message);
+      alert("Failed to update balance");
+    });
+}
+
+function toggleFakeTxnModal() {
+  const modal = document.getElementById("fakeTxnModal");
+  const select = document.getElementById("fakeTxnUserSelect");
+
+  if (modal.classList.contains("hidden")) {
+    modal.classList.remove("hidden");
+
+    fetch("http://localhost:3000/api/admin/users", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    })
+      .then(res => res.json())
+      .then(users => {
+        select.innerHTML = "";
+        users.forEach(user => {
+          const opt = document.createElement("option");
+          opt.value = user._id;
+          opt.textContent = `${user.email}`;
+          select.appendChild(opt);
+        });
+      });
+  } else {
+    modal.classList.add("hidden");
+  }
+}
+
+function submitFakeTxnInjection() {
+  const userId = document.getElementById("fakeTxnUserSelect").value;
+  const count = parseInt(document.getElementById("fakeTxnCount").value) || 100;
+
+  if (!userId) return alert("Please select a user");
+
+  fetch("http://localhost:3000/api/admin/inject-fake-txns", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    ,
+    body: JSON.stringify({ userId, count })
+  })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.message || "Fake transactions injected");
+      toggleFakeTxnModal();
+      loadTransferHistory(); // reload the history section
+    })
+    .catch(err => {
+      console.error("❌ Failed to inject txns:", err.message);
+      alert("Error injecting transactions");
+    });
+}
+
+// Add event listeners for Approve/Reject Transfers buttons
+document.getElementById("approveTransfersBtn").addEventListener("click", loadPendingTransfers);
+document.getElementById("rejectTransfersBtn").addEventListener("click", loadPendingTransfers);
+</script>
+
+<!-- 👇 Block User Modal -->
+<div id="blockUserModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+  <div class="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-lg text-white relative">
+    <button onclick="toggleBlockUserModal()" class="absolute top-2 right-3 text-white/60 hover:text-red-500 text-xl">×</button>
+    <h2 class="text-xl font-bold mb-4">Block/Unblock User</h2>
+    <select id="userSelect" class="w-full p-2 mb-4 rounded bg-gray-700 text-white"></select>
+    <button onclick="blockOrUnblockUser()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white font-semibold w-full">
+      Toggle Block Status
+    </button>
+  </div>
+</div>
+
+<!-- 👇 Edit Balance Modal -->
+<div id="editBalanceModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+  <div class="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-lg text-white relative">
+    <button onclick="toggleEditBalanceModal()" class="absolute top-2 right-3 text-white/60 hover:text-red-500 text-xl">×</button>
+    <h2 class="text-xl font-bold mb-4">Edit User Balance</h2>
+    
+    <label for="editUserSelect" class="text-sm text-white/60">Select User:</label>
+    <select id="editUserSelect" class="w-full p-2 mb-4 rounded bg-gray-700 text-white"></select>
+
+    <label class="block mb-2">Total Balance</label>
+    <input id="editTotalBalance" type="number" class="w-full p-2 mb-3 rounded bg-gray-700 text-white" placeholder="e.g. 1000" />
+
+    <label class="block mb-2">Savings</label>
+    <input id="editSavings" type="number" class="w-full p-2 mb-3 rounded bg-gray-700 text-white" placeholder="e.g. 200" />
+
+    <label class="block mb-2">Credit</label>
+    <input id="editCredit" type="number" class="w-full p-2 mb-5 rounded bg-gray-700 text-white" placeholder="e.g. 300" />
+
+    <button onclick="submitBalanceEdit()" class="bg-cyan-600 hover:bg-cyan-700 px-4 py-2 rounded text-white font-semibold w-full">
+      Update Balances
+    </button>
+  </div>
+</div>
+
+<!-- 👇 Send Notification Modal -->
+<div id="notifyModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+  <div class="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-lg text-white relative">
+    <button onclick="toggleNotifyModal()" class="absolute top-2 right-3 text-white/60 hover:text-red-500 text-xl">×</button>
+    <h2 class="text-xl font-bold mb-4">Send Notification</h2>
+
+    <label class="block text-sm mb-1">Select User:</label>
+    <select id="notifyUserSelect" class="w-full p-2 mb-3 rounded bg-gray-700 text-white"></select>
+
+    <label class="block text-sm mb-1">Subject:</label>
+    <input id="notifySubject" class="w-full p-2 mb-3 rounded bg-gray-700 text-white" placeholder="Subject"/>
+
+    <label class="block text-sm mb-1">Message:</label>
+    <textarea id="notifyMessage" class="w-full p-2 mb-4 rounded bg-gray-700 text-white" placeholder="Message" rows="4"></textarea>
+
+    <button onclick="sendNotification()" class="bg-cyan-600 hover:bg-cyan-700 px-4 py-2 rounded text-white font-semibold w-full">
+      Send
+    </button>
+  </div>
+</div>
+
+<!-- 👻 Inject Fake Transactions Modal -->
+<div id="fakeTxnModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+  <div class="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-lg text-white relative">
+    <button onclick="toggleFakeTxnModal()" class="absolute top-2 right-3 text-white/60 hover:text-red-500 text-xl">×</button>
+    <h2 class="text-xl font-bold mb-4">Inject Fake Transactions</h2>
+
+    <label for="fakeTxnUserSelect" class="text-sm text-white/60">Select User:</label>
+    <select id="fakeTxnUserSelect" class="w-full p-2 mb-4 rounded bg-gray-700 text-white"></select>
+
+    <label for="fakeTxnCount" class="text-sm text-white/60">Number of Fake Transactions:</label>
+    <input id="fakeTxnCount" type="number" value="100" min="1" max="100" class="w-full p-2 mb-4 rounded bg-gray-700 text-white" />
+
+    <button onclick="submitFakeTxnInjection()" class="bg-cyan-600 hover:bg-cyan-700 px-4 py-2 rounded text-white font-semibold w-full">
+      Inject Transactions
+    </button>
+  </div>
+</div>
+
+
+
+
+<!-- 🔧 FAKE TRANSACTION INJECTOR -->
+<div class="mt-10 p-6 bg-gray-900 rounded-lg shadow-lg">
+  <h2 class="text-2xl font-bold mb-4 text-white">🧪 Inject Fake Transactions</h2>
+  <form id="fakeTxnForm" class="space-y-4">
+    <div>
+      <label for="userEmail" class="block text-white font-semibold mb-1">User Email</label>
+      <input type="email" id="userEmail" required placeholder="Enter user email"
+             class="w-full px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded-md">
+    </div>
+    <div>
+      <label for="txnCount" class="block text-white font-semibold mb-1">Number of Fake Transactions</label>
+      <input type="number" id="txnCount" required min="1" max="100"
+             class="w-full px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded-md">
+    </div>
+    <button type="submit"
+            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+      Inject
+    </button>
+    <p id="injectStatus" class="text-green-400 mt-2 hidden">✅ Transactions injected.</p>
+  </form>
+</div>
+
+<script>
+document.getElementById("fakeTxnForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("userEmail").value;
+  const count = document.getElementById("txnCount").value;
+  const res = await fetch("/api/admin/inject-fake-transactions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + localStorage.getItem("adminToken")
+    },
+    body: JSON.stringify({ email, count })
+  });
+  const result = await res.json();
+  document.getElementById("injectStatus").classList.remove("hidden");
+});
+</script>
+
+</body>
+</html>
+
+
