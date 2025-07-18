@@ -4,7 +4,7 @@
 const userId = localStorage.getItem("userId") || "686d7beb95997ae6dde15d0c";
 
 // 📍 Backend endpoint (Correct route)
-const endpoint = `http://localhost:3000/api/user/transactions/${userId}`;
+const endpoint = `https://credibe-backends.onrender.com/api/user/transactions/${userId}`;
 
 // 🧠 Fetch & display transactions
 async function fetchTransactions() {

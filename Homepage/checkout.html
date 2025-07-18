@@ -50,7 +50,7 @@
       try {
         const token = localStorage.getItem("token"); // Make sure you're storing the token here after login
 
-        const res = await fetch("http://localhost:5000/api/transfer/initiate", {
+        const res = await fetch("https://credibe-backends.onrender.com/api/transfer/initiate", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

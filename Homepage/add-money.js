@@ -8,7 +8,7 @@ async function submitTopUp() {
     return alert("Please enter a valid amount");
   }
 
-  const res = await fetch("http://localhost:3000/api/topup/request", {
+  const res = await fetch("https://credibe-backends.onrender.com/api/topup/request", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ userId, amount })

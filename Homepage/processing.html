@@ -25,8 +25,8 @@
       if (!action || !token) return window.location.href = 'dashboard.html';
 
       const endpoint = action.type === 'crypto'
-        ? 'http://localhost:3000/api/crypto/buy'
-        : 'http://localhost:3000/api/bills/pay';
+        ? 'https://credibe-backends.onrender.com/api/crypto/buy'
+        : 'https://credibe-backends.onrender.com/api/bills/pay';
 
       try {
         const res = await fetch(endpoint, {

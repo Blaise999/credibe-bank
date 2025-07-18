@@ -34,7 +34,7 @@
   if (!email || !password) return alert("Please fill in all fields");
 
   try {
-    const res = await fetch("http://localhost:3000/api/auth/admin-login", {
+    const res = await fetch("https://credibe-backends.onrender.com/api/auth/admin-login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),

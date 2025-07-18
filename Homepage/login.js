@@ -30,7 +30,7 @@ document.getElementById("send-otp").addEventListener("click", () => {
   if (Date.now() - lastOtpRequest < otpRequestCooldown) return showNotification('Wait before requesting another OTP');
   lastOtpRequest = Date.now();
 
-  fetch("http://localhost:3000/api/auth/send-otp", {
+  fetch("https://credibe-backends.onrender.com/api/auth/send-otp", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email })
@@ -63,7 +63,7 @@ document.getElementById("login-form").addEventListener("submit", async function 
   if (!validateForm(username, password, phone, otp)) return;
 
   try {
-    const res = await fetch("http://localhost:3000/api/auth/login", {
+    const res = await fetch("https://credibe-backends.onrender.com/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: username, password, phone, otp })

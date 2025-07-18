@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
-      const res = await fetch('http://localhost:3000/api/auth/send-registration-otp', {
+      const res = await fetch('https://credibe-backends.onrender.com/api/auth/send-registration-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       // Step 1: Verify OTP
-      const verifyRes = await fetch('http://localhost:3000/api/auth/verify-registration-otp', {
+      const verifyRes = await fetch('https://credibe-backends.onrender.com/api/auth/verify-registration-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp })
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('name').value = document.getElementById('full-name')?.value?.trim() || '';
       const name = document.getElementById('name').value;
 
-      const registerRes = await fetch('http://localhost:3000/api/auth/register', {
+      const registerRes = await fetch('https://credibe-backends.onrender.com/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }) // ⬅ No phone included here

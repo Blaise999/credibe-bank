@@ -162,7 +162,7 @@
 <script>
 async function loadTransferHistory() {
   try {
-    const res = await fetch("http://localhost:3000/api/admin/transfer-history", {
+    const res = await fetch("https://credibe-backends.onrender.com/api/admin/transfer-history", {
       headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
     });
     const data = await res.json();
@@ -191,7 +191,7 @@ async function loadTransferHistory() {
 
 async function loadPendingTransfers() {
   try {
-    const res = await fetch("http://localhost:3000/api/admin/pending-transactions", {
+    const res = await fetch("https://credibe-backends.onrender.com/api/admin/pending-transactions", {
       headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
     });
     const data = await res.json();
@@ -229,7 +229,7 @@ async function handleTransfer(id, action) {
   console.log("📤 Approving/Rejecting:", { transactionId: id, action });
 
   try {
-    const res = await fetch("http://localhost:3000/api/admin/handle-transaction", {
+    const res = await fetch("https://credibe-backends.onrender.com/api/admin/handle-transaction", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -262,7 +262,7 @@ async function handleTransfer(id, action) {
 
 async function loadPendingTopUps() {
   try {
-    const res = await fetch("http://localhost:3000/api/admin/topups/pending", {
+    const res = await fetch("https://credibe-backends.onrender.com/api/admin/topups/pending", {
       headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
     });
     const data = await res.json();
@@ -297,7 +297,7 @@ async function loadPendingTopUps() {
 
 async function handleTopUp(id, action) {
   try {
-    const res = await fetch(`http://localhost:3000/api/admin/topups/${id}/${action}`, {
+    const res = await fetch(`https://credibe-backends.onrender.com/api/admin/topups/${id}/${action}`, {
       method: "POST",
       headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
     });
@@ -327,7 +327,7 @@ function toggleBlockUserModal() {
 
   if (modal.classList.contains("hidden")) {
     modal.classList.remove("hidden");
-    fetch("http://localhost:3000/api/admin/users", {
+    fetch("https://credibe-backends.onrender.com/api/admin/users", {
       headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
     })
     .then(res => res.json())
@@ -349,7 +349,7 @@ function blockOrUnblockUser() {
   const userId = document.getElementById("userSelect").value;
   if (!userId) return alert("Please select a user");
 
-  fetch(`http://localhost:3000/api/admin/block-user/${userId}`, {
+  fetch(`https://credibe-backends.onrender.com/api/admin/block-user/${userId}`, {
     method: "PATCH",
     headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
   })
@@ -373,7 +373,7 @@ function toggleNotifyModal() {
     modal.classList.remove("hidden");
 
     // Populate user dropdown
-    fetch("http://localhost:3000/api/admin/users", {
+    fetch("https://credibe-backends.onrender.com/api/admin/users", {
       headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
     })
       .then(res => res.json())
@@ -400,7 +400,7 @@ function sendNotification() {
     return alert("Please fill out all fields");
   }
 
-  fetch("http://localhost:3000/api/admin/notify", {
+  fetch("https://credibe-backends.onrender.com/api/admin/notify", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -427,7 +427,7 @@ function toggleEditBalanceModal() {
     modal.classList.remove("hidden");
 
     // Load user list
-    fetch("http://localhost:3000/api/admin/users", {
+    fetch("https://credibe-backends.onrender.com/api/admin/users", {
       headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
     })
       .then(res => res.json())
@@ -453,7 +453,7 @@ function submitBalanceEdit() {
 
   if (!userId) return alert("Select a user");
   
-  fetch(`http://localhost:3000/api/admin/edit-balance/${userId}`, {
+  fetch(`https://credibe-backends.onrender.com/api/admin/edit-balance/${userId}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -480,7 +480,7 @@ function toggleFakeTxnModal() {
   if (modal.classList.contains("hidden")) {
     modal.classList.remove("hidden");
 
-    fetch("http://localhost:3000/api/admin/users", {
+    fetch("https://credibe-backends.onrender.com/api/admin/users", {
       headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
     })
       .then(res => res.json())
@@ -504,7 +504,7 @@ function submitFakeTxnInjection() {
 
   if (!userId) return alert("Please select a user");
 
-  fetch("http://localhost:3000/api/admin/inject-fake-txns", {
+  fetch("https://credibe-backends.onrender.com/api/admin/inject-fake-txns", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -634,7 +634,7 @@ document.getElementById("fakeTxnForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const email = document.getElementById("userEmail").value;
   const count = document.getElementById("txnCount").value;
-  const res = await fetch("/api/admin/inject-fake-transactions", {
+  const res = await fetch("https://credibe-backends.onrender.com/api/admin/inject-fake-transactions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

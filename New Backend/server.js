@@ -7,9 +7,9 @@ const cors = require("cors");
 const app = express();
 app.use(express.json());
 
-// ✅ Fix CORS: Allow PATCH, PUT, DELETE for admin actions
+// ✅ Fix CORS: Add your frontend domain
 app.use(cors({
-  origin: ['http://localhost:5500', 'http://127.0.0.1:5500'],
+  origin: ['http://localhost:5500', 'http://127.0.0.1:5500', 'https://thecredibe.com'],
   methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true
 }));
