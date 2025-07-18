@@ -7,34 +7,40 @@ const cors = require("cors");
 const app = express();
 app.use(express.json());
 
-// ✅ Fix CORS: Add your frontend domain
+// ✅ CORS: Allow local + live frontend domains
 app.use(cors({
-  origin: ['http://localhost:5500', 'http://127.0.0.1:5500', 'https://thecredibe.com'],
+  origin: [
+    'http://localhost:5500',
+    'http://127.0.0.1:5500',
+    'https://thecredibe.com',
+    'https://credibe-frontend.onrender.com'
+  ],
   methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true
 }));
 
-// Route imports
+// ✅ Route imports
 const authRoutes = require("./routes/auth");
 const transferRoutes = require("./routes/transfer");
 const adminRoutes = require("./routes/admin");
 const userRoutes = require("./routes/user");
 const topUpRoutes = require("./routes/topup");
 
-// Connect to DB
+// ✅ Connect to MongoDB
 const connectDB = require("./config/db");
 
 const startServer = async () => {
   await connectDB();
 
-  // Mount API routes
+  // ✅ Mount routes
   app.use("/api/auth", authRoutes);
   app.use("/api/transfer", transferRoutes);
   app.use("/api/admin", adminRoutes);
   app.use("/api/user", userRoutes);
   app.use("/api/topup", topUpRoutes);
 
-  app.listen(3000, () => console.log("🚀 Server running on port 3000"));
+  // ✅ Use dynamic port for Render
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 };
-
 startServer();
