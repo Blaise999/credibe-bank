@@ -1,4 +1,5 @@
-const puppeteer = require("puppeteer");
+const puppeteer = require("puppeteer-core");
+const chromium = require("chrome-aws-lambda");
 const fs = require("fs");
 const path = require("path");
 
@@ -30,10 +31,17 @@ module.exports = async function generatePDF(transactionData) {
     .replace("{{date}}", formattedDate)
     .replace("{{reference}}", ref);
 
-  // Launch Puppeteer & generate PDF buffer
-  const browser = await puppeteer.launch({ headless: "new" });
+  // Launch Puppeteer with chrome-aws-lambda settings
+  const browser = await puppeteer.launch({
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath,
+    headless: chromium.headless,
+  });
+
   const page = await browser.newPage();
   await page.setContent(html, { waitUntil: "networkidle0" });
+
   const pdfBuffer = await page.pdf({
     format: "A4",
     printBackground: true
