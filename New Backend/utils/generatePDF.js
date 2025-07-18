@@ -1,4 +1,4 @@
-const puppeteer = require("puppeteer");
+const { chromium } = require("playwright");
 const fs = require("fs");
 const path = require("path");
 
@@ -30,19 +30,12 @@ module.exports = async function generatePDF(transactionData) {
     .replace("{{date}}", formattedDate)
     .replace("{{reference}}", ref);
 
-  // Launch Puppeteer
-  const browser = await puppeteer.launch({
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    headless: true,
-  });
-
+  // Launch Playwright Chromium
+  const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
-  await page.setContent(html, { waitUntil: "networkidle0" });
+  await page.setContent(html, { waitUntil: "networkidle" });
 
-  const pdfBuffer = await page.pdf({
-    format: "A4",
-    printBackground: true,
-  });
+  const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
 
   await browser.close();
   return pdfBuffer;
