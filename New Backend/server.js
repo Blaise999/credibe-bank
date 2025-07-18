@@ -7,17 +7,30 @@ const cors = require("cors");
 const app = express();
 app.use(express.json());
 
-// ✅ CORS: Allow local + live frontend domains
-app.use(cors({
-  origin: [
-    'http://localhost:5500',
-    'http://127.0.0.1:5500',
-    'https://thecredibe.com',
-    'https://credibe-frontend.onrender.com'
-  ],
-  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-  credentials: true
-}));
+// ✅ Full CORS fix – for local + live + preflight OPTIONS
+const allowedOrigins = [
+  'http://localhost:5500',
+  'http://127.0.0.1:5500',
+  'https://thecredibe.com',
+  'https://www.thecredibe.com',
+  'https://credibe-frontend.onrender.com'
+];
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,PUT,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
 
 // ✅ Route imports
 const authRoutes = require("./routes/auth");
