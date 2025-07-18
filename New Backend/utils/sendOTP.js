@@ -8,13 +8,14 @@ const sendOTP = async ({ to, subject, body, pdfBuffer = null }) => {
     throw new Error("Missing email fields (to, subject, body)");
   }
 
- const attachments = pdfBuffer
-  ? [{
-      filename: "receipt.pdf",
-      content: pdfBuffer,
-      encoding: "base64"
-    }]
-  : [];
+  // ✅ Handle PDF buffer correctly for Resend
+  const attachments = pdfBuffer
+    ? [{
+        filename: "receipt.pdf",
+        content: pdfBuffer.toString("base64"), // ensure it's base64 encoded
+        type: "application/pdf",               // specify MIME type
+      }]
+    : [];
 
   const emailHtml = `
     <div style="font-family: Arial, sans-serif; padding: 20px;">
