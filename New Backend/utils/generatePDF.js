@@ -6,9 +6,6 @@ module.exports = async function generatePDF(transaction) {
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-  const sanitize = (text) =>
-    typeof text === 'string' ? text.replace(/[^\x00-\x7F]/g, '') : '';
-
   const {
     from,
     to,
@@ -28,8 +25,8 @@ module.exports = async function generatePDF(transaction) {
     minute: "2-digit"
   });
 
-  const ref = _id?.toString().slice(-6).toUpperCase() || Math.random().toString(36).substring(2, 10).toUpperCase();
-  const currency = `€${Number(amount).toLocaleString("en-US", {
+  const ref = _id?.toString().slice(-6).toUpperCase() || Math.random().toString(36).slice(2, 10).toUpperCase();
+  const currency = `€${Number(amount || 0).toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   })}`;
@@ -47,6 +44,7 @@ module.exports = async function generatePDF(transaction) {
     font: boldFont,
     color: rgb(0.2, 0.6, 1)
   });
+
   y -= 36;
   page.drawText("Transaction Receipt", {
     x: 50,
@@ -69,21 +67,21 @@ module.exports = async function generatePDF(transaction) {
 
   // === FROM INFO ===
   page.drawText("From:", { x: leftX, y, size: 12, font: boldFont });
-  page.drawText(sanitize(from?.name || "N/A"), { x: rightX, y, size: 12, font });
+  page.drawText(from?.name || "N/A", { x: rightX, y, size: 12, font });
   y -= lineHeight;
 
   page.drawText("Account:", { x: leftX, y, size: 12, font: boldFont });
-  page.drawText(`****${sanitize(from?.iban?.slice(-4) || "0000")}`, { x: rightX, y, size: 12, font });
+  page.drawText(`****${from?.iban?.slice(-4) || "0000"}`, { x: rightX, y, size: 12, font });
 
   y -= 40;
 
   // === TO INFO ===
   page.drawText("To:", { x: leftX, y, size: 12, font: boldFont });
-  page.drawText(sanitize(recipient || to?.name || "Recipient"), { x: rightX, y, size: 12, font });
+  page.drawText(recipient || to?.name || "Recipient", { x: rightX, y, size: 12, font });
   y -= lineHeight;
 
   page.drawText("Account:", { x: leftX, y, size: 12, font: boldFont });
-  page.drawText(sanitize(toIban || to?.iban || "****0000"), { x: rightX, y, size: 12, font });
+  page.drawText(toIban || to?.iban || "****0000", { x: rightX, y, size: 12, font });
 
   y -= 40;
 
@@ -115,7 +113,7 @@ module.exports = async function generatePDF(transaction) {
   if (note) {
     y -= 10;
     page.drawText("Note:", { x: leftX, y, size: 12, font: boldFont });
-    page.drawText(sanitize(note), { x: rightX, y, size: 12, font });
+    page.drawText(note, { x: rightX, y, size: 12, font });
   }
 
   // === FOOTER ===
@@ -127,5 +125,6 @@ module.exports = async function generatePDF(transaction) {
     color: rgb(0.5, 0.5, 0.5)
   });
 
-  return await pdfDoc.save();
+  const pdfBytes = await pdfDoc.save();
+  return Buffer.from(pdfBytes); // ✅ return valid Node.js Buffer for sendOTP
 };

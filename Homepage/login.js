@@ -39,7 +39,7 @@ document.getElementById("send-otp").addEventListener("click", () => {
     .then(data => {
       if (data.message) {
         otpSent = true;
-        showNotification("OTP sent to your email (check console)");
+        showNotification("OTP sent to your email");
       } else {
         showNotification(data.error || "Failed to send OTP");
       }
