@@ -13,7 +13,6 @@
   "dependencies": {
     "@faker-js/faker": "^9.9.0",
     "@sendgrid/mail": "^8.1.5",
-    "chrome-aws-lambda": "^10.1.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
@@ -21,7 +20,7 @@
     "mongoose": "^8.16.2",
     "nodemon": "^3.1.10",
     "pdf-lib": "^1.17.1",
-    "puppeteer-core": "^10.4.0",
+    "puppeteer": "^21.3.8", 
     "resend": "^4.6.0"
   }
 }
