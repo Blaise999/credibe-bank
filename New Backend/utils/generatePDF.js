@@ -1,4 +1,3 @@
-const puppeteer = require("puppeteer-core");
 const chromium = require("chrome-aws-lambda");
 const fs = require("fs");
 const path = require("path");
@@ -10,7 +9,7 @@ module.exports = async function generatePDF(transactionData) {
   const templatePath = path.join(__dirname, "../templates/receiptTemplate.html");
   let html = fs.readFileSync(templatePath, "utf8");
 
-  // Format data
+  // Format date
   const formattedDate = new Date(date || Date.now()).toLocaleString("en-GB", {
     day: "2-digit",
     month: "short",
@@ -31,8 +30,8 @@ module.exports = async function generatePDF(transactionData) {
     .replace("{{date}}", formattedDate)
     .replace("{{reference}}", ref);
 
-  // Launch Puppeteer with chrome-aws-lambda settings
-  const browser = await puppeteer.launch({
+  // Launch Puppeteer from chrome-aws-lambda
+  const browser = await chromium.puppeteer.launch({
     args: chromium.args,
     defaultViewport: chromium.defaultViewport,
     executablePath: await chromium.executablePath,
