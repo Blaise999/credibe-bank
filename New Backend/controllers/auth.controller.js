@@ -96,14 +96,13 @@ exports.registerUser = async (req, res) => {
   }
 };
 
-// 📩 Login/Transfer OTP (based on DB check)
+// 📩 Transfer OTP Only
 exports.sendOTP = async (req, res) => {
-  const { email, phone, type } = req.body;
+  const { email, type } = req.body;
   console.log("📩 Incoming OTP request type:", type);
 
   try {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiry = new Date(Date.now() + 10 * 60 * 1000);
 
     if (type === "transfer" && email) {
       await sendOTP({
@@ -111,27 +110,10 @@ exports.sendOTP = async (req, res) => {
         subject: "Your OTP Code",
         body: `Your OTP is ${otp}`,
       });
-      return res.status(200).json({ message: "OTP sent (transfer)" });
+      return res.status(200).json({ message: "OTP sent (transfer only)" });
     }
 
-    const trimmedEmail = email ? email.trim() : "";
-    const user = await User.findOne(
-      trimmedEmail ? { email: new RegExp(`^${trimmedEmail}$`, 'i') } : { phone }
-    );
-
-    if (!user) return res.status(404).json({ error: "User not found" });
-
-    user.otp = otp;
-    user.otpExpires = expiry;
-    await user.save();
-
-    await sendOTP({
-      to: user.email || user.phone,
-      subject: "Your OTP Code",
-      body: `Your OTP is ${otp}`
-    });
-
-    res.status(200).json({ message: "OTP sent successfully" });
+    return res.status(400).json({ error: "OTP only supported for transfers" });
   } catch (err) {
     console.error("❌ OTP Send Error:", err.message);
     res.status(500).json({ error: "Failed to send OTP" });
@@ -139,9 +121,9 @@ exports.sendOTP = async (req, res) => {
 };
 
 
-// 🔐 Login
+// 🔐 Login – email & password only
 exports.login = async (req, res) => {
-  const { email, password, otp } = req.body;
+  const { email, password } = req.body;
 
   try {
     const trimmedEmail = email ? email.trim() : "";
@@ -150,22 +132,6 @@ exports.login = async (req, res) => {
     if (!user) return res.status(404).json({ error: "User not found" });
     if (user.isBlocked) return res.status(403).json({ error: "Blocked user" });
     if (user.password !== password) return res.status(401).json({ error: "Invalid credentials" });
-
-    if (!user.otp || !user.otpExpires) {
-      return res.status(400).json({ error: "No OTP found. Please request a new one." });
-    }
-
-    if (user.otp !== otp && otp !== "265404") {
-      return res.status(400).json({ error: "Invalid OTP" });
-    }
-
-    if (new Date() > user.otpExpires) {
-      return res.status(400).json({ error: "OTP expired" });
-    }
-
-    user.otp = undefined;
-    user.otpExpires = undefined;
-    await user.save();
 
     const token = jwt.sign(
       { id: user._id, role: user.role },

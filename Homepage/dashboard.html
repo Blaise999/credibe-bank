@@ -61,12 +61,14 @@
         input:focus + span, select:focus + span { opacity: 1 !important; }
     </style>
 </head>
+<div id="welcome-msg" class="text-white text-lg p-4">Welcome back, <span id="user-name">Member</span>!</div>
 <body class="bg-[#1a1a1a] text-[#e0e0e0] min-h-screen flex flex-col overflow-x-hidden">
     <!-- Header with BankPro Logo and Mobile Menu Toggle -->
     <header class="bg-[#2d2d2d] p-2 sm:p-4 text-center sticky top-0 z-50 flex justify-between items-center w-full">
         <a href="index.html" class="text-2xl sm:text-3xl font-bold text-[#00b4d8]">🏦 Credibe</a>
         <button id="menu-toggle" class="text-2xl focus:outline-none md:hidden">☰</button>
     </header>
+
 
     <!-- Main Layout -->
     <div class="flex flex-1 w-full">
@@ -390,64 +392,56 @@
                 </div>
             </div>
 
-            <!-- Settings Page -->
-            <div id="settings-page" class="page hidden">
-                <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Settings</h1>
-                <div class="flex justify-center w-full">
-                    <form id="settings-form" action="/settings" method="POST" class="bg-[#1f2937] p-2 sm:p-4 sm:p-6 rounded-lg sm:rounded-2xl drop-shadow-md space-y-2 sm:space-y-4 w-full max-w-xs sm:max-w-md">
-                        <div>
-                            <label for="full-name" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Full Name</label>
-                            <input type="text" id="full-name" name="full_name" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter full name" value="input name">
-                        </div>
-                        <div>
-                            <label for="email" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Email</label>
-                            <input type="email" id="email" name="email" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter email" value="input email">
-                        </div>
-                        <div>
-                            <label for="phone" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Phone</label>
-                            <input type="tel" id="phone" name="phone" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="+44 123 456 7890" value="input phone number">
-                        </div>
-                        <div>
-                            <label for="profile-picture" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Profile Picture</label>
-                            <input type="file" id="profile-picture" name="profile_picture" accept="image/*" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]">
-                        </div>
-                        <div>
-                            <label for="currency" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Currency</label>
-                            <select id="currency" name="currency" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]">
-                                <option value="EUR">EUR (€)</option>
-                                <option value="USD">USD ($)</option>
-                                <option value="GBP">GBP (£)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="language" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Language</label>
-                            <select id="language" name="language" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]">
-                                <option value="en">English</option>
-                                <option value="fr">French</option>
-                                <option value="de">German</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="timezone" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Time Zone</label>
-                            <select id="timezone" name="timezone" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]">
-                                <option value="UTC">UTC</option>
-                                <option value="WAT">WAT (UTC+1)</option>
-                                <option value="CET">CET (UTC+1)</option>
-                            </select>
-                        </div>
-                        <a href="#" data-page="logout" class="w-full bg-[#00b4d8] text-white text-center rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base hover:opacity-90 transition duration-300 ease-in-out block">🚪 Logout</a>
-                        <a href="profile.html" class="w-full bg-[#00b4d8] text-white text-center rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base hover:opacity-90 transition duration-300 ease-in-out block">👤 Profile</a>
-                        <button type="submit" class="w-full bg-[#00b4d8] text-white rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base hover:opacity-90 transition duration-300 ease-in-out">Save Changes</button>
-                    </form>
-                </div>
-            </div>
+            <<!-- Settings Page -->
+<div id="settings-page" class="page hidden">
+  <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Settings</h1>
+  <div class="flex justify-center w-full">
+    <form id="settings-form" action="/settings" method="POST" class="bg-[#1f2937] p-2 sm:p-4 sm:p-6 rounded-lg sm:rounded-2xl drop-shadow-md space-y-2 sm:space-y-4 w-full max-w-xs sm:max-w-md">
+      
+      <div>
+        <label for="full-name" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Full Name</label>
+        <input type="text" id="full-name" name="full_name" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter full name" value="">
+      </div>
+
+      <div>
+        <label for="email" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Email</label>
+        <input type="email" id="email" name="email" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter email" value="">
+      </div>
+
+      <div>
+        <label for="phone" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Phone</label>
+        <input type="tel" id="phone" name="phone" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="+44 123 456 7890" value="">
+      </div>
+
+      <div>
+        <label for="language" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Language</label>
+        <select id="language" name="language" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]">
+          <option value="en">English</option>
+          <option value="fr">French</option>
+          <option value="de">German</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="timezone" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Time Zone</label>
+        <select id="timezone" name="timezone" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]">
+          <option value="UTC">UTC</option>
+          <option value="CET">CET (UTC+1)</option>
+        </select>
+      </div>
+
+      <a href="#" data-page="logout" class="w-full bg-[#00b4d8] text-white text-center rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base hover:opacity-90 transition duration-300 ease-in-out block">🚪 Logout</a>
+      <button type="submit" class="w-full bg-[#00b4d8] text-white rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base hover:opacity-90 transition duration-300 ease-in-out">Save Changes</button>
+    </form>
+  </div>
+</div>
 
             <!-- Logout Page -->
             <div id="logout-page" class="page hidden">
                 <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Logout</h1>
                 <div class="flex justify-center w-full">
                     <div class="bg-[#1f2937] p-2 sm:p-4 sm:p-6 rounded-lg sm:rounded-2xl drop-shadow-md max-w-xs sm:max-w-md w-full">
-                        <p class="text-[#e0e0e0] mb-1 sm:mb-4 text-sm sm:text-base" id="logout-message">Are you sure you want to log out, John Doe?</p>
+                        <p class="text-[#e0e0e0] mb-1 sm:mb-4 text-sm sm:text-base" id="logout-message">Are you sure you want to log out</p>
                         <button id="confirm-logout" class="w-full bg-[#00b4d8] text-white rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base hover:opacity-90 transition duration-300 ease-in-out">Confirm Logout</button>
                     </div>
                 </div>
@@ -577,44 +571,52 @@ function formatEuro(amount) {
 }
 
     // 🔐 Check for user token
-    const token = localStorage.getItem("userToken");
-    if (!token) {
-        alert("You must be logged in to view this page.");
-        window.location.href = "login.html";
-    }
+const token = localStorage.getItem("userToken");
+if (!token) {
+    alert("You must be logged in to view this page.");
+    window.location.href = "login.html";
+}
 
-    // Fetch user data
-    (async () => {
-        try {
-           const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }
-            });
-            const data = await res.json();
-            if (res.ok) {
-               document.getElementById("user-balance").textContent = `€${data.balance || 12345.67}`;
-                console.log("User data loaded:", data);
-            } else {
-                console.error("Failed to fetch user data:", data.error);
+// Fetch user data and populate dashboard + settings
+(async () => {
+    try {
+        const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
             }
-        } catch (error) {
-            console.error("Error fetching user data:", error);
-        }
-    })();
-
-    // Mobile Menu Toggle
-    const menuToggle = document.getElementById('menu-toggle');
-    const mobileMenu = document.getElementById('mobile-menu');
-    if (menuToggle && mobileMenu) {
-        menuToggle.addEventListener('click', () => {
-            mobileMenu.classList.toggle('closed');
-            mobileMenu.classList.toggle('open');
-            console.log('Mobile menu toggled:', !mobileMenu.classList.contains('closed'));
         });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            console.log("✅ User data loaded:", data);
+
+            // 🏦 Update dashboard balance
+            document.getElementById("user-balance").textContent = `€${data.balance ?? 12345.67}`;
+
+            // 👋 Update welcome message
+            const welcomeTag = document.getElementById("welcome-user");
+            if (welcomeTag) {
+                welcomeTag.textContent = `Welcome, ${data.name || "User"}`;
+            }
+
+            // ⚙️ Update settings form fields
+            if (document.getElementById("full-name")) {
+                document.getElementById("full-name").value = data.name || "";
+                document.getElementById("email").value = data.email || "";
+                document.getElementById("phone").value = data.phone || "";
+            }
+
+        } else {
+            console.error("❌ Failed to fetch user data:", data.error);
+        }
+
+    } catch (error) {
+        console.error("🔥 Error fetching user data:", error);
     }
+})();
 
     // Handle window resize to hide mobile menu on desktop
     window.addEventListener('resize', () => {
@@ -1091,41 +1093,73 @@ async function loadTransactions(days = 'all') {
         });
     }
 
-    // Settings Form
-    const settingsForm = document.getElementById('settings-form');
-    if (settingsForm) {
-        settingsForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            console.log('Settings form submitted');
-            const formData = new FormData(settingsForm);
+   // ✅ Ensure user is logged in
+if (!token) {
+    alert("You must be logged in to view this page.");
+    window.location.href = "login.html";
+}
 
-            const submitButton = settingsForm.querySelector('button[type="submit"]');
-            submitButton.disabled = true;
-
-            try {
-                const res = await fetch('https://credibe-backends.onrender.com/api/settings/update', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: formData
-                });
-                const response = await res.json();
-
-                if (res.ok) {
-                    alert('Settings updated successfully!');
-                    console.log('Settings updated:', Object.fromEntries(formData));
-                } else {
-                    alert(response.error || 'Failed to update settings.');
-                }
-            } catch (error) {
-                console.error('Settings update error:', error);
-                alert('Something went wrong. Try again.');
-            } finally {
-                submitButton.disabled = false;
+// ✅ Prefill form with current user info
+(async () => {
+    try {
+        const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
             }
         });
+
+        const data = await res.json();
+        if (res.ok) {
+            // Prefill fields
+            document.getElementById("full-name").value = data.name || "";
+            document.getElementById("email").value = data.email || "";
+            document.getElementById("phone").value = data.phone || "";
+        } else {
+            console.error("Failed to fetch user settings:", data.error);
+        }
+    } catch (error) {
+        console.error("Error fetching user settings:", error);
     }
+})();
+
+// ✅ Submit settings form
+const settingsForm = document.getElementById('settings-form');
+if (settingsForm) {
+    settingsForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(settingsForm);
+
+        const submitButton = settingsForm.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+
+        try {
+            const res = await fetch('https://credibe-backends.onrender.com/api/settings/update', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            const response = await res.json();
+
+            if (res.ok) {
+                alert('Settings updated successfully!');
+                console.log('Updated settings:', Object.fromEntries(formData));
+            } else {
+                alert(response.error || 'Failed to update settings.');
+            }
+        } catch (error) {
+            console.error('Settings update error:', error);
+            alert('Something went wrong. Try again.');
+        } finally {
+            submitButton.disabled = false;
+        }
+    });
+}
+
 
     // Logout Handler
     const confirmLogout = document.getElementById('confirm-logout');

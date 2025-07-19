@@ -230,6 +230,21 @@ exports.handleTransaction = async (req, res) => {
   }
 };
 
+// ⏳ Get Pending Transfers
+exports.getPendingTransfers = async (req, res) => {
+  try {
+    const pendingTransfers = await Transaction.find({ status: "pending" })
+      .populate("from to")
+      .sort({ createdAt: -1 });
+
+    console.log("🧪 getPendingTransfers", { count: pendingTransfers.length });
+    res.json(pendingTransfers);
+  } catch (err) {
+    console.error("❌ Failed to fetch pending transfers", { error: err.message });
+    res.status(500).json({ error: "Failed to fetch pending transfers" });
+  }
+};
+
 // 📜 Admin Transfer History
 exports.getTransferHistory = async (req, res) => {
   try {
