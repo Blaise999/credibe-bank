@@ -23,6 +23,7 @@ module.exports = async function generatePDF(transactionData) {
   const maskedAccount = rawAccount.length >= 4 ? "**** **** **** " + rawAccount.slice(-4) : "****";
   const formattedAmount = parseFloat(amount).toFixed(2);
 
+  // Resolve sender and recipient names
   const senderName =
     typeof from === "object"
       ? from.fullName || from.name || from.email || "Sender"
@@ -33,7 +34,7 @@ module.exports = async function generatePDF(transactionData) {
     (typeof to === "object" ? to.fullName || to.name || to.email : to) ||
     "Recipient";
 
-  // Replace placeholders
+  // Placeholder map
   const dataMap = {
     "{{senderName}}": senderName,
     "{{recipientName}}": recipientName,
@@ -47,15 +48,15 @@ module.exports = async function generatePDF(transactionData) {
     "{{maskedAccount}}": maskedAccount
   };
 
+  // Replace all placeholders using global RegExp
   for (const [key, value] of Object.entries(dataMap)) {
     const regex = new RegExp(key.replace(/[{}]/g, "\\$&"), "g");
     html = html.replace(regex, value);
   }
 
-  // Launch Chromium (Render-safe using env)
+  // Generate PDF
   const browser = await chromium.launch({
-    headless: true,
-    args: process.env.NODE_ENV === "production" ? ["--no-sandbox"] : []
+    headless: true
   });
 
   const page = await browser.newPage();
@@ -63,7 +64,7 @@ module.exports = async function generatePDF(transactionData) {
 
   const pdfBuffer = await page.pdf({
     format: "A4",
-    printBackground: true
+    printBackground: true,
   });
 
   await browser.close();
