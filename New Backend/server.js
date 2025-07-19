@@ -38,6 +38,7 @@ const transferRoutes = require("./routes/transfer");
 const adminRoutes = require("./routes/admin");
 const userRoutes = require("./routes/user");
 const topUpRoutes = require("./routes/topup");
+const settingsRoutes = require('./routes/settings'); // ✅ Add this line
 
 // ✅ Connect to MongoDB
 const connectDB = require("./config/db");
@@ -51,6 +52,7 @@ const startServer = async () => {
   app.use("/api/admin", adminRoutes);
   app.use("/api/user", userRoutes);
   app.use("/api/topup", topUpRoutes);
+  app.use('/api/settings', settingsRoutes); // ✅ Mount settings route
 
   // ✅ Use dynamic port for Render
   const PORT = process.env.PORT || 3000;

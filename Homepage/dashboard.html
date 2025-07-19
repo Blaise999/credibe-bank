@@ -1205,6 +1205,10 @@ if (settingsForm) {
         e.preventDefault();
         const formData = new FormData(settingsForm);
 
+        const name = document.getElementById('full-name').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+
         const submitButton = settingsForm.querySelector('button[type="submit"]');
         submitButton.disabled = true;
 
@@ -1212,16 +1216,17 @@ if (settingsForm) {
             const res = await fetch('https://credibe-backends.onrender.com/api/settings/update', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('userToken')}`
                 },
-                body: formData
+                body: JSON.stringify({ name, email, phone })
             });
 
             const response = await res.json();
 
             if (res.ok) {
                 alert('Settings updated successfully!');
-                console.log('Updated settings:', Object.fromEntries(formData));
+                console.log('Updated settings:', { name, email, phone });
             } else {
                 alert(response.error || 'Failed to update settings.');
             }
