@@ -640,161 +640,161 @@ function formatEuro(amount) {
   })}`;
 }
 
-    // 🔐 Check for user token
+// 🔐 Check for user token
 const token = localStorage.getItem("userToken");
 if (!token) {
     alert("You must be logged in to view this page.");
     window.location.href = "login.html";
 }
 
-    // Handle window resize to hide mobile menu on desktop
-    window.addEventListener('resize', () => {
-        if (window.innerWidth >= 768 && mobileMenu && !mobileMenu.classList.contains('closed')) {
-            mobileMenu.classList.add('closed');
-            mobileMenu.classList.remove('open');
-            console.log('Mobile menu hidden on resize to desktop');
+// Handle window resize to hide mobile menu on desktop
+window.addEventListener('resize', () => {
+    if (window.innerWidth >= 768 && mobileMenu && !mobileMenu.classList.contains('closed')) {
+        mobileMenu.classList.add('closed');
+        mobileMenu.classList.remove('open');
+        console.log('Mobile menu hidden on resize to desktop');
+    }
+});
+
+// Page Switching with Skeleton Loader
+const navLinks = document.querySelectorAll('.nav-link');
+const pages = document.querySelectorAll('.page');
+
+function showPage(pageId) {
+    pages.forEach(page => {
+        page.classList.add('hidden');
+        if (page.__x && page.__x.$data) {
+            page.__x.$data.loading = true;
         }
     });
 
-    // Page Switching with Skeleton Loader
-    const navLinks = document.querySelectorAll('.nav-link');
-    const pages = document.querySelectorAll('.page');
+    const activePage = document.getElementById(`${pageId}-page`);
+    if (activePage) {
+        setTimeout(() => {
+            activePage.classList.remove('hidden');
+            if (activePage.__x && activePage.__x.$data) {
+                activePage.__x.$data.loading = false;
+            }
+            if (pageId === 'transactions') {
+                loadTransactions();
+            }
+        }, 500);
+    }
 
-    function showPage(pageId) {
-        pages.forEach(page => {
-            page.classList.add('hidden');
-            if (page.__x && page.__x.$data) {
-                page.__x.$data.loading = true;
+    navLinks.forEach(link => link.classList.remove('bg-[#3a3a3a]', 'text-[#00b4d8]'));
+    const activeLink = document.querySelector(`[data-page="${pageId}"]`);
+    if (activeLink) activeLink.classList.add('bg-[#3a3a3a]', 'text-[#00b4d8]');
+
+    if (window.innerWidth < 768 && mobileMenu) {
+        mobileMenu.classList.add('closed');
+        mobileMenu.classList.remove('open');
+    }
+
+    console.log(`Switched to page: ${pageId}`);
+}
+
+navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const pageId = link.getAttribute('data-page');
+        showPage(pageId);
+    });
+});
+
+// Charts
+const spendingChartCtx = document.getElementById('spending-chart');
+if (spendingChartCtx) {
+    try {
+        new Chart(spendingChartCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Spending',
+                    data: [1200, 1900, 1500, 2200, 1800, 2500],
+                    borderColor: '#00b4d8',
+                    backgroundColor: 'rgba(0, 180, 216, 0.2)',
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#00b4d8',
+                    pointBorderColor: '#e0e0e0'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } },
+                    x: { ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } }
+                },
+                plugins: { legend: { labels: { color: '#e0e0e0', font: { size: 12 } } } },
+                animation: { duration: 1000, easing: 'easeInOutQuad' }
             }
         });
-
-        const activePage = document.getElementById(`${pageId}-page`);
-        if (activePage) {
-            setTimeout(() => {
-                activePage.classList.remove('hidden');
-                if (activePage.__x && activePage.__x.$data) {
-                    activePage.__x.$data.loading = false;
-                }
-                if (pageId === 'transactions') {
-                    loadTransactions();
-                }
-            }, 500);
-        }
-
-        navLinks.forEach(link => link.classList.remove('bg-[#3a3a3a]', 'text-[#00b4d8]'));
-        const activeLink = document.querySelector(`[data-page="${pageId}"]`);
-        if (activeLink) activeLink.classList.add('bg-[#3a3a3a]', 'text-[#00b4d8]');
-
-        if (window.innerWidth < 768 && mobileMenu) {
-            mobileMenu.classList.add('closed');
-            mobileMenu.classList.remove('open');
-        }
-
-        console.log(`Switched to page: ${pageId}`);
+        console.log('Spending chart initialized');
+    } catch (error) {
+        console.error('Error initializing spending chart:', error);
     }
+}
 
-    navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const pageId = link.getAttribute('data-page');
-            showPage(pageId);
+const monthlySpendingChartCtx = document.getElementById('monthly-spending-chart');
+if (monthlySpendingChartCtx) {
+    try {
+        new Chart(monthlySpendingChartCtx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Monthly Spending',
+                    data: [1000, 1500, 1200, 1800, 1600, 2000],
+                    backgroundColor: '#00b4d8',
+                    borderColor: '#e0e0e0',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } },
+                    x: { ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } }
+                },
+                plugins: { legend: { labels: { color: '#e0e0e0', font: { size: 12 } } } },
+                animation: { duration: 1000, easing: 'easeInOutQuad' }
+            }
         });
-    });
-
-    // Charts
-    const spendingChartCtx = document.getElementById('spending-chart');
-    if (spendingChartCtx) {
-        try {
-            new Chart(spendingChartCtx.getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Spending',
-                        data: [1200, 1900, 1500, 2200, 1800, 2500],
-                        borderColor: '#00b4d8',
-                        backgroundColor: 'rgba(0, 180, 216, 0.2)',
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#00b4d8',
-                        pointBorderColor: '#e0e0e0'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true, ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } },
-                        x: { ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } }
-                    },
-                    plugins: { legend: { labels: { color: '#e0e0e0', font: { size: 12 } } } },
-                    animation: { duration: 1000, easing: 'easeInOutQuad' }
-                }
-            });
-            console.log('Spending chart initialized');
-        } catch (error) {
-            console.error('Error initializing spending chart:', error);
-        }
+        console.log('Monthly spending chart initialized');
+    } catch (error) {
+        console.error('Error initializing monthly spending chart:', error);
     }
+}
 
-    const monthlySpendingChartCtx = document.getElementById('monthly-spending-chart');
-    if (monthlySpendingChartCtx) {
-        try {
-            new Chart(monthlySpendingChartCtx.getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Monthly Spending',
-                        data: [1000, 1500, 1200, 1800, 1600, 2000],
-                        backgroundColor: '#00b4d8',
-                        borderColor: '#e0e0e0',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true, ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } },
-                        x: { ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } }
-                    },
-                    plugins: { legend: { labels: { color: '#e0e0e0', font: { size: 12 } } } },
-                    animation: { duration: 1000, easing: 'easeInOutQuad' }
-                }
-            });
-            console.log('Monthly spending chart initialized');
-        } catch (error) {
-            console.error('Error initializing monthly spending chart:', error);
-        }
+const categorySpendingChartCtx = document.getElementById('category-spending-chart');
+if (categorySpendingChartCtx) {
+    try {
+        new Chart(categorySpendingChartCtx.getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: ['Groceries', 'Bills', 'Entertainment', 'Travel', 'Other'],
+                datasets: [{
+                    data: [30, 25, 20, 15, 10],
+                    backgroundColor: ['#00b4d8', '#87ceeb', '#4682b4', '#1e90ff', '#add8e6'],
+                    borderColor: '#e0e0e0',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: '#e0e0e0', font: { size: 12 } } } },
+                animation: { duration: 1000, easing: 'easeInOutQuad' }
+            }
+        });
+        console.log('Category spending chart initialized');
+    } catch (error) {
+        console.error('Error initializing category spending chart:', error);
     }
-
-    const categorySpendingChartCtx = document.getElementById('category-spending-chart');
-    if (categorySpendingChartCtx) {
-        try {
-            new Chart(categorySpendingChartCtx.getContext('2d'), {
-                type: 'pie',
-                data: {
-                    labels: ['Groceries', 'Bills', 'Entertainment', 'Travel', 'Other'],
-                    datasets: [{
-                        data: [30, 25, 20, 15, 10],
-                        backgroundColor: ['#00b4d8', '#87ceeb', '#4682b4', '#1e90ff', '#add8e6'],
-                        borderColor: '#e0e0e0',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: '#e0e0e0', font: { size: 12 } } } },
-                    animation: { duration: 1000, easing: 'easeInOutQuad' }
-                }
-            });
-            console.log('Category spending chart initialized');
-        } catch (error) {
-            console.error('Error initializing category spending chart:', error);
-        }
-    }
+}
 
 // Transfer Form
 const transferForm = document.getElementById('transfer-form');
@@ -949,13 +949,15 @@ if (transferForm) {
                     submitSpinner.classList.add('hidden');
                     submitTransfer.disabled = false;
 
+                    // 🛠️ Fix: Explicitly set date for pending transfer
                     localStorage.setItem('pendingTransfer', JSON.stringify({
                         recipientName,
                         recipientIban,
                         amount,
                         purpose,
                         reference,
-                        transferId: data.transactionId
+                        transferId: data.transactionId,
+                        date: new Date().toISOString() // Ensure date is set
                     }));
 
                     window.location.href = 'transfer-pending.html';
@@ -1024,9 +1026,16 @@ function generateStaticFakeTransactions() {
 // ⏳ Filter transactions strictly by date
 function filterTxnsByDays(txns, days) {
   const now = new Date();
+  // 🛠️ Fix: Log client date and warn if future
+  console.log("Client date:", now.toISOString());
+  if (now.getFullYear() > 2025) {
+    console.warn("Device clock is set to a future year:", now);
+  }
+  // 🛠️ Fix: Enforce date cap of March 26, 2025
+  const dateCap = new Date('2025-03-26T23:59:59.999Z');
   return txns.filter(t => {
     const rawDate = new Date(t.date || t.createdAt);
-    if (isNaN(rawDate.getTime()) || rawDate > now) return false;
+    if (isNaN(rawDate.getTime()) || rawDate > now || rawDate > dateCap) return false;
 
     const daysDiff = (now - rawDate) / (1000 * 60 * 60 * 24);
     return days === 'all' || daysDiff <= parseInt(days);
@@ -1042,7 +1051,11 @@ async function loadTransactions(days = 'all') {
 
   try {
     const userId = localStorage.getItem("userId") || "";
-    const url = `https://credibe-backends.onrender.com/api/user/transactions/${userId}${days !== 'all' ? `?days=${days}` : ''}`;
+    // 🛠️ Fix: Add cache-busting parameter
+    const url = `https://credibe-backends.onrender.com/api/user/transactions/${userId}${days !== 'all' ? `?days=${days}` : ''}&_=${Date.now()}`;
+
+    // 🛠️ Fix: Log API URL
+    console.log("API URL:", url);
 
     const res = await fetch(url, {
       headers: {
@@ -1051,7 +1064,11 @@ async function loadTransactions(days = 'all') {
     });
 
     const transactions = res.ok ? await res.json() : [];
-    console.log("🔥 Raw transactions:", transactions);
+    // 🛠️ Fix: Log raw transactions and warn on missing recipients
+    console.log("🔥 Raw transactions:", JSON.stringify(transactions, null, 2));
+    transactions.forEach(t => {
+      if (!t.recipient) console.warn("Missing recipient for transaction:", t);
+    });
 
     // 🧠 Apply filter by days
     const filtered = filterTxnsByDays(transactions, days);
@@ -1077,7 +1094,10 @@ async function loadTransactions(days = 'all') {
         ? txnDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
         : 'Unknown';
 
-      const recipient = t.recipient || 'Unknown';
+      // 🛠️ Fix: Fallback to pendingTransfer recipientName
+      const pendingTransfer = JSON.parse(localStorage.getItem('pendingTransfer') || '{}');
+      const recipient = t.recipient || pendingTransfer.recipientName || 'Unknown';
+
       const amount = typeof t.amount === "number" ? `${t.amount} €` : 'Unknown';
 
       const statusRaw = t.status || 'pending';
@@ -1109,6 +1129,7 @@ async function loadTransactions(days = 'all') {
     tableBody.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-red-500">Error loading transactions.</td></tr>';
   }
 }
+})();
 
     // Security Handlers
     const changePassword = document.getElementById('change-password');
@@ -1295,7 +1316,6 @@ document.getElementById("creditAmount").textContent = `€${data.credits.toLocal
 }
 
 window.onload = loadUserDashboard;
-})();
 </script>
 
 
