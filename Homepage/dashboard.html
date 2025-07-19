@@ -168,40 +168,38 @@
 
         <!-- Main Content Area -->
         <main class="flex-1 p-2 sm:p-4 w-full md:ml-64">
-       <!-- Dashboard Page -->
-<div id="dashboard-page" class="page">
-    <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Dashboard</h1>
-    <div x-data="{ loading: true }" class="space-y-2 sm:space-y-4">
-        <div x-show="loading" class="grid grid-cols-1 gap-2 sm:gap-4">
-            <div class="skeleton h-16 sm:h-24"></div>
-            <div class="skeleton h-16 sm:h-24"></div>
-            <div class="skeleton h-16 sm:h-24"></div>
-        </div>
-        <div x-show="!loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
-            <!-- Total Balance -->
-            <div class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md hover:scale-105 transition duration-300 ease-in-out">
-                <a href="add-money.html" class="block flex flex-col">
-                    <span class="text-xl sm:text-3xl">💰</span>
-                    <h3 class="text-[#e0e0e0] font-semibold mt-1 sm:mt-2 text-sm sm:text-base">Total Balance</h3>
-                    <p id="totalBalance" class="text-[#00b4d8] text-base sm:text-xl">€0.00</p>
-                </a>
-            </div>
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page">
+                <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Dashboard</h1>
+                <div x-data="{ loading: false }" class="space-y-2 sm:space-y-4">
+                    <div x-show="loading" class="grid grid-cols-1 gap-2 sm:gap-4">
+                        <div class="skeleton h-16 sm:h-24"></div>
+                        <div class="skeleton h-16 sm:h-24"></div>
+                        <div class="skeleton h-16 sm:h-24"></div>
+                    </div>
+                   <div x-show="!loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
+  <!-- Total Balance -->
+  <div class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md hover:scale-105 transition duration-300 ease-in-out">
+    <a href="add-money.html" class="block flex flex-col">
+      <span class="text-xl sm:text-3xl">💰</span>
+      <h3 class="text-[#e0e0e0] font-semibold mt-1 sm:mt-2 text-sm sm:text-base">Total Balance</h3>
+      <p id="totalBalance" class="text-[#00b4d8] text-base sm:text-xl">€0.00</p>
+    </a>
+  </div>
 
-            <!-- Savings -->
-            <div class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md hover:scale-105 transition duration-300 ease-in-out">
-                <span class="text-xl sm:text-3xl">🏦</span>
-                <h3 class="text-[#e0e0e0] font-semibold mt-1 sm:mt-2 text-sm sm:text-base">Savings</h3>
-                <p id="savingsAmount" class="text-[#00b4d8] text-base sm:text-xl">€0.00</p>
-            </div>
+  <!-- Savings -->
+  <div class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md hover:scale-105 transition duration-300 ease-in-out">
+    <span class="text-xl sm:text-3xl">🏦</span>
+    <h3 class="text-[#e0e0e0] font-semibold mt-1 sm:mt-2 text-sm sm:text-base">Savings</h3>
+    <p id="savingsAmount" class="text-[#00b4d8] text-base sm:text-xl">€0.00</p>
+  </div>
 
-            <!-- Credit -->
-            <div class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md hover:scale-105 transition duration-300 ease-in-out">
-                <span class="text-xl sm:text-3xl">💳</span>
-                <h3 class="text-[#e0e0e0] font-semibold mt-1 sm:mt-2 text-sm sm:text-base">Credit</h3>
-                <p id="creditAmount" class="text-[#00b4d8] text-base sm:text-xl">€0.00</p>
-            </div>
-        </div>
-    </div>
+  <!-- Credit -->
+  <div class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md hover:scale-105 transition duration-300 ease-in-out">
+    <span class="text-xl sm:text-3xl">💳</span>
+    <h3 class="text-[#e0e0e0] font-semibold mt-1 sm:mt-2 text-sm sm:text-base">Credit</h3>
+    <p id="creditAmount" class="text-[#00b4d8] text-base sm:text-xl">€0.00</p>
+  </div>
 </div>
           <div class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md chart-container">
                         <h2 class="text-lg sm:text-xl font-semibold text-[#e0e0e0] mb-1 sm:mb-4">Spending Overview</h2>
@@ -632,7 +630,7 @@
   <footer class="bg-[#111] text-gray-400 text-xs text-center py-4 mt-auto">
     © 2025 Credibe. All rights reserved. | <a href="#">Privacy</a> | <a href="#">Terms</a> | <a href="#">Support</a>
   </footer>
-
+  
 <script>
 (async () => {
 function formatEuro(amount) {
@@ -1258,48 +1256,37 @@ if (settingsForm) {
     });
 
     // Ensure script execution completes
- async function loadUserDashboard() {
-    const token = localStorage.getItem("userToken");
-    if (!token) {
-        alert("You must be logged in to view this page.");
-        window.location.href = "login.html";
-        return;
+   
+  async function loadUserDashboard() {
+  const token = localStorage.getItem("userToken");
+  if (!token) {
+    alert("You must be logged in to view this page.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  try {
+    const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      console.error("❌ Failed to load user data:", errorData);
+      throw new Error(errorData.error || "Unknown error");
     }
 
-    const dashboard = document.querySelector('#dashboard-page [x-data]');
-    if (dashboard && dashboard.__x) {
-        dashboard.__x.$data.loading = true; // Show skeleton loader
-    }
+    const data = await res.json();
 
-    try {
-        const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-
-        if (!res.ok) {
-            const errorData = await res.json();
-            console.error("❌ Failed to load user data:", errorData);
-            throw new Error(errorData.error || "Unknown error");
-        }
-
-        const data = await res.json();
-        const { balance = 0, savings = 0, credits = 0 } = data;
-
-        // Update dashboard values with fetched data
-        document.getElementById("totalBalance").textContent = `€${balance.toLocaleString()}`;
-        document.getElementById("savingsAmount").textContent = `€${savings.toLocaleString()}`;
-        document.getElementById("creditAmount").textContent = `€${credits.toLocaleString()}`;
-    } catch (err) {
-        console.error("❌ Dashboard load error:", err.message);
-        // Fallback to €0.00 on error
-        document.getElementById("totalBalance").textContent = "€0.00";
-        document.getElementById("savingsAmount").textContent = "€0.00";
-        document.getElementById("creditAmount").textContent = "€0.00";
-    } finally {
-        if (dashboard && dashboard.__x) {
-            dashboard.__x.$data.loading = false; // Hide skeleton loader
-        }
-    }
+    // 🔁 Update the user dashboard values
+ document.getElementById("totalBalance").textContent = `€${data.balance.toLocaleString()}`;
+document.getElementById("savingsAmount").textContent = `€${data.savings.toLocaleString()}`;
+document.getElementById("creditAmount").textContent = `€${data.credits.toLocaleString()}`;
+  } catch (err) {
+    console.error("❌ Dashboard load error:", err.message);
+  }
 }
 
 window.onload = loadUserDashboard;
