@@ -5,9 +5,11 @@ const path = require("path");
 module.exports = async function generatePDF(transactionData) {
   const { from, to, amount, toIban, note, date, recipient, _id } = transactionData;
 
+  // Load HTML template
   const templatePath = path.join(__dirname, "../templates/receiptTemplate.html");
   let html = fs.readFileSync(templatePath, "utf8");
 
+  // Format values
   const formattedDate = new Date(date || Date.now()).toLocaleString("en-GB", {
     day: "2-digit",
     month: "short",
@@ -21,9 +23,20 @@ module.exports = async function generatePDF(transactionData) {
   const maskedAccount = rawAccount.length >= 4 ? "**** **** **** " + rawAccount.slice(-4) : "****";
   const formattedAmount = parseFloat(amount).toFixed(2);
 
+  const senderName =
+    typeof from === "object"
+      ? from.fullName || from.name || from.email || "Sender"
+      : from || "Sender";
+
+  const recipientName =
+    recipient ||
+    (typeof to === "object" ? to.fullName || to.name || to.email : to) ||
+    "Recipient";
+
+  // Replace placeholders
   const dataMap = {
-    "{{senderName}}": from || "N/A",
-    "{{recipientName}}": recipient || to || "N/A",
+    "{{senderName}}": senderName,
+    "{{recipientName}}": recipientName,
     "{{iban}}": toIban || "N/A",
     "{{amount}}": `€${formattedAmount}`,
     "{{fee}}": `€0.00`,
@@ -34,19 +47,23 @@ module.exports = async function generatePDF(transactionData) {
     "{{maskedAccount}}": maskedAccount
   };
 
-  // Use regex to replace all
-  for (const [placeholder, value] of Object.entries(dataMap)) {
-    const regex = new RegExp(placeholder.replace(/[{}/]/g, "\\$&"), "g");
+  for (const [key, value] of Object.entries(dataMap)) {
+    const regex = new RegExp(key.replace(/[{}]/g, "\\$&"), "g");
     html = html.replace(regex, value);
   }
 
-  const browser = await chromium.launch({ headless: true });
+  // Launch Chromium (Render-safe using env)
+  const browser = await chromium.launch({
+    headless: true,
+    args: process.env.NODE_ENV === "production" ? ["--no-sandbox"] : []
+  });
+
   const page = await browser.newPage();
   await page.setContent(html, { waitUntil: "networkidle" });
 
   const pdfBuffer = await page.pdf({
     format: "A4",
-    printBackground: true,
+    printBackground: true
   });
 
   await browser.close();
