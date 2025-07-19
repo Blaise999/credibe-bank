@@ -1020,8 +1020,7 @@ if (transferForm) {
     });
 }
 
-// Transaction Filter
-// 🎯 Filter dropdown
+// 🎯 Transaction Filter Dropdown
 const transactionFilter = document.getElementById('transaction-filter');
 if (transactionFilter) {
   transactionFilter.addEventListener('change', (e) => {
@@ -1032,7 +1031,7 @@ if (transactionFilter) {
   });
 }
 
-// 🧪 One-time static fake transactions generator
+// 🧪 Static fake transaction generator (local use only)
 function generateStaticFakeTransactions() {
   const cached = localStorage.getItem('fakeTransactions');
   if (cached) return JSON.parse(cached);
@@ -1052,7 +1051,7 @@ function generateStaticFakeTransactions() {
 
     txns.push({
       _id: `fake-${i}`,
-      date: date.toISOString(), // ✅ unified field
+      date: date.toISOString(),
       recipient: names[Math.floor(Math.random() * names.length)],
       amount: Math.floor(Math.random() * 900 + 100),
       status: "approved"
@@ -1063,11 +1062,11 @@ function generateStaticFakeTransactions() {
   return txns;
 }
 
-// 🧪 Filter transactions strictly by date
+// ⏳ Filter transactions strictly by date
 function filterTxnsByDays(txns, days) {
   const now = new Date();
   return txns.filter(t => {
-    const rawDate = new Date(t.date || t.createdAt); // unified logic
+    const rawDate = new Date(t.date || t.createdAt);
     if (isNaN(rawDate.getTime()) || rawDate > now) return false;
 
     const daysDiff = (now - rawDate) / (1000 * 60 * 60 * 24);
@@ -1075,7 +1074,6 @@ function filterTxnsByDays(txns, days) {
   });
 }
 
-// 📦 Load and display all transactions
 // 📦 Load and display all transactions
 async function loadTransactions(days = 'all') {
   const tableBody = document.getElementById('transactions-table');
@@ -1095,20 +1093,26 @@ async function loadTransactions(days = 'all') {
 
     const transactions = res.ok ? await res.json() : [];
 
+    // 🧠 Apply filter by days
+    const filtered = filterTxnsByDays(transactions, days);
 
-    const sortedTxns = transactions.sort((a, b) => {
+    // 🧠 Sort newest → oldest
+    const sortedTxns = filtered.sort((a, b) => {
       const aDate = new Date(a.date || a.createdAt);
       const bDate = new Date(b.date || b.createdAt);
       return bDate - aDate;
     });
 
+    // 🧼 No results
     if (sortedTxns.length === 0) {
       tableBody.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-gray-500">No transactions found.</td></tr>';
       return;
     }
 
+    // 🧾 Render each row
     tableBody.innerHTML = sortedTxns.map(t => {
-      const txnDate = new Date(t.date || t.createdAt);
+      const rawDate = t.date || t.createdAt;
+      const txnDate = new Date(rawDate);
       const formattedDate = !isNaN(txnDate.getTime())
         ? txnDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
         : 'Unknown';
@@ -1145,7 +1149,6 @@ async function loadTransactions(days = 'all') {
     tableBody.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-red-500">Error loading transactions.</td></tr>';
   }
 }
-
 
     // Security Handlers
     const changePassword = document.getElementById('change-password');
