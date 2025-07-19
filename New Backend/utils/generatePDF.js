@@ -1,4 +1,4 @@
-const { chromium } = require("playwright"); // ✔️ Full version
+const { chromium } = require("playwright");
 const fs = require("fs");
 const path = require("path");
 
@@ -9,38 +9,26 @@ module.exports = async function generatePDF(transactionData) {
   let html = fs.readFileSync(templatePath, "utf8");
 
   const formattedDate = new Date(date || Date.now()).toLocaleString("en-GB", {
-    day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
   });
 
   const ref = _id?.toString().slice(-6).toUpperCase() || Math.random().toString(36).slice(2, 10).toUpperCase();
-  const rawAccount = toIban?.replace(/\s+/g, "") || "";
-  const maskedAccount = rawAccount.length >= 4 ? "**** **** **** " + rawAccount.slice(-4) : "****";
-  const formattedAmount = parseFloat(amount).toFixed(2);
 
-  const senderName = typeof from === "object" ? from.fullName || from.name || from.email || "Sender" : from || "Sender";
-  const recipientName = recipient || (typeof to === "object" ? to.fullName || to.name || to.email : to) || "Recipient";
-
-  const dataMap = {
-    "{{senderName}}": senderName,
-    "{{recipientName}}": recipientName,
-    "{{iban}}": toIban || "N/A",
-    "{{amount}}": `€${formattedAmount}`,
-    "{{fee}}": `€0.00`,
-    "{{total}}": `€${formattedAmount}`,
-    "{{note}}": note || "No note",
-    "{{date}}": formattedDate,
-    "{{reference}}": ref,
-    "{{maskedAccount}}": maskedAccount
-  };
-
-  for (const [key, value] of Object.entries(dataMap)) {
-    const regex = new RegExp(key.replace(/[{}]/g, "\\$&"), "g");
-    html = html.replace(regex, value);
-  }
+  html = html
+    .replace("{{senderName}}", from || "N/A")
+    .replace("{{recipientName}}", recipient || to || "N/A")
+    .replace("{{iban}}", toIban || "N/A")
+    .replace("{{amount}}", `€${amount}`)
+    .replace("{{note}}", note || "No note")
+    .replace("{{date}}", formattedDate)
+    .replace("{{reference}}", ref);
 
   const browser = await chromium.launch({
     headless: true,
-    args: process.env.NODE_ENV === "production" ? ["--no-sandbox"] : []
   });
 
   const page = await browser.newPage();
@@ -48,7 +36,7 @@ module.exports = async function generatePDF(transactionData) {
 
   const pdfBuffer = await page.pdf({
     format: "A4",
-    printBackground: true
+    printBackground: true,
   });
 
   await browser.close();
