@@ -12,71 +12,133 @@
     <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.0/dist/vanilla-tilt.min.js"></script>
     <script src="https://js.stripe.com/v3/"></script>
 
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
+   <style>
+    body {
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .skeleton {
+        animation: pulse 1.5s infinite ease-in-out;
+        background-color: #2d2d2d;
+        height: 1.5rem;
+        border-radius: 0.25rem;
+    }
+
+    .chart-container {
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .mobile-menu {
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .mobile-menu.open {
+        transform: translateX(0);
+    }
+
+    .mobile-menu.closed {
+        transform: translateX(-100%);
+    }
+
+    .fade-in {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .gradient-border {
+        border: 2px solid transparent;
+        background: linear-gradient(45deg, #00b4d8, #00d4ff, #00b4d8) border-box;
+        background-size: 200%;
+        animation: gradientShift 3s ease infinite;
+    }
+
+    .gradient-border:hover {
+        background: linear-gradient(45deg, #00d4ff, #00b4d8, #00d4ff) border-box;
+    }
+
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .map-path { 
+        fill: #2d2d2d; 
+    }
+
+    input:focus + span, select:focus + span { 
+        opacity: 1 !important; 
+    }
+
+    /* Header Enhancements */
+    .header {
+        transition: background-color 0.3s ease;
+    }
+
+    .header:hover {
+        background-color: #3a3a3a;
+    }
+
+    .greeting {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .greeting:hover {
+        transform: scale(1.05);
+        opacity: 0.9;
+    }
+
+    /* Mobile Greeting (Simplified) */
+    @media (max-width: 767px) {
+        .header .greeting {
+            display: none;
         }
-        .skeleton {
-            animation: pulse 1.5s infinite ease-in-out;
-            background-color: #2d2d2d;
-            height: 1.5rem;
-            border-radius: 0.25rem;
+        .header::after {
+            content: "👋 Member";
+            display: block;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #bbb;
+            padding-top: 0.5rem;
         }
-        .chart-container {
-            animation: fadeIn 1s ease-in-out;
-        }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .mobile-menu {
-            transition: transform 0.3s ease-in-out;
-        }
-        .mobile-menu.open {
-            transform: translateX(0);
-        }
-        .mobile-menu.closed {
-            transform: translateX(-100%);
-        }
-        .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
-        .fade-in.visible { opacity: 1; transform: translateY(0); }
-        .gradient-border {
-            border: 2px solid transparent;
-            background: linear-gradient(45deg, #00b4d8, #00d4ff, #00b4d8) border-box;
-            background-size: 200%;
-            animation: gradientShift 3s ease infinite;
-        }
-        .gradient-border:hover { background: linear-gradient(45deg, #00d4ff, #00b4d8, #00d4ff) border-box; }
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .map-path { fill: #2d2d2d; }
-        input:focus + span, select:focus + span { opacity: 1 !important; }
-    </style>
+    }
+</style>
 </head>
 <body class="bg-[#1a1a1a] text-[#e0e0e0] min-h-screen flex flex-col overflow-x-hidden">
-
   <!-- Header with Logo, Welcome Text, and Menu Toggle -->
-  <header class="bg-[#2d2d2d] p-3 sm:px-6 flex items-center justify-between sticky top-0 z-50 w-full">
+  <header class="bg-[#2d2d2d] p-3 sm:p-6 flex items-center justify-between sticky top-0 z-50 w-full shadow-md">
     <div class="flex items-center space-x-4">
-      <a href="index.html" class="text-2xl sm:text-3xl font-bold text-[#00b4d8] flex items-center">
-        🏦 <span class="ml-1">Credibe</span>
-      </a>
-      <span class="hidden sm:inline text-white text-base sm:text-lg font-medium">Welcome back</span>
+        <a href="index.html" class="text-2xl sm:text-3xl font-bold text-[#00b4d8] flex items-center">
+            🏦 <span class="ml-1">Credibe</span>
+        </a>
+        <div class="hidden sm:flex items-center space-x-2">
+            <span class="text-white text-base sm:text-lg font-medium bg-[#1e1f2a] px-3 py-1 rounded-full">👋 Welcome, Member!</span>
+        </div>
     </div>
     <button id="menu-toggle" class="text-white text-2xl md:hidden focus:outline-none">
-      ☰
+        ☰
     </button>
   </header>
-
-
 
     <!-- Main Layout -->
     <div class="flex flex-1 w-full">
@@ -1339,14 +1401,15 @@ document.getElementById("pay-bills-form")?.addEventListener("submit", async (e) 
       window.location.href = 'down.html';
     });
   }
-  const menuToggle = document.getElementById("menu-toggle");
-  const sidebar = document.querySelector("aside"); // your sidebar
+ const menuToggle = document.getElementById("menu-toggle");
+const mobileMenu = document.getElementById("mobile-menu");
 
-  if (menuToggle && sidebar) {
+if (menuToggle && mobileMenu) {
     menuToggle.addEventListener("click", () => {
-      sidebar.classList.toggle("hidden"); // toggle visibility
+        mobileMenu.classList.toggle("closed");
+        mobileMenu.classList.toggle("open");
     });
-  }
+}
 </script>
 
 
