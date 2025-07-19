@@ -427,7 +427,7 @@ exports.injectFakeTransactions = async (req, res) => {
     for (let i = 0; i < Math.min(count, 100); i++) {
       const isCompany = Math.random() < 0.4;
       const recipient = isCompany ? faker.company.name() : faker.person.fullName();
-      const date = faker.date.between('2024-01-01', '2025-03-27');
+     const date = faker.date.between({ from: '2024-01-01', to: '2025-03-27' });
 
       fakeTxns.push({
         from: user._id,
