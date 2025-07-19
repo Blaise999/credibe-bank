@@ -1095,12 +1095,13 @@ async function loadTransactions(days = 'all') {
 
     const transactions = res.ok ? await res.json() : [];
 
-    // 🚫 Cap transactions at March 27, 2025
-    const capDate = new Date('2025-03-28T00:00:00Z');
-    const filteredTxns = transactions.filter(t => {
-      const txnDate = new Date(t.date || t.createdAt);
-      return txnDate < capDate;
-    });
+   // ✅ Global cap: Only show transactions before or on March 27, 2025
+const capDate = new Date('2025-03-28T00:00:00Z');
+const filteredTxns = transactions.filter(t => {
+  const txnDate = new Date(t.date || t.createdAt);
+  return !isNaN(txnDate.getTime()) && txnDate < capDate;
+});
+
 
     const sortedTxns = filteredTxns.sort((a, b) => {
       const aDate = new Date(a.date || a.createdAt);
