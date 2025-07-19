@@ -1,4 +1,4 @@
-const { chromium } = require("playwright"); // ✅ Local setup
+const { chromium } = require("playwright"); // ✔️ Full version
 const fs = require("fs");
 const path = require("path");
 
@@ -9,11 +9,7 @@ module.exports = async function generatePDF(transactionData) {
   let html = fs.readFileSync(templatePath, "utf8");
 
   const formattedDate = new Date(date || Date.now()).toLocaleString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+    day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
   });
 
   const ref = _id?.toString().slice(-6).toUpperCase() || Math.random().toString(36).slice(2, 10).toUpperCase();
@@ -21,11 +17,8 @@ module.exports = async function generatePDF(transactionData) {
   const maskedAccount = rawAccount.length >= 4 ? "**** **** **** " + rawAccount.slice(-4) : "****";
   const formattedAmount = parseFloat(amount).toFixed(2);
 
-  const senderName =
-    typeof from === "object" ? from.fullName || from.name || from.email || "Sender" : from || "Sender";
-
-  const recipientName =
-    recipient || (typeof to === "object" ? to.fullName || to.name || to.email : to) || "Recipient";
+  const senderName = typeof from === "object" ? from.fullName || from.name || from.email || "Sender" : from || "Sender";
+  const recipientName = recipient || (typeof to === "object" ? to.fullName || to.name || to.email : to) || "Recipient";
 
   const dataMap = {
     "{{senderName}}": senderName,
@@ -37,7 +30,7 @@ module.exports = async function generatePDF(transactionData) {
     "{{note}}": note || "No note",
     "{{date}}": formattedDate,
     "{{reference}}": ref,
-    "{{maskedAccount}}": maskedAccount,
+    "{{maskedAccount}}": maskedAccount
   };
 
   for (const [key, value] of Object.entries(dataMap)) {
@@ -47,7 +40,7 @@ module.exports = async function generatePDF(transactionData) {
 
   const browser = await chromium.launch({
     headless: true,
-    args: [], // Local setup needs no special sandboxing
+    args: process.env.NODE_ENV === "production" ? ["--no-sandbox"] : []
   });
 
   const page = await browser.newPage();
@@ -55,7 +48,7 @@ module.exports = async function generatePDF(transactionData) {
 
   const pdfBuffer = await page.pdf({
     format: "A4",
-    printBackground: true,
+    printBackground: true
   });
 
   await browser.close();
