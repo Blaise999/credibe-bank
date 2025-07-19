@@ -60,14 +60,22 @@
         .map-path { fill: #2d2d2d; }
         input:focus + span, select:focus + span { opacity: 1 !important; }
     </style>
-</head>
-<div id="welcome-msg" class="text-white text-lg p-4">Welcome back, <span id="user-name">Member</span>!</div>
-<body class="bg-[#1a1a1a] text-[#e0e0e0] min-h-screen flex flex-col overflow-x-hidden">
-    <!-- Header with BankPro Logo and Mobile Menu Toggle -->
-    <header class="bg-[#2d2d2d] p-2 sm:p-4 text-center sticky top-0 z-50 flex justify-between items-center w-full">
-        <a href="index.html" class="text-2xl sm:text-3xl font-bold text-[#00b4d8]">🏦 Credibe</a>
-        <button id="menu-toggle" class="text-2xl focus:outline-none md:hidden">☰</button>
-    </header>
+<header class="bg-[#2d2d2d] p-3 sm:px-6 sm:py-4 sticky top-0 z-50 flex justify-between items-center w-full shadow-md">
+  <!-- Left: Logo + Welcome -->
+  <div class="flex items-center gap-4">
+    <a href="index.html" class="text-2xl sm:text-3xl font-bold text-[#00b4d8] tracking-tight flex items-center">
+      🏦 Credibe
+    </a>
+    <span id="welcome-msg" class="text-[#e0e0e0] text-sm sm:text-lg font-medium sm:ml-2 opacity-80">
+      Welcome back, <span id="user-name" class="text-white font-semibold">Member</span>!
+    </span>
+  </div>
+
+  <!-- Right: Mobile Toggle -->
+  <button id="menu-toggle" class="text-2xl text-white sm:hidden focus:outline-none">
+    ☰
+  </button>
+</header>
 
 
     <!-- Main Layout -->
