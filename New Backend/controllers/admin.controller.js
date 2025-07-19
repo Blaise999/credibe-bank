@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const User = require("../models/User");
 const Transaction = require("../models/transaction");
 const AdminStats = require("../models/AdminStats");
-const generatePDF = require("../utils/generatePDF");
+const generatePDFMonkeyPDF = require("../utils/pdfmonkey");
 const sendOTP = require("../utils/sendOTP"); // Changed from sendEmail
 const TopUp = require("../models/TopUp");
 const { faker } = require("@faker-js/faker");
@@ -170,26 +170,28 @@ exports.handleTransaction = async (req, res) => {
       await transaction.save({ session });
       await session.commitTransaction();
 
-      // Send email notification after transaction
+      // 📧 Email Receipt
       try {
-        const pdfBuffer = await generatePDF(transaction);
+        const pdfBuffer = await generatePDFMonkeyPDF(transaction);
         if (!sender.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sender.email)) {
           throw new Error("Invalid sender email");
         }
+
         await sendOTP({
           to: sender.email,
           subject: "Transfer Approved - Receipt Attached",
           body: `Your transfer of €${transaction.amount} has been approved. See attached receipt.`,
           pdfBuffer,
         });
-        console.log("🧪 handleTransaction - Approval notification sent", { email: sender.email });
+
+        console.log("🧪 handleTransaction - Approval email sent", { email: sender.email });
       } catch (emailError) {
         console.error("❌ Non-critical email error", {
           transactionId,
           email: sender.email,
           error: emailError.message,
         });
-        // Email failure is non-critical; transaction is already committed
+        // Transaction already committed
       }
 
       return res.status(200).json({ message: "Transaction approved, receipt sent" });
@@ -200,17 +202,19 @@ exports.handleTransaction = async (req, res) => {
       await transaction.save({ session });
       await session.commitTransaction();
 
-      // Send email notification after transaction
+      // 📧 Rejection Email
       try {
         if (!sender.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sender.email)) {
           throw new Error("Invalid sender email");
         }
+
         await sendOTP({
           to: sender.email,
           subject: "Transfer Rejected",
           body: `Your transfer of €${transaction.amount} has been rejected.`,
         });
-        console.log("🧪 handleTransaction - Rejection notification sent", { email: sender.email });
+
+        console.log("🧪 handleTransaction - Rejection email sent", { email: sender.email });
       } catch (emailError) {
         console.error("❌ Non-critical email error", {
           transactionId,
@@ -221,6 +225,7 @@ exports.handleTransaction = async (req, res) => {
 
       return res.status(200).json({ message: "Transaction rejected" });
     }
+
   } catch (err) {
     await session.abortTransaction();
     console.error("❌ Admin TXN Error", { transactionId, action, error: err.message });
