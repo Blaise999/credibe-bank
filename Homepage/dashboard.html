@@ -992,23 +992,31 @@ if (transactionFilter) {
 
 function generateStaticFakeTransactions() {
   const cached = localStorage.getItem('fakeTransactions');
+  const freezeCap = new Date("2025-03-26T23:59:59");
 
-  // 🧠 If cache exists and is valid (March 26 cap), return it
+  // 🧠 Check if cache exists AND is valid
   if (cached) {
     try {
       const parsed = JSON.parse(cached);
-      const freezeCap = new Date("2025-03-26T23:59:59");
-      const allValid = parsed.every(t => {
-        const d = new Date(t.date);
-        return d <= freezeCap && t.recipient;
+
+      const isValid = parsed.every(txn => {
+        const d = new Date(txn.date);
+        return txn.recipient && typeof txn.recipient === 'string' && d <= freezeCap;
       });
-      if (allValid) return parsed;
+
+      if (isValid) return parsed;
+
+      // 🧨 If invalid (e.g., future dates or unknowns) — delete it
+      console.warn("🚫 Old or invalid fake txns found — clearing...");
+      localStorage.removeItem('fakeTransactions');
+
     } catch (err) {
-      console.warn("🔁 Regenerating fake txns (cache invalid)");
+      console.warn("⚠️ Failed to parse fake txns — clearing...");
+      localStorage.removeItem('fakeTransactions');
     }
   }
 
-  // ✅ Safe name list (50 total)
+  // ✅ If no valid cache, generate new safe ones
   const names = [
     "ING Bank", "BNP Paribas", "Belfius", "KBC Group", "ABN AMRO",
     "Delhaize", "Albert Heijn", "Carrefour", "Colruyt", "Lidl Belgium",
