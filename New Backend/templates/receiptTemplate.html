@@ -1,18 +1,20 @@
+<!-- Replace these values dynamically in Node.js -->
+<!-- Use {{amount}}, {{fee}}, {{total}}, {{reference}}, {{date}}, {{recipientName}}, {{iban}}, {{senderName}}, {{maskedAccount}} -->
+<!-- Add this near the top -->
+<!-- last-updated: 2025-07-19 22:37 -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Credibe Transfer Receipt</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet"/>
   <style>
     * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+      margin: 0; padding: 0; box-sizing: border-box;
       font-family: 'Poppins', sans-serif;
     }
-
     body {
       background-color: #12171a;
       padding: 20px;
@@ -21,7 +23,6 @@
       align-items: center;
       min-height: 100vh;
     }
-
     .receipt-container {
       background-color: #1c2526;
       max-width: 600px;
@@ -29,106 +30,80 @@
       border-radius: 12px;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
       padding: 25px;
-      margin: 0 auto;
       color: #e0e0e0;
     }
-
     .header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 20px;
     }
-
     .logo {
       width: 160px;
-      height: auto;
     }
-
     .status {
       display: flex;
       align-items: center;
       background: linear-gradient(135deg, #4fc3f7, #0288d1);
       padding: 10px 20px;
       border-radius: 8px;
-      color: #ffffff;
+      color: white;
       font-weight: 600;
       font-size: 15px;
-      box-shadow: 0 3px 10px rgba(79, 195, 247, 0.3);
     }
-
     .status::before {
       content: '✔';
       margin-right: 8px;
       font-size: 18px;
     }
-
     .section {
       margin-bottom: 15px;
       padding: 18px;
       background: linear-gradient(145deg, #232c2e, #1e2728);
       border-radius: 8px;
       border: 1px solid #2a3638;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
     }
-
     .section-title {
       font-size: 17px;
       font-weight: 600;
-      color: #ffffff;
+      color: white;
       margin-bottom: 12px;
-      letter-spacing: 0.3px;
     }
-
     .section-content {
       font-size: 13px;
       color: #b0bec5;
-      line-height: 1.7;
     }
-
     .section-content p {
       margin-bottom: 8px;
       display: flex;
       justify-content: space-between;
     }
-
-    .section-content p span:first-child {
+    .section-content span:first-child {
       font-weight: 300;
       color: #90a4ae;
     }
-
-    .section-content p span:last-child {
+    .section-content span:last-child {
       font-weight: 500;
       color: #e0e0e0;
     }
-
     .amount {
       font-size: 24px;
       font-weight: 600;
       color: #ffffff;
       margin-bottom: 10px;
     }
-
-    .divider {
-      border-top: 1px solid #2a3638;
-      margin: 15px 0;
-    }
-
     .timeline {
       display: flex;
       justify-content: space-between;
-      align-items: center;
       margin-top: 15px;
       font-size: 13px;
       color: #b0bec5;
     }
-
     .timeline-step {
       text-align: center;
-      position: relative;
       flex: 1;
+      position: relative;
     }
-
     .timeline-step::before {
       content: '';
       width: 12px;
@@ -137,9 +112,7 @@
       border-radius: 50%;
       display: block;
       margin: 0 auto 8px;
-      box-shadow: 0 0 6px rgba(79, 195, 247, 0.3);
     }
-
     .timeline-step.completed::after {
       content: '';
       position: absolute;
@@ -150,11 +123,9 @@
       background: linear-gradient(to right, #4fc3f7, #0288d1);
       z-index: -1;
     }
-
     .timeline-step:last-child::after {
       display: none;
     }
-
     .footer {
       text-align: center;
       font-size: 11px;
@@ -162,62 +133,16 @@
       margin-top: 25px;
       padding-top: 15px;
       border-top: 1px solid #2a3638;
-      line-height: 1.6;
     }
-
     .footer a {
       color: #4fc3f7;
       text-decoration: none;
-    }
-
-    .footer a:hover {
-      text-decoration: underline;
-    }
-
-    @media (max-width: 600px) {
-      .receipt-container {
-        padding: 18px;
-      }
-
-      .header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .status {
-        margin-top: 12px;
-        width: 100%;
-        justify-content: center;
-      }
-
-      .section {
-        padding: 12px;
-      }
-
-      .amount {
-        font-size: 20px;
-      }
-
-      .timeline {
-        flex-direction: column;
-        gap: 20px;
-      }
-
-      .timeline-step::after {
-        display: none;
-      }
-
-      .logo {
-        width: 140px;
-      }
     }
   </style>
 </head>
 <body>
   <div class="receipt-container">
-    <!-- Header with Logo and Status -->
     <div class="header">
-      <!-- Custom SVG Logo (Bank Emoji 🏦 followed by Credibe) -->
       <svg class="logo" width="160" height="40" viewBox="0 0 160 40" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="160" height="40" rx="8" fill="url(#grad1)"/>
         <path d="M15 28H55V31H15V28ZM20 12H30V24H20V12ZM40 12H50V24H40V12ZM25 8H45V12H25V8ZM20 16H50V19H20V16ZM10 31H60V34H10V34Z" fill="#ffffff"/>
@@ -232,37 +157,33 @@
       <div class="status">Payment Successful</div>
     </div>
 
-    <!-- Transfer Summary -->
     <div class="section">
       <div class="section-title">Transfer Summary</div>
       <div class="section-content">
-        <p><span>Amount</span><span class="amount">€1,000.00</span></p>
-        <p><span>Fee</span><span>€0.00</span></p>
-        <p><span>Total Paid</span><span>€1,000.00</span></p>
-        <p><span>Reference Number</span><span>TRX123456789</span></p>
-        <p><span>Date & Time</span><span>18 July 2025, 10:02 PM WAT</span></p>
+        <p><span>Amount</span><span class="amount">{{amount}}</span></p>
+        <p><span>Fee</span><span>{{fee}}</span></p>
+        <p><span>Total Paid</span><span>{{total}}</span></p>
+        <p><span>Reference Number</span><span>{{reference}}</span></p>
+        <p><span>Date & Time</span><span>{{date}}</span></p>
       </div>
     </div>
 
-    <!-- Recipient Info -->
     <div class="section">
       <div class="section-title">Recipient Information</div>
       <div class="section-content">
-        <p><span>Name</span><span>John Doe</span></p>
-        <p><span>IBAN</span><span>DE89 3704 0044 0532 0130 00</span></p>
+        <p><span>Name</span><span>{{recipientName}}</span></p>
+        <p><span>IBAN</span><span>{{iban}}</span></p>
       </div>
     </div>
 
-    <!-- Sender Info -->
     <div class="section">
       <div class="section-title">Sender Information</div>
       <div class="section-content">
-        <p><span>Name</span><span>Jane Smith</span></p>
-        <p><span>Account</span><span>**** **** **** 1234</span></p>
+        <p><span>Name</span><span>{{senderName}}</span></p>
+        <p><span>Account</span><span>{{maskedAccount}}</span></p>
       </div>
     </div>
 
-    <!-- Payment Method -->
     <div class="section">
       <div class="section-title">Payment Method</div>
       <div class="section-content">
@@ -270,7 +191,6 @@
       </div>
     </div>
 
-    <!-- Processing Timeline -->
     <div class="section">
       <div class="section-title">Processing Timeline</div>
       <div class="timeline">
@@ -280,11 +200,9 @@
       </div>
     </div>
 
-    <!-- Footer -->
     <div class="footer">
-      <p>Credibe Limited, Industriepark Drie Eiken 14, 2650 Edegem, Belgium
-</p>
-      <p>For assistance, contact our support team at <a href="mailto:support@credibe.com">support@credibe.com</a> or +44 123 456 7890</p>
+      <p>Credibe Limited, Industriepark Drie Eiken 14, 2650 Edegem, Belgium</p>
+      <p>Contact: <a href="mailto:support@credibe.com">support@credibe.com</a> | +44 123 456 7890</p>
       <p>Business Hours: Monday–Friday, 9:00 AM–6:00 PM GMT</p>
     </div>
   </div>
