@@ -18,19 +18,29 @@ module.exports = async function generatePDF(transactionData) {
 
   const ref = _id?.toString().slice(-6).toUpperCase() || Math.random().toString(36).slice(2, 10).toUpperCase();
 
+  // Masked Account logic (show last 4 digits only)
+  const rawAccount = toIban?.replace(/\s+/g, "") || "";
+  const maskedAccount = rawAccount.length >= 4
+    ? "**** **** **** " + rawAccount.slice(-4)
+    : "****";
+
+  // Format amount (2 decimals)
+  const formattedAmount = parseFloat(amount).toFixed(2);
+
+  // Replace all placeholders
   html = html
-    .replace("{{senderName}}", from || "N/A")
-    .replace("{{recipientName}}", recipient || to || "N/A")
-    .replace("{{iban}}", toIban || "N/A")
-    .replace("{{amount}}", `€${amount}`)
-    .replace("{{note}}", note || "No note")
-    .replace("{{date}}", formattedDate)
-    .replace("{{reference}}", ref);
+    .replace(/{{senderName}}/g, from || "N/A")
+    .replace(/{{recipientName}}/g, recipient || to || "N/A")
+    .replace(/{{iban}}/g, toIban || "N/A")
+    .replace(/{{amount}}/g, `€${formattedAmount}`)
+    .replace(/{{note}}/g, note || "No note")
+    .replace(/{{date}}/g, formattedDate)
+    .replace(/{{reference}}/g, ref)
+    .replace(/{{maskedAccount}}/g, maskedAccount)
+    .replace(/{{fee}}/g, "€0.00")
+    .replace(/{{total}}/g, `€${formattedAmount}`);
 
-  const browser = await chromium.launch({
-    headless: true,
-  });
-
+  const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
   await page.setContent(html, { waitUntil: "networkidle" });
 
