@@ -60,22 +60,22 @@
         .map-path { fill: #2d2d2d; }
         input:focus + span, select:focus + span { opacity: 1 !important; }
     </style>
-<header class="bg-[#2d2d2d] p-3 sm:px-6 sm:py-4 sticky top-0 z-50 flex justify-between items-center w-full shadow-md">
-  <!-- Left: Logo + Welcome -->
-  <div class="flex items-center gap-4">
-    <a href="index.html" class="text-2xl sm:text-3xl font-bold text-[#00b4d8] tracking-tight flex items-center">
-      🏦 Credibe
-    </a>
-    <span id="welcome-msg" class="text-[#e0e0e0] text-sm sm:text-lg font-medium sm:ml-2 opacity-80">
-      Welcome back, <span id="user-name" class="text-white font-semibold">Member</span>!
-    </span>
-  </div>
+</head>
+<body class="bg-[#1a1a1a] text-[#e0e0e0] min-h-screen flex flex-col overflow-x-hidden">
 
-  <!-- Right: Mobile Toggle -->
-  <button id="menu-toggle" class="text-2xl text-white sm:hidden focus:outline-none">
-    ☰
-  </button>
-</header>
+  <!-- Header with Logo, Welcome Text, and Menu Toggle -->
+  <header class="bg-[#2d2d2d] p-3 sm:px-6 flex items-center justify-between sticky top-0 z-50 w-full">
+    <div class="flex items-center space-x-4">
+      <a href="index.html" class="text-2xl sm:text-3xl font-bold text-[#00b4d8] flex items-center">
+        🏦 <span class="ml-1">Credibe</span>
+      </a>
+      <span class="hidden sm:inline text-white text-base sm:text-lg font-medium">Welcome back</span>
+    </div>
+    <button id="menu-toggle" class="text-white text-2xl md:hidden focus:outline-none">
+      ☰
+    </button>
+  </header>
+
 
 
     <!-- Main Layout -->
@@ -1339,7 +1339,16 @@ document.getElementById("pay-bills-form")?.addEventListener("submit", async (e) 
       window.location.href = 'down.html';
     });
   }
+  const menuToggle = document.getElementById("menu-toggle");
+  const sidebar = document.querySelector("aside"); // your sidebar
+
+  if (menuToggle && sidebar) {
+    menuToggle.addEventListener("click", () => {
+      sidebar.classList.toggle("hidden"); // toggle visibility
+    });
+  }
 </script>
+
 
 </body>
 </html>
