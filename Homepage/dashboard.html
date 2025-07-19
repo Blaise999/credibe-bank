@@ -1092,6 +1092,7 @@ async function loadTransactions(days = 'all') {
     });
 
     const transactions = res.ok ? await res.json() : [];
+    console.log("🔥 Raw transactions:", transactions);
 
     // 🧠 Apply filter by days
     const filtered = filterTxnsByDays(transactions, days);
