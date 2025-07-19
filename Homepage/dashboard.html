@@ -1095,15 +1095,8 @@ async function loadTransactions(days = 'all') {
 
     const transactions = res.ok ? await res.json() : [];
 
-   // ✅ Global cap: Only show transactions before or on March 27, 2025
-const capDate = new Date('2025-03-28T00:00:00Z');
-const filteredTxns = transactions.filter(t => {
-  const txnDate = new Date(t.date || t.createdAt);
-  return !isNaN(txnDate.getTime()) && txnDate < capDate;
-});
 
-
-    const sortedTxns = filteredTxns.sort((a, b) => {
+    const sortedTxns = transactions.sort((a, b) => {
       const aDate = new Date(a.date || a.createdAt);
       const bDate = new Date(b.date || b.createdAt);
       return bDate - aDate;
@@ -1152,6 +1145,7 @@ const filteredTxns = transactions.filter(t => {
     tableBody.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-red-500">Error loading transactions.</td></tr>';
   }
 }
+
 
     // Security Handlers
     const changePassword = document.getElementById('change-password');
