@@ -24,6 +24,7 @@ router.get("/me", verifyToken, async (req, res) => {
       credits: user.credits,
       email: user.email,
       name: user.name || "Anonymous",
+        phone: user.phone || ""
     });
   } catch (err) {
     console.error("❌ Failed to fetch user info:", err.message);

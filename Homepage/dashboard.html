@@ -132,7 +132,7 @@
             🏦 <span class="ml-1">Credibe</span>
         </a>
         <div class="hidden sm:flex items-center space-x-2">
-            <span class="text-white text-base sm:text-lg font-medium bg-[#1e1f2a] px-3 py-1 rounded-full">👋 Welcome, Member!</span>
+            <span class="text-white text-base sm:text-lg font-medium bg-[#1e1f2a] px-3 py-1 rounded-full">👋 Welcome back</span>
         </div>
     </div>
     <button id="menu-toggle" class="text-white text-2xl md:hidden focus:outline-none">
@@ -647,47 +647,6 @@ if (!token) {
     window.location.href = "login.html";
 }
 
-// Fetch user data and populate dashboard + settings
-(async () => {
-    try {
-        const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-            console.log("✅ User data loaded:", data);
-
-            // 🏦 Update dashboard balance
-            document.getElementById("user-balance").textContent = `€${data.balance ?? 12345.67}`;
-
-            // 👋 Update welcome message
-            const welcomeTag = document.getElementById("welcome-user");
-            if (welcomeTag) {
-                welcomeTag.textContent = `Welcome, ${data.name || "User"}`;
-            }
-
-            // ⚙️ Update settings form fields
-            if (document.getElementById("full-name")) {
-                document.getElementById("full-name").value = data.name || "";
-                document.getElementById("email").value = data.email || "";
-                document.getElementById("phone").value = data.phone || "";
-            }
-
-        } else {
-            console.error("❌ Failed to fetch user data:", data.error);
-        }
-
-    } catch (error) {
-        console.error("🔥 Error fetching user data:", error);
-    }
-})();
-
     // Handle window resize to hide mobile menu on desktop
     window.addEventListener('resize', () => {
         if (window.innerWidth >= 768 && mobileMenu && !mobileMenu.classList.contains('closed')) {
@@ -1173,71 +1132,108 @@ if (!token) {
     window.location.href = "login.html";
 }
 
-// ✅ Prefill form with current user info
-(async () => {
-    try {
-        const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
-        });
 
-        const data = await res.json();
-        if (res.ok) {
-            // Prefill fields
-            document.getElementById("full-name").value = data.name || "";
-            document.getElementById("email").value = data.email || "";
-            document.getElementById("phone").value = data.phone || "";
-        } else {
-            console.error("Failed to fetch user settings:", data.error);
-        }
-    } catch (error) {
-        console.error("Error fetching user settings:", error);
+// ✅ Reusable function to fetch user data
+async function fetchUserData() {
+  try {
+    const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error("❌ Failed to fetch user data:", data.error);
+      return null;
     }
+
+    return data;
+  } catch (err) {
+    console.error("🔥 Error fetching user data:", err);
+    return null;
+  }
+}
+
+// ✅ Populate form + dashboard
+(async () => {
+  const data = await fetchUserData();
+  if (!data) return;
+
+  // ⚙️ Prefill settings
+  if (document.getElementById("full-name")) {
+    document.getElementById("full-name").value = data.name || "";
+    document.getElementById("email").value = data.email || "";
+    document.getElementById("phone").value = data.phone || "";
+  }
+
+  // 👋 Dashboard welcome message
+  const welcomeTag = document.getElementById("welcome-user");
+  if (welcomeTag) {
+    welcomeTag.textContent = `Welcome, ${data.name || "User"}`;
+  }
+
+  // 💶 Dashboard balance
+  const balanceTag = document.getElementById("user-balance");
+  if (balanceTag) {
+    balanceTag.textContent = `€${data.balance ?? 0}`;
+  }
 })();
 
 // ✅ Submit settings form
 const settingsForm = document.getElementById('settings-form');
 if (settingsForm) {
-    settingsForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(settingsForm);
+  settingsForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-        const name = document.getElementById('full-name').value;
-        const email = document.getElementById('email').value;
-        const phone = document.getElementById('phone').value;
+    const name = document.getElementById('full-name').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
 
-        const submitButton = settingsForm.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
+    const submitButton = settingsForm.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
 
-        try {
-            const res = await fetch('https://credibe-backends.onrender.com/api/settings/update', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('userToken')}`
-                },
-                body: JSON.stringify({ name, email, phone })
-            });
+    try {
+      const res = await fetch('https://credibe-backends.onrender.com/api/settings/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ name, email, phone })
+      });
 
-            const response = await res.json();
+      const response = await res.json();
 
-            if (res.ok) {
-                alert('Settings updated successfully!');
-                console.log('Updated settings:', { name, email, phone });
-            } else {
-                alert(response.error || 'Failed to update settings.');
-            }
-        } catch (error) {
-            console.error('Settings update error:', error);
-            alert('Something went wrong. Try again.');
-        } finally {
-            submitButton.disabled = false;
-        }
-    });
+      if (res.ok) {
+        alert('✅ Settings updated successfully!');
+        console.log('Updated settings:', { name, email, phone });
+
+        // 🔄 Refresh values
+        await (async () => {
+          const newData = await fetchUserData();
+          if (!newData) return;
+          document.getElementById("full-name").value = newData.name || "";
+          document.getElementById("email").value = newData.email || "";
+          document.getElementById("phone").value = newData.phone || "";
+        })();
+
+      } else {
+        alert(response.error || '❌ Failed to update settings.');
+      }
+
+    } catch (err) {
+      console.error('⚠️ Settings update error:', err);
+      alert('Something went wrong. Try again.');
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
 }
+
 
 
     // Logout Handler
