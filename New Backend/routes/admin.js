@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const adminController = require("../controllers/admin.controller");
-const { injectFakeTransactions } = adminController; // 🧼 Removed cleanFakeTransactions
 const { verifyToken, isAdmin } = require("../middleware/auth");
 
 const Transaction = require("../models/transaction");
