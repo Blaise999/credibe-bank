@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
-// ✅ Middleware to verify ANY token (user or admin)
-exports.verifyToken = (req, res, next) => {
+// ✅ Verify token (user or admin)
+const verifyToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -12,7 +13,15 @@ exports.verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // contains user.id and role
+    req.user = decoded;
+
+    const fullUser = await User.findById(decoded.id).select("email phone name");
+    if (fullUser) {
+      req.user.email = fullUser.email;
+      req.user.phone = fullUser.phone;
+      req.user.name = fullUser.name;
+    }
+
     next();
   } catch (err) {
     console.error("❌ Invalid token error:", err);
@@ -20,29 +29,16 @@ exports.verifyToken = (req, res, next) => {
   }
 };
 
-// ✅ Middleware to check for admin role
-exports.isAdmin = (req, res, next) => {
+// ✅ Check admin role
+const isAdmin = (req, res, next) => {
   if (req.user.role !== "admin") {
-    return res.status(403).json({ error: "Access denied. Not an admin." });
+    return res.status(403).json({ error: "Access denied. Admins only." });
   }
   next();
 };
 
-// ✅ Middleware to check for regular user role
-exports.verifyUserToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ error: "No token provided" });
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (decoded.role !== "user") {
-      return res.status(403).json({ error: "Access denied" });
-    }
-
-    req.user = decoded;
-    next();
-  } catch (err) {
-    console.error("❌ User token error:", err.message);
-    res.status(401).json({ error: "Invalid token" });
-  }
+// ✅ Export both
+module.exports = {
+  verifyToken,
+  isAdmin,
 };

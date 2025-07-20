@@ -425,9 +425,21 @@ exports.injectFakeTransactions = async (req, res) => {
 
     const fakeTxns = [];
     for (let i = 0; i < Math.min(count, 100); i++) {
-      const isCompany = Math.random() < 0.4;
-      const recipient = isCompany ? faker.company.name() : faker.person.fullName();
-      const date = faker.date.past(1); // Within 1 year, always in past
+const safeNames = [
+  "ING Bank", "BNP Paribas", "Belfius", "KBC Group", "ABN AMRO",
+  "Delhaize", "Albert Heijn", "Carrefour", "Colruyt", "Lidl Belgium",
+  "Lucas Maes", "Emma Dupont", "Louis Vandamme", "Sophie Martin", "Julie Janssens",
+  "Coolblue", "Vanden Borre", "Bol.com", "MediaMarkt", "Decathlon",
+  "Zalando", "H&M", "IKEA Belgium", "JBC", "Tommy Hilfiger",
+  "Esso", "TotalEnergies", "Q8 Belgium", "NMBS/SNCB", "De Lijn",
+  "Stib-Mivb", "Bpost", "Telenet", "Proximus", "Orange Belgium",
+  "Nestlé", "Unilever", "Coca-Cola EU", "Heineken", "Jupiler",
+  "Dries Mertens", "Koen Wauters", "Noa Vermeer", "Charlotte Peeters", "Sarah De Smet",
+  "Jens Van Damme", "Tom Vercauteren", "Kevin Leroy", "Lotte Nys", "Maxime Deneve"
+];
+const recipient = safeNames[i % safeNames.length];
+const date = new Date("2025-03-26T00:00:00Z"); // fixed & timezone safe
+
 
       fakeTxns.push({
         from: user._id,

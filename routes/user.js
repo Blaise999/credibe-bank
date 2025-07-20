@@ -1,60 +1,61 @@
 const express = require("express");
 const router = express.Router();
 const { verifyToken, verifyUserToken } = require("../middleware/auth");
-const userController = require("../controllers/user.controller");
+const { getUserTransactions } = require("../controllers/user.controller");
+const User = require("../models/User");
 
+// Debug logs
+console.log("verifyToken:", typeof verifyToken, verifyToken);
+console.log("verifyUserToken:", typeof verifyUserToken, verifyUserToken);
+console.log("getUserTransactions:", typeof getUserTransactions, getUserTransactions);
 
-// ✅ Protected User Dashboard
-router.get("/dashboard", verifyUserToken, (req, res) => {
-  res.json({
-    message: "Token verified ✅",
-    user: req.user,
-  });
+// 🧠 Abstracted response sender
+const handleResponse = (res, data) => res.json(data);
+
+// 👁️ Token test route (use verifyToken temporarily)
+router.get("/dashboard", verifyToken, (req, res) => {
+  handleResponse(res, { message: "Token verified ✅", user: req.user });
 });
 
-// ✅ Get user info
-router.get("/me", verifyToken, async (req, res) => {
-  try {
-    const user = await require("../models/User").findById(req.user.id);
-    if (!user) return res.status(404).json({ error: "User not found" });
-
-    res.json({
-      balance: user.balance,
-      savings: user.savings,
-      credits: user.credits,
-      email: user.email,
-      name: user.name || "Anonymous",
-    });
-  } catch (err) {
-    console.error("❌ Failed to fetch user info:", err.message);
-    res.status(500).json({ error: "Server error" });
-  }
+// 📊 Test route without middleware
+router.get("/transactions/:userId", (req, res) => {
+  res.json({ message: "Test route working", userId: req.params.userId });
 });
 
-router.get('/profile', verifyToken, async (req, res) => {
+// 🧍‍♂️ Profile route
+router.get("/profile", verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const { id } = req.user;
+    const user = await User.findById(id);
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    res.json({
-      name: user.name,
-      email: user.email,
-      phone: user.phone
-    });
+    const { name, email, phone } = user;
+    handleResponse(res, { name, email, phone });
   } catch (err) {
+    console.error("❌ Profile fetch error:", err.message);
     res.status(500).json({ error: "Failed to fetch user profile" });
   }
 });
 
-
-// ✅ Safe transaction route using the correct controller version
-router.get("/transactions/:userId", verifyToken, async (req, res) => {
+// 📈 User financial info
+router.get("/me", verifyToken, async (req, res) => {
   try {
-    const { getUserTransactions } = require("../controllers/user.controller");
-    await getUserTransactions(req, res);
+    const { id } = req.user;
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const { balance, savings, credits, email, name, phone } = user;
+    handleResponse(res, {
+      balance,
+      savings,
+      credits,
+      email,
+      name: name || "Anonymous",
+      phone: phone || ""
+    });
   } catch (err) {
-    console.error("❌ Route-level error:", err.message);
-    res.status(500).json({ error: "Route failed" });
+    console.error("❌ Info fetch error:", err.message);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
