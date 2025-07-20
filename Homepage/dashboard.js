@@ -15,7 +15,7 @@
     // Fetch user data
     (async () => {
         try {
-           const res = await fetch("http://localhost:3000/api/user/me", {
+           const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -241,7 +241,7 @@ if (transferForm) {
             if (transferOtpSection) transferOtpSection.classList.remove('hidden');
 
             try {
-                const res = await fetch('http://localhost:3000/api/transfer/send-direct-otp', {
+                const res = await fetch('https://credibe-backends.onrender.com/api/transfer/send-direct-otp', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -321,7 +321,7 @@ if (transferForm) {
             submitTransfer.disabled = true;
 
             try {
-                const res = await fetch("http://localhost:3000/api/transfer/initiate", {
+                const res = await fetch("https://credibe-backends.onrender.com/api/transfer/initiate", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -442,7 +442,7 @@ async function loadTransactions(days = 'all') {
 
   try {
     const userId = localStorage.getItem("userId") || "";
-    const url = `http://localhost:3000/api/user/transactions/${userId}${days !== 'all' ? `?days=${days}` : ''}`;
+    const url = `https://credibe-backends.onrender.com/api/user/transactions/${userId}${days !== 'all' ? `?days=${days}` : ''}`;
 
     const res = await fetch(url, {
       headers: {
@@ -532,7 +532,7 @@ async function loadTransactions(days = 'all') {
             submitButton.disabled = true;
 
             try {
-                const res = await fetch('http://localhost:3000/api/settings/update', {
+                const res = await fetch('https://credibe-backends.onrender.com/api/settings/update', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -591,7 +591,7 @@ async function loadTransactions(days = 'all') {
   }
 
   try {
-    const res = await fetch("http://localhost:3000/api/user/me", {
+    const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
       headers: {
         Authorization: `Bearer ${token}`
       }

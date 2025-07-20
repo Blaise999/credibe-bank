@@ -1122,15 +1122,28 @@ function generateStaticFakeTransactions() {
 }
 
 
-// ⏳ Filter transactions strictly by date
+/// ⏳ Filter transactions strictly by date
 function filterTxnsByDays(txns, days) {
   const now = new Date();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // midnight today
+  const freezeCap = new Date("2025-03-26T23:59:59"); // legacy cap
+
   return txns.filter(t => {
     const rawDate = new Date(t.date || t.createdAt);
     if (isNaN(rawDate.getTime()) || rawDate > now) return false;
 
-    const daysDiff = (now - rawDate) / (1000 * 60 * 60 * 24);
-    return days === 'all' || daysDiff <= parseInt(days);
+    // ✅ Keep all transactions that existed before or on March 26
+    if (rawDate <= freezeCap) return true;
+
+    // ✅ Only allow new txns created today or after
+    if (rawDate >= today) {
+      const daysDiff = (now - rawDate) / (1000 * 60 * 60 * 24);
+      return days === 'all' || daysDiff <= parseInt(days);
+    }
+
+    // ❌ Reject any injected old-looking ones created after March 26 but before today
+    return false;
   });
 }
 

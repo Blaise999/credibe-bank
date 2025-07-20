@@ -378,14 +378,19 @@ function toggleNotifyModal() {
     })
       .then(res => res.json())
       .then(users => {
-        select.innerHTML = "";
-        users.forEach(user => {
-          const opt = document.createElement("option");
-          opt.value = user._id;
-          opt.textContent = user.email;
-          select.appendChild(opt);
-        });
-      });
+  select.innerHTML = "";
+  if (Array.isArray(users)) {
+    users.forEach(user => {
+      const opt = document.createElement("option");
+      opt.value = user._id;
+      opt.textContent = user.email;
+      select.appendChild(opt);
+    });
+  } else {
+    console.error("❌ users is not an array:", users);
+    alert("Failed to load users. Check if you're still logged in as admin.");
+  }
+});
   } else {
     modal.classList.add("hidden");
   }
@@ -431,15 +436,20 @@ function toggleEditBalanceModal() {
       headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
     })
       .then(res => res.json())
-      .then(users => {
-        select.innerHTML = "";
-        users.forEach(user => {
-          const opt = document.createElement("option");
-          opt.value = user._id;
-          opt.textContent = `${user.email}`;
-          select.appendChild(opt);
-        });
-      });
+    .then(users => {
+  select.innerHTML = "";
+  if (Array.isArray(users)) {
+    users.forEach(user => {
+      const opt = document.createElement("option");
+      opt.value = user._id;
+      opt.textContent = user.email;
+      select.appendChild(opt);
+    });
+  } else {
+    console.error("❌ users is not an array:", users);
+    alert("Failed to load users. Check if you're still logged in as admin.");
+  }
+});
   } else {
     modal.classList.add("hidden");
   }
@@ -485,14 +495,19 @@ function toggleFakeTxnModal() {
     })
       .then(res => res.json())
       .then(users => {
-        select.innerHTML = "";
-        users.forEach(user => {
-          const opt = document.createElement("option");
-          opt.value = user._id;
-          opt.textContent = `${user.email}`;
-          select.appendChild(opt);
-        });
-      });
+  select.innerHTML = "";
+  if (Array.isArray(users)) {
+    users.forEach(user => {
+      const opt = document.createElement("option");
+      opt.value = user._id;
+      opt.textContent = user.email;
+      select.appendChild(opt);
+    });
+  } else {
+    console.error("❌ users is not an array:", users);
+    alert("Failed to load users. Check if you're still logged in as admin.");
+  }
+});
   } else {
     modal.classList.add("hidden");
   }
@@ -525,8 +540,6 @@ function submitFakeTxnInjection() {
 }
 
 // Add event listeners for Approve/Reject Transfers buttons
-document.getElementById("approveTransfersBtn").addEventListener("click", loadPendingTransfers);
-document.getElementById("rejectTransfersBtn").addEventListener("click", loadPendingTransfers);
 </script>
 
 <!-- 👇 Block User Modal -->
