@@ -18,9 +18,8 @@ router.get("/dashboard", verifyToken, (req, res) => {
 });
 
 // 📊 Test route without middleware
-router.get("/transactions/:userId", (req, res) => {
-  res.json({ message: "Test route working", userId: req.params.userId });
-});
+router.get("/transactions/:userId", verifyToken, getUserTransactions);
+
 
 // 🧍‍♂️ Profile route
 router.get("/profile", verifyToken, async (req, res) => {
