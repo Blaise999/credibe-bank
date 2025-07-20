@@ -131,34 +131,29 @@ exports.initiateTransfer = async (req, res) => {
 
 // ✅ Step 3: Send OTP via email or phone (memory-only)
 exports.sendTransferOtp = async (req, res) => {
-  const { email, phone } = req.body;
-
   try {
-    const user = await User.findOne({ $or: [{ email }, { phone }] });
-    if (!user) {
-      console.log('🧪 sendTransferOtp - User not found:', { email, phone });
-      return res.status(404).json({ error: "User not found" });
-    }
-    if (!user.email) {
-      console.log('🧪 sendTransferOtp - No email:', { userId: user._id });
-      return res.status(400).json({ error: "User email not set" });
+    const userId = req.user?.id;
+
+    const user = await User.findById(userId);
+    if (!user || !user.email) {
+      console.log('🧪 sendTransferOtp - User not found or missing email:', { userId });
+      return res.status(404).json({ error: "User not found or email not set" });
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     setOtp(user.email, otp);
-    console.log(`🧪 OTP generated for transfer (sendTransferOtp): ${user.email}: ${otp}`);
+    console.log(`🧪 OTP generated for ${user.email}: ${otp}`);
 
-    const target = email || user.email;
     await sendOTP({
-      to: target,
+      to: user.email,
       subject: "Your Transfer OTP",
       body: `Your OTP is ${otp}`,
     });
 
-    res.status(200).json({ message: "OTP sent to user" });
+    return res.status(200).json({ message: "OTP sent to your registered email" });
   } catch (err) {
-    console.error("❌ Send Transfer OTP Error:", err.message, { email, phone });
-    res.status(500).json({ error: "Failed to send OTP" });
+    console.error("❌ Send Transfer OTP Error:", err.message);
+    return res.status(500).json({ error: "Failed to send OTP" });
   }
 };
 
