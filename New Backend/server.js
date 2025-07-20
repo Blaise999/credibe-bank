@@ -7,7 +7,7 @@ const cors = require("cors");
 const app = express();
 app.use(express.json());
 
-// ✅ Finalized CORS fix – for local + Render + live frontend
+// ✅ CORS config for local, production, and preflight support
 const allowedOrigins = [
   'http://localhost:5500',
   'http://127.0.0.1:5500',
@@ -17,21 +17,23 @@ const allowedOrigins = [
   'https://credibe-frontend.onrender.com'
 ];
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  methods: "GET,POST,PATCH,PUT,DELETE,OPTIONS",
-  allowedHeaders: "Content-Type,Authorization"
-};
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Vary", "Origin"); // important to avoid caching origin
+  }
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // ✅ Handle preflight for all routes
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,PUT,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200); // Preflight OK
+  }
+
+  next();
+});
 
 // ✅ Route imports
 const authRoutes = require("./routes/auth");
@@ -45,19 +47,24 @@ const settingsRoutes = require('./routes/settings');
 const connectDB = require("./config/db");
 
 const startServer = async () => {
-  await connectDB();
+  try {
+    await connectDB();
 
-  // ✅ Mount routes
-  app.use("/api/auth", authRoutes);
-  app.use("/api/transfer", transferRoutes);
-  app.use("/api/admin", adminRoutes);
-  app.use("/api/user", userRoutes);
-  app.use("/api/topup", topUpRoutes);
-  app.use("/api/settings", settingsRoutes);
+    // ✅ Route mounts
+    app.use("/api/auth", authRoutes);
+    app.use("/api/transfer", transferRoutes);
+    app.use("/api/admin", adminRoutes);
+    app.use("/api/user", userRoutes);
+    app.use("/api/topup", topUpRoutes);
+    app.use("/api/settings", settingsRoutes);
 
-  // ✅ Use dynamic port for Render
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+    // ✅ Dynamic port for local + Render
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+  } catch (err) {
+    console.error("❌ Server startup error:", err.message);
+    process.exit(1);
+  }
 };
 
 startServer();
