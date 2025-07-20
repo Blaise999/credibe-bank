@@ -170,37 +170,27 @@ exports.handleTransaction = async (req, res) => {
       await transaction.save({ session });
       await session.commitTransaction();
 
-      // 📧 Email Receipt
-      try {
-        const pdfBuffer = await generatePDFMonkeyPDF(transaction);
-        if (!sender.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sender.email)) {
-          throw new Error("Invalid sender email");
-        }
+     // ✅ Simple approval notification (no PDF)
+try {
+  if (!sender.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sender.email)) {
+    throw new Error("Invalid sender email");
+  }
 
-        await sendOTP({
-          to: sender.email,
-          subject: "Transfer Approved - Receipt Attached",
-          body: `Your transfer of €${transaction.amount} has been approved. See attached receipt.`,
-          pdfBuffer,
-        });
+  await sendOTP({
+    to: sender.email,
+    subject: "✅ Transfer Approved",
+    body: `Hello ${sender.name || "Customer"},\n\nYour transfer of €${transaction.amount} to ${transaction.recipient} has been approved successfully.\n\nThank you for banking with us.\nCredibe.`,
+  });
 
-        console.log("🧪 handleTransaction - Approval email sent", { email: sender.email });
-      } catch (emailError) {
-        console.error("❌ Non-critical email error", {
-          transactionId,
-          email: sender.email,
-          error: emailError.message,
-        });
-        // Transaction already committed
-      }
+  console.log("🧪 handleTransaction - Simple approval email sent", { email: sender.email });
+} catch (emailError) {
+  console.error("❌ Non-critical email error", {
+    transactionId,
+    email: sender.email,
+    error: emailError.message,
+  });
+}
 
-      return res.status(200).json({ message: "Transaction approved, receipt sent" });
-    }
-
-    if (action === "reject") {
-      transaction.status = "rejected";
-      await transaction.save({ session });
-      await session.commitTransaction();
 
       // 📧 Rejection Email
       try {
