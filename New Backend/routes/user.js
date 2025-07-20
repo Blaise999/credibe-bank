@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { verifyToken, verifyUserToken } = require("../middleware/auth");
 const userController = require("../controllers/user.controller");
+const User = require("../models/User"); 
 
 
 // ✅ Protected User Dashboard
