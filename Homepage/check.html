@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🏦 Check Deposit - Credibe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="../favicon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Poppins', sans-serif; }
+    .gradient-border {
+      border: 2px solid transparent;
+      background: linear-gradient(45deg, #00b4d8, #00d4ff, #00b4d8) border-box;
+      background-size: 200%;
+      animation: gradientShift 3s ease infinite;
+    }
+    .gradient-border:hover {
+      background: linear-gradient(45deg, #00d4ff, #00b4d8, #00d4ff) border-box;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+  </style>
+</head>
+<body class="bg-[#1a1a1a] text-[#e0e0e0] min-h-screen overflow-y-auto">
+
+  <!-- Scrollable Modal Overlay -->
+  <div class="modal-overlay min-h-screen bg-black/80 py-10 px-4 flex justify-center">
+    <div class="bg-[#1f2937] p-6 sm:p-10 rounded-2xl w-full max-w-4xl space-y-6 shadow-xl">
+      <h2 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] flex items-center gap-2">🏦 Check Deposit</h2>
+      <form id="check-deposit-form" class="space-y-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div>
+          <label for="bank-name" class="block text-sm mb-1">Bank Name</label>
+          <input type="text" id="bank-name" required placeholder="e.g. Chase, ING" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" />
+        </div>
+        <div>
+          <label for="check-number" class="block text-sm mb-1">Check Number</label>
+          <input type="text" id="check-number" required placeholder="e.g. 104582" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" />
+        </div>
+        <div>
+          <label for="amount" class="block text-sm mb-1">Amount (€)</label>
+          <input type="number" id="amount" step="0.01" min="0.01" required placeholder="e.g. 500.00" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" />
+        </div>
+        <div>
+          <label for="date" class="block text-sm mb-1">Deposit Date</label>
+          <input type="date" id="date" required class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" />
+        </div>
+        <div class="sm:col-span-2">
+          <label for="notes" class="block text-sm mb-1">Notes (optional)</label>
+          <textarea id="notes" rows="2" placeholder="Any additional details..." class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]"></textarea>
+        </div>
+        <div class="sm:col-span-2">
+          <label for="check-image" class="block text-sm mb-1">Upload Check Image (optional)</label>
+          <input type="file" id="check-image" accept="image/*" class="w-full bg-[#1a1a1a]/50 text-[#e0e0e0] border border-[#444] rounded-lg px-4 py-2 file:bg-[#00b4d8] file:text-white file:rounded-lg file:px-3 file:py-1 file:border-none" />
+        </div>
+        <div class="sm:col-span-2">
+          <button type="submit" id="submit-deposit" class="w-full bg-[#00b4d8] text-white rounded-lg px-6 py-3 hover:bg-[#00b4d8]/90 transition-all flex items-center justify-center gradient-border">
+            <span id="submit-text">Submit Deposit</span>
+            <svg id="submit-spinner" class="hidden animate-spin h-5 w-5 ml-2 text-white" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+          </button>
+        </div>
+      </form>
+
+      <div id="confirmation" class="hidden text-green-400 text-sm">Check deposit initiated. Status: <span class="bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded">Pending</span></div>
+      <a href="dashboard.html" class="block text-center text-[#00b4d8] hover:underline">Back to Dashboard</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('check-deposit-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('submit-deposit');
+      const spinner = document.getElementById('submit-spinner');
+      const text = document.getElementById('submit-text');
+
+      submitBtn.disabled = true;
+      text.classList.add('hidden');
+      spinner.classList.remove('hidden');
+
+      setTimeout(() => {
+        window.location.href = "processing.html";
+      }, 1500);
+    });
+  </script>
+</body>
+</html>

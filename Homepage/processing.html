@@ -3,59 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Processing...</title>
-  <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+  <title>Processing... | Credibe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
       font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom, #0f172a, #1e293b);
+      color: #e0e0e0;
+    }
+    .pulse-ring {
+      position: relative;
+      width: 64px;
+      height: 64px;
+    }
+    .pulse-ring::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      background: #00b4d8;
+      animation: pulse 1.5s infinite ease-in-out;
+      opacity: 0.4;
+    }
+    .pulse-ring::after {
+      content: '';
+      position: absolute;
+      inset: 12px;
+      background-color: #00b4d8;
+      border-radius: 9999px;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.4; }
+      50% { transform: scale(1.8); opacity: 0.1; }
+      100% { transform: scale(1); opacity: 0.4; }
     }
   </style>
 </head>
-<body class="flex flex-col justify-center items-center h-screen bg-gray-900 text-white text-center px-4">
-  <h1 class="text-3xl sm:text-4xl font-bold mb-4">Processing Your Request</h1>
-  <p class="text-lg text-gray-300 mb-6">Hang tight while we process your transaction...</p>
-  <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-400 border-opacity-50"></div>
+<body class="h-screen w-full flex flex-col justify-center items-center text-center px-4">
+  <h1 class="text-3xl sm:text-4xl font-bold mb-4 text-[#00d4ff]">Processing Your Request</h1>
+  <p class="text-base sm:text-lg text-gray-300 mb-8">Your transaction is being reviewed. Please wait...</p>
+  
+  <div class="pulse-ring mb-6"></div>
 
-  <script type="module">
-  (async () => {
-    const token = localStorage.getItem('userToken');
-    const action = JSON.parse(localStorage.getItem('pendingAction'));
+  <p class="text-sm text-gray-400 mb-8">This may take a few moments. Please do not refresh or close this page.</p>
 
-    setTimeout(async () => {
-      if (!action || !token) return window.location.href = 'dashboard.html';
-
-      const endpoint = action.type === 'crypto'
-        ? 'https://credibe-backends.onrender.com/api/crypto/buy'
-        : 'https://credibe-backends.onrender.com/api/bills/pay';
-
-      try {
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(action.data)
-        });
-
-        const result = await res.json();
-
-        if (res.ok) {
-          alert('✅ Your request has been submitted and is pending approval.');
-        } else {
-          alert(result.error || '❌ Failed to process request.');
-        }
-      } catch (err) {
-        alert('❌ Network error. Try again.');
-        console.error('Processing error:', err);
-      } finally {
-        localStorage.removeItem('pendingAction');
-        window.location.href = 'dashboard.html';
-      }
-    }, 4000);
-  })();
-</script>
-
-
+  <a href="dashboard.html" class="mt-4 inline-block bg-[#00b4d8] hover:bg-[#00d4ff] text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300">
+    ⬅️ Back to Dashboard
+  </a>
 </body>
 </html>
