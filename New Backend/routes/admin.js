@@ -9,7 +9,7 @@ router.patch("/block-user/:userId", verifyToken, isAdmin, adminController.toggle
 router.patch("/edit-balance/:userId", verifyToken, isAdmin, adminController.editUserBalance);
 
 // 💸 Transaction Management
-router.get("/pending-transactions", verifyToken, isAdmin, adminController.getPendingTransfers); // ✅ Used by AdminDashboard.html
+router.get("/pending-transactions", verifyToken, isAdmin, adminController.getPendingTransactions); // ✅ Used by AdminDashboard.html
 router.get("/transfer-history", verifyToken, isAdmin, adminController.getTransferHistory); // ✅ Used by AdminDashboard.html
 router.post("/handle-transaction", verifyToken, isAdmin, adminController.handleTransaction);
 router.post("/inject-fake-transactions", verifyToken, isAdmin, adminController.injectFakeTransactions); // ✅ Confirmed
