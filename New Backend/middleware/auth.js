@@ -1,8 +1,8 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/User"); // ✅ Import User model
+const User = require("../models/User");
 
-// ✅ Middleware to verify ANY token (user or admin)
-exports.verifyToken = async (req, res, next) => {
+// ✅ Verify token (user or admin)
+const verifyToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -13,9 +13,8 @@ exports.verifyToken = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // contains user.id and role
+    req.user = decoded;
 
-    // ✅ Attach full user document (optional fields: email, phone)
     const fullUser = await User.findById(decoded.id).select("email phone name");
     if (fullUser) {
       req.user.email = fullUser.email;
@@ -28,4 +27,18 @@ exports.verifyToken = async (req, res, next) => {
     console.error("❌ Invalid token error:", err);
     return res.status(401).json({ error: "Invalid token" });
   }
+};
+
+// ✅ Check admin role
+const isAdmin = (req, res, next) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ error: "Access denied. Admins only." });
+  }
+  next();
+};
+
+// ✅ Export both
+module.exports = {
+  verifyToken,
+  isAdmin,
 };
