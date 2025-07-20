@@ -332,6 +332,11 @@ function toggleBlockUserModal() {
     })
     .then(res => res.json())
     .then(data => {
+      if (!Array.isArray(data)) {
+        console.error("❌ users is not an array:", data);
+        alert("Failed to load users. You may be unauthorized.");
+        return;
+      }
       select.innerHTML = "";
       data.forEach(user => {
         const opt = document.createElement("option");
@@ -339,6 +344,10 @@ function toggleBlockUserModal() {
         opt.textContent = `${user.email} — ${user.isBlocked ? "Blocked" : "Active"}`;
         select.appendChild(opt);
       });
+    })
+    .catch(err => {
+      console.error("❌ Failed to fetch users:", err.message);
+      alert("Failed to load users. Please try again.");
     });
   } else {
     modal.classList.add("hidden");
@@ -371,26 +380,28 @@ function toggleNotifyModal() {
 
   if (modal.classList.contains("hidden")) {
     modal.classList.remove("hidden");
-
-    // Populate user dropdown
     fetch("https://credibe-backends.onrender.com/api/admin/users", {
       headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
     })
       .then(res => res.json())
-      .then(users => {
-  select.innerHTML = "";
-  if (Array.isArray(users)) {
-    users.forEach(user => {
-      const opt = document.createElement("option");
-      opt.value = user._id;
-      opt.textContent = user.email;
-      select.appendChild(opt);
-    });
-  } else {
-    console.error("❌ users is not an array:", users);
-    alert("Failed to load users. Check if you're still logged in as admin.");
-  }
-});
+      .then(data => {
+        if (!Array.isArray(data)) {
+          console.error("❌ users is not an array:", data);
+          alert("Failed to load users. You may be unauthorized.");
+          return;
+        }
+        select.innerHTML = "";
+        data.forEach(user => {
+          const opt = document.createElement("option");
+          opt.value = user._id;
+          opt.textContent = user.email;
+          select.appendChild(opt);
+        });
+      })
+      .catch(err => {
+        console.error("❌ Failed to fetch users:", err.message);
+        alert("Failed to load users. Please try again.");
+      });
   } else {
     modal.classList.add("hidden");
   }
@@ -430,26 +441,28 @@ function toggleEditBalanceModal() {
 
   if (modal.classList.contains("hidden")) {
     modal.classList.remove("hidden");
-
-    // Load user list
     fetch("https://credibe-backends.onrender.com/api/admin/users", {
       headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
     })
       .then(res => res.json())
-    .then(users => {
-  select.innerHTML = "";
-  if (Array.isArray(users)) {
-    users.forEach(user => {
-      const opt = document.createElement("option");
-      opt.value = user._id;
-      opt.textContent = user.email;
-      select.appendChild(opt);
-    });
-  } else {
-    console.error("❌ users is not an array:", users);
-    alert("Failed to load users. Check if you're still logged in as admin.");
-  }
-});
+      .then(data => {
+        if (!Array.isArray(data)) {
+          console.error("❌ users is not an array:", data);
+          alert("Failed to load users. You may be unauthorized.");
+          return;
+        }
+        select.innerHTML = "";
+        data.forEach(user => {
+          const opt = document.createElement("option");
+          opt.value = user._id;
+          opt.textContent = user.email;
+          select.appendChild(opt);
+        });
+      })
+      .catch(err => {
+        console.error("❌ Failed to fetch users:", err.message);
+        alert("Failed to load users. Please try again.");
+      });
   } else {
     modal.classList.add("hidden");
   }
@@ -489,25 +502,28 @@ function toggleFakeTxnModal() {
 
   if (modal.classList.contains("hidden")) {
     modal.classList.remove("hidden");
-
     fetch("https://credibe-backends.onrender.com/api/admin/users", {
       headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
     })
       .then(res => res.json())
-      .then(users => {
-  select.innerHTML = "";
-  if (Array.isArray(users)) {
-    users.forEach(user => {
-      const opt = document.createElement("option");
-      opt.value = user._id;
-      opt.textContent = user.email;
-      select.appendChild(opt);
-    });
-  } else {
-    console.error("❌ users is not an array:", users);
-    alert("Failed to load users. Check if you're still logged in as admin.");
-  }
-});
+      .then(data => {
+        if (!Array.isArray(data)) {
+          console.error("❌ users is not an array:", data);
+          alert("Failed to load users. You may be unauthorized.");
+          return;
+        }
+        select.innerHTML = "";
+        data.forEach(user => {
+          const opt = document.createElement("option");
+          opt.value = user._id;
+          opt.textContent = user.email;
+          select.appendChild(opt);
+        });
+      })
+      .catch(err => {
+        console.error("❌ Failed to fetch users:", err.message);
+        alert("Failed to load users. Please try again.");
+      });
   } else {
     modal.classList.add("hidden");
   }

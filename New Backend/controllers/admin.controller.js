@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const User = require("../models/User");
 const Transaction = require("../models/transaction");
 const AdminStats = require("../models/AdminStats");
-const generatePDFMonkeyPDF = require("../utils/pdfmonkey");
 const sendOTP = require("../utils/sendOTP"); // Changed from sendEmail
 const TopUp = require("../models/TopUp");
 const { faker } = require("@faker-js/faker");
@@ -225,18 +224,18 @@ try {
   }
 };
 
-// ⏳ Get Pending Transfers
-exports.getPendingTransfers = async (req, res) => {
+// ⏳ Get Pending Transactions
+exports.getPendingTransactions = async (req, res) => {
   try {
     const pendingTransfers = await Transaction.find({ status: "pending" })
       .populate("from to")
       .sort({ createdAt: -1 });
 
-    console.log("🧪 getPendingTransfers", { count: pendingTransfers.length });
+    console.log("🧪 getPendingTransactions", { count: pendingTransfers.length });
     res.json(pendingTransfers);
   } catch (err) {
-    console.error("❌ Failed to fetch pending transfers", { error: err.message });
-    res.status(500).json({ error: "Failed to fetch pending transfers" });
+    console.error("❌ Failed to fetch pending transactions", { error: err.message });
+    res.status(500).json({ error: "Failed to fetch pending transactions" });
   }
 };
 

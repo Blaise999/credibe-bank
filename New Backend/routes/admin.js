@@ -9,17 +9,17 @@ router.patch("/block-user/:userId", verifyToken, isAdmin, adminController.toggle
 router.patch("/edit-balance/:userId", verifyToken, isAdmin, adminController.editUserBalance);
 
 // 💸 Transaction Management
-router.get("/pending-transactions", verifyToken, isAdmin, adminController.getPendingTransfers);
-router.get("/transfer-history", verifyToken, isAdmin, adminController.getTransferHistory);
+router.get("/pending-transactions", verifyToken, isAdmin, adminController.getPendingTransfers); // ✅ Used by AdminDashboard.html
+router.get("/transfer-history", verifyToken, isAdmin, adminController.getTransferHistory); // ✅ Used by AdminDashboard.html
 router.post("/handle-transaction", verifyToken, isAdmin, adminController.handleTransaction);
-router.post("/inject-fake-transactions", verifyToken, isAdmin, adminController.injectFakeTransactions); // ✅ updated
+router.post("/inject-fake-transactions", verifyToken, isAdmin, adminController.injectFakeTransactions); // ✅ Confirmed
 
 // ⬆️ Top-Up Management
-router.get("/topups/pending", verifyToken, isAdmin, adminController.getPendingTopUps);
+router.get("/topups/pending", verifyToken, isAdmin, adminController.getPendingTopUps); // ✅ Used by AdminDashboard.html
 router.post("/topups/:id/approve", verifyToken, isAdmin, adminController.approveTopUp);
 router.post("/topups/:id/reject", verifyToken, isAdmin, adminController.rejectTopUp);
 
-// 📧 Notifications
+// 📧 Admin Notifications
 router.post("/notify", verifyToken, isAdmin, adminController.sendNotification);
 
 // 📊 Dashboard Stats
