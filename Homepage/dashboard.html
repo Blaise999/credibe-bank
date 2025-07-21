@@ -190,16 +190,16 @@
             </nav>
         </aside>
 
-        <!-- Mobile Menu -->
-        <nav id="mobile-menu" class="fixed top-[4rem] left-0 w-64 bg-[#2d2d2d] h-full p-2 space-y-2 transform transition-transform duration-300 ease-in-out md:hidden z-40 hidden"
-            <a href="#" data-page="dashboard" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">🏠 Dashboard</a>
-            <a href="#" data-page="accounts" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">💳 Accounts</a>
-            <a href="#" data-page="transfers" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">💸 Transfers</a>
-            <a href="#" data-page="transactions" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">📄 Transactions</a>
-            <a href="#" data-page="analytics" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">📊 Analytics</a>
-            <a href="#" data-page="security" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">🔒 Security</a>
-            <a href="#" data-page="settings" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">⚙️ Settings</a>
-        </nav>
+        <<!-- Mobile Menu -->
+<nav id="mobile-menu" class="mobile-menu fixed top-[4rem] left-0 w-64 bg-[#2d2d2d] h-full p-2 space-y-2 transform transition-transform duration-300 ease-in-out md:hidden closed">
+    <a href="#" data-page="dashboard" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">🏠 Dashboard</a>
+    <a href="#" data-page="accounts" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">💳 Accounts</a>
+    <a href="#" data-page="transfers" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">💸 Transfers</a>
+    <a href="#" data-page="transactions" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">📄 Transactions</a>
+    <a href="#" data-page="analytics" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">📊 Analytics</a>
+    <a href="#" data-page="security" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">🔒 Security</a>
+    <a href="#" data-page="settings" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">⚙️ Settings</a>
+</nav>
 
         <!-- Main Content Area -->
         <main class="flex-1 p-2 sm:p-4 w-full md:ml-64">
@@ -716,20 +716,10 @@
       }
     });
   });
-// Handle window resize to hide mobile menu on desktop
+// Mobile menu toggle and resize handler
 const mobileMenu = document.getElementById("mobile-menu");
 const menuToggle = document.getElementById("menu-toggle");
 
-window.addEventListener('resize', () => {
-  if (window.innerWidth >= 768 && mobileMenu && !mobileMenu.classList.contains('closed')) {
-    mobileMenu.classList.add('closed');
-    mobileMenu.classList.remove('open');
-    if (menuToggle) menuToggle.textContent = '☰'; // Reset icon
-    console.log('Mobile menu hidden on resize to desktop');
-  }
-});
-
-// Mobile menu toggle (FIXED)
 if (menuToggle && mobileMenu) {
   menuToggle.addEventListener("click", () => {
     const isOpen = mobileMenu.classList.contains("open");
@@ -737,15 +727,28 @@ if (menuToggle && mobileMenu) {
     if (isOpen) {
       mobileMenu.classList.remove("open");
       mobileMenu.classList.add("closed");
-      // ✂️ Removed: menuToggle.textContent = '✕';
+      mobileMenu.classList.add("hidden"); // Hide menu when closed
+      menuToggle.textContent = "☰"; // Show hamburger icon
     } else {
       mobileMenu.classList.remove("closed");
+      mobileMenu.classList.remove("hidden"); // Ensure menu is visible
       mobileMenu.classList.add("open");
-      // ✂️ Removed: menuToggle.textContent = '☰';
+      menuToggle.textContent = "✕"; // Show close icon
     }
+    console.log(`Mobile menu toggled: ${isOpen ? "closed" : "open"}`);
   });
 }
 
+// Handle window resize to hide mobile menu on desktop
+window.addEventListener("resize", () => {
+  if (window.innerWidth >= 768 && mobileMenu && mobileMenu.classList.contains("open")) {
+    mobileMenu.classList.remove("open");
+    mobileMenu.classList.add("closed");
+    mobileMenu.classList.add("hidden"); // Hide menu on desktop
+    if (menuToggle) menuToggle.textContent = "☰"; // Reset to hamburger icon
+    console.log("Mobile menu hidden on resize to desktop");
+  }
+});
   // Page Switching with Skeleton Loader
   const navLinks = document.querySelectorAll('.nav-link');
   const pages = document.querySelectorAll('.page');
@@ -1698,15 +1701,7 @@ document.getElementById("pay-bills-form")?.addEventListener("submit", async (e) 
       window.location.href = 'down.html';
     });
   }
- const menuToggle = document.getElementById("menu-toggle");
-const mobileMenu = document.getElementById("mobile-menu");
-
-if (menuToggle && mobileMenu) {
-    menuToggle.addEventListener("click", () => {
-        mobileMenu.classList.toggle("closed");
-        mobileMenu.classList.toggle("open");
-    });
-}
+ 
 </script>
 
 
