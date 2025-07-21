@@ -172,17 +172,25 @@ exports.adminLogin = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { userId: user._id, role: user.role },
+      {
+        id: user._id,              // ✅ critical for DB lookup
+        role: user.role,           // ✅ required for isAdmin
+        email: user.email
+      },
       process.env.JWT_SECRET,
       { expiresIn: "12h" }
     );
 
-    res.json({ message: "Admin logged in", token });
+    res.json({
+      message: "Admin logged in",
+      token
+    });
   } catch (err) {
     console.error("❌ Admin login error:", err);
     res.status(500).json({ error: "Server error during admin login" });
   }
 };
+
 
 // ✅ OTP Verification (for login only)
 exports.verifyOTP = async (req, res) => {

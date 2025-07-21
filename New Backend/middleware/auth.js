@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-// ✅ Middleware to verify any valid user (used for both users and admins)
+// ✅ Shared token verifier (for both user and admin)
 const verifyToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -13,6 +13,11 @@ const verifyToken = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!decoded.id) {
+      return res.status(401).json({ error: "Invalid token payload: missing user ID" });
+    }
+
     const user = await User.findById(decoded.id).select("email phone name role");
 
     if (!user) {
@@ -30,11 +35,11 @@ const verifyToken = async (req, res, next) => {
     next();
   } catch (err) {
     console.error("❌ Invalid token error:", err.message);
-    return res.status(401).json({ error: "Invalid token" });
+    return res.status(401).json({ error: "Invalid or expired token" });
   }
 };
 
-// ✅ Optional: Middleware to verify only regular users (not admins)
+// ✅ Leave this unchanged (regular user protection)
 const verifyUserToken = async (req, res, next) => {
   await verifyToken(req, res, () => {
     if (req.user.role !== "user") {
@@ -44,16 +49,18 @@ const verifyUserToken = async (req, res, next) => {
   });
 };
 
-// ✅ Admin check
-const isAdmin = (req, res, next) => {
-  if (req.user.role !== "admin") {
-    return res.status(403).json({ error: "Access denied. Admins only." });
-  }
-  next();
+// ✅ Hardened admin-only access middleware
+const verifyAdminToken = async (req, res, next) => {
+  await verifyToken(req, res, async () => {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ error: "Access denied. Admins only." });
+    }
+    next();
+  });
 };
 
 module.exports = {
-  verifyToken,
-  verifyUserToken,
-  isAdmin
+  verifyToken,         // ✅ keep for generic use
+  verifyUserToken,     // ✅ unchanged
+  isAdmin: verifyAdminToken  // ✅ updated to use full DB lookup
 };
