@@ -152,13 +152,14 @@
 <body class="bg-[#1a1a1a] text-[#e0e0e0] min-h-screen flex flex-col overflow-x-hidden">
 <!-- Header with Credibe Logo Right, Menu Left -->
 <header class="bg-[#2d2d2d] p-3 sm:p-6 flex items-center justify-between sticky top-0 z-50 w-full shadow-md">
-  <!-- 🍔 Hamburger Left + Greeting -->
-  <div class="flex items-center space-x-2">
-    <button id="menu-toggle" class="text-white text-2xl md:hidden focus:outline-none" aria-label="Toggle mobile menu">
-      ☰
-    </button>
-    <span id="mobile-greeting" class="text-white text-base md:hidden"></span>
-  </div>
+  <!-- 🍔 Hamburger + Greeting -->
+<div class="flex items-center space-x-2">
+  <button id="menu-toggle" class="text-white text-2xl md:hidden focus:outline-none" aria-label="Toggle mobile menu">
+    ☰
+  </button>
+  <span id="mobile-greeting" class="text-white text-base md:hidden"></span>
+</div>
+
 
   <!-- 🏦 Logo + Text Right -->
   <div class="flex items-center space-x-4 ml-auto">
@@ -190,7 +191,7 @@
         </aside>
 
         <!-- Mobile Menu -->
-        <nav id="mobile-menu" class="fixed top-[4rem] left-0 w-64 bg-[#2d2d2d] h-full p-2 space-y-2 transform transition-transform duration-300 ease-in-out md:hidden z-40 mobile-menu closed">
+        <nav id="mobile-menu" class="fixed top-[4rem] left-0 w-64 bg-[#2d2d2d] h-full p-2 space-y-2 transform transition-transform duration-300 ease-in-out md:hidden z-40 hidden"
             <a href="#" data-page="dashboard" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">🏠 Dashboard</a>
             <a href="#" data-page="accounts" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">💳 Accounts</a>
             <a href="#" data-page="transfers" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">💸 Transfers</a>
@@ -736,11 +737,11 @@ if (menuToggle && mobileMenu) {
     if (isOpen) {
       mobileMenu.classList.remove("open");
       mobileMenu.classList.add("closed");
-      menuToggle.textContent = '☰';
+      // ✂️ Removed: menuToggle.textContent = '✕';
     } else {
       mobileMenu.classList.remove("closed");
       mobileMenu.classList.add("open");
-      menuToggle.textContent = '✕';
+      // ✂️ Removed: menuToggle.textContent = '☰';
     }
   });
 }
