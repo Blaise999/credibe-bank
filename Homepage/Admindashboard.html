@@ -560,9 +560,10 @@ function submitBalanceEdit() {
     return;
   }
 
-  const totalCreditRaw = document.getElementById("editTotalBalance").value;
-  const savingsRaw = document.getElementById("editSavings").value;
-  const creditsRaw = document.getElementById("editCredit").value;
+  const totalCreditRaw = document.getElementById("editTotalBalance").value.trim();
+const savingsRaw = document.getElementById("editSavings").value.trim();
+const creditsRaw = document.getElementById("editCredit").value.trim();
+
 
   const totalCredit = parseFloat(totalCreditRaw);
   const savings = parseFloat(savingsRaw);
@@ -572,6 +573,8 @@ function submitBalanceEdit() {
   if (!isNaN(totalCredit)) payload.totalCredit = totalCredit;
   if (!isNaN(savings)) payload.savings = savings;
   if (!isNaN(credits)) payload.credits = credits;
+  console.log("🧪 Payload being sent:", payload);
+
 
   if (Object.keys(payload).length === 0) {
     alert("Enter at least one valid amount");
