@@ -14,634 +14,621 @@
 </head>
 <body class="bg-gray-950 text-white">
   <div class="min-h-screen flex flex-col">
+    <script>
+      const token = localStorage.getItem("adminToken");
+      if (!token) {
+        alert("Unauthorized access. Please log in.");
+        window.location.href = "Adminlogin.html";
+      }
+    </script>
 
-<header class="bg-gray-900/80 backdrop-blur-sm shadow-md py-4 px-6 flex justify-between items-center">
-  <h1 class="text-2xl font-bold text-cyan-400">Credibe Admin</h1>
-  <span class="text-sm text-white/70">Dashboard</span>
-</header>
+    <header class="bg-gray-900/80 backdrop-blur-sm shadow-md py-4 px-6 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-cyan-400">Credibe Admin</h1>
+      <span class="text-sm text-white/70">Dashboard</span>
+    </header>
 
-<main class="flex-1 p-6 bg-gradient-to-b from-gray-900 to-black">
-  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <div class="bg-white/10 p-4 rounded-xl shadow-md backdrop-blur-md">
-      <h2 class="text-sm font-semibold text-white/70">Total Users</h2>
-      <p id="totalUsers" class="text-2xl font-bold text-white mt-2">0</p>
+    <main class="flex-1 p-6 bg-gradient-to-b from-gray-900 to-black">
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white/10 p-4 rounded-xl shadow-md backdrop-blur-md">
+          <h2 class="text-sm font-semibold text-white/70">Total Users</h2>
+          <p id="totalUsers" class="text-2xl font-bold text-white mt-2">0</p>
+        </div>
+        <div class="bg-white/10 p-4 rounded-xl shadow-md backdrop-blur-md">
+          <h2 class="text-sm font-semibold text-white/70">Total Transactions</h2>
+          <p id="totalTxns" class="text-2xl font-bold text-white mt-2">0</p>
+        </div>
+        <div class="bg-white/10 p-4 rounded-xl shadow-md backdrop-blur-md">
+          <h2 class="text-sm font-semibold text-white/70">Total Balance</h2>
+          <p id="totalBalance" class="text-2xl font-bold text-white mt-2">€0.00</p>
+        </div>
+        <div class="bg-white/10 p-4 rounded-xl shadow-md backdrop-blur-md">
+          <h2 class="text-sm font-semibold text-white/70">Blocked Users</h2>
+          <p id="blockedUsers" class="text-2xl font-bold text-white mt-2">0</p>
+        </div>
+      </section>
+
+      <section class="mb-10">
+        <h3 class="text-lg font-bold mb-4">Quick Actions</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <button onclick="toggleBlockUserModal()" class="bg-cyan-600 hover:bg-cyan-700 p-4 rounded-xl text-white font-semibold shadow">
+            Block/Unblock User
+          </button>
+          <button onclick="toggleNotifyModal()" class="bg-cyan-600 hover:bg-cyan-700 p-4 rounded-xl text-white font-semibold shadow">
+            Send Notification
+          </button>
+          <button onclick="toggleEditBalanceModal()" class="bg-cyan-600 hover:bg-cyan-700 p-4 rounded-xl text-white font-semibold shadow">
+            Edit Balance
+          </button>
+          <button onclick="toggleFakeTxnModal()" class="bg-cyan-600 hover:bg-cyan-700 p-4 rounded-xl text-white font-semibold shadow">
+            Inject Fake Transactions
+          </button>
+        </div>
+      </section>
+
+      <section class="mb-12">
+        <h3 class="text-lg font-bold mb-4">All Users</h3>
+        <div class="overflow-x-auto rounded-xl shadow">
+          <table class="w-full text-left bg-white/5">
+            <thead class="bg-white/10 text-sm text-white/70">
+              <tr>
+                <th class="p-3">Email</th>
+                <th class="p-3">Balance</th>
+                <th class="p-3">IBAN</th>
+                <th class="p-3">Status</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody" class="text-white/90 text-sm"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="mb-12">
+        <h3 class="text-lg font-bold mb-4">Pending Transfers</h3>
+        <div class="overflow-x-auto rounded-xl shadow">
+          <table class="w-full text-left bg-white/5">
+            <thead class="bg-white/10 text-sm text-white/70">
+              <tr>
+                <th class="p-3">Sender</th>
+                <th class="p-3">Recipient</th>
+                <th class="p-3">Amount</th>
+                <th class="p-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="pendingTransfersTableBody" class="text-white/90 text-sm"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="mb-12">
+        <h3 class="text-lg font-bold mb-4">Transfer History</h3>
+        <div class="overflow-x-auto rounded-xl shadow">
+          <table class="w-full text-left bg-white/5">
+            <thead class="bg-white/10 text-sm text-white/70">
+              <tr>
+                <th class="p-3">Date</th>
+                <th class="p-3">Sender</th>
+                <th class="p-3">Receiver</th>
+                <th class="p-3">Amount</th>
+                <th class="p-3">Status</th>
+              </tr>
+            </thead>
+            <tbody id="transfer-body" class="text-white/90 text-sm"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="mb-12">
+        <h3 class="text-lg font-bold mb-4">Pending Top-Ups</h3>
+        <div class="overflow-x-auto rounded-xl shadow">
+          <table class="w-full text-left bg-white/5">
+            <thead class="bg-white/10 text-sm text-white/70">
+              <tr>
+                <th class="p-3">User Email</th>
+                <th class="p-3">Amount</th>
+                <th class="p-3">Date</th>
+                <th class="p-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="topup-body" class="text-white/90 text-sm">
+              <tr><td colspan="4" class="p-4 text-center text-white/40">Loading top-ups...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="mt-10 p-6 bg-gray-900 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-4 text-white">🧪 Inject Fake Transactions</h2>
+        <form id="fakeTxnForm" class="space-y-4">
+          <div>
+            <label for="fakeTxnUserSelect" class="block text-white font-semibold mb-1">Select User</label>
+            <select id="fakeTxnUserSelect" class="w-full px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded-md"></select>
+          </div>
+          <div>
+            <label for="txnCount" class="block text-white font-semibold mb-1">Number of Fake Transactions</label>
+            <input type="number" id="txnCount" required min="1" max="100" value="25"
+                   class="w-full px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded-md">
+          </div>
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Inject
+          </button>
+          <p id="injectStatus" class="text-green-400 mt-2 hidden">✅ Transactions injected.</p>
+        </form>
+      </div>
+    </main>
+
+    <div id="blockUserModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+      <div class="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-lg text-white relative">
+        <button onclick="toggleBlockUserModal()" class="absolute top-2 right-3 text-white/60 hover:text-red-500 text-xl">×</button>
+        <h2 class="text-xl font-bold mb-4">Block/Unblock User</h2>
+        <select id="userSelect" class="w-full p-2 mb-4 rounded bg-gray-700 text-white"></select>
+        <button onclick="blockOrUnblockUser()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white font-semibold w-full">
+          Toggle Block Status
+        </button>
+      </div>
     </div>
-    <div class="bg-white/10 p-4 rounded-xl shadow-md backdrop-blur-md">
-      <h2 class="text-sm font-semibold text-white/70">Total Transactions</h2>
-      <p id="totalTxns" class="text-2xl font-bold text-white mt-2">0</p>
+
+    <div id="editBalanceModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+      <div class="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-lg text-white relative">
+        <button onclick="toggleEditBalanceModal()" class="absolute top-2 right-3 text-white/60 hover:text-red-500 text-xl">×</button>
+        <h2 class="text-xl font-bold mb-4">Edit User Balance</h2>
+        <label for="editUserSelect" class="text-sm text-white/60">Select User:</label>
+        <select id="editUserSelect" class="w-full p-2 mb-4 rounded bg-gray-700 text-white"></select>
+        <label class="block mb-2">Total Balance</label>
+        <input id="editTotalBalance" type="number" class="w-full p-2 mb-3 rounded bg-gray-700 text-white" placeholder="e.g. 1000" />
+        <label class="block mb-2">Savings</label>
+        <input id="editSavings" type="number" class="w-full p-2 mb-3 rounded bg-gray-700 text-white" placeholder="e.g. 200" />
+        <label class="block mb-2">Credit</label>
+        <input id="editCredit" type="number" class="w-full p-2 mb-5 rounded bg-gray-700 text-white" placeholder="e.g. 300" />
+        <button onclick="submitBalanceEdit()" class="bg-cyan-600 hover:bg-cyan-700 px-4 py-2 rounded text-white font-semibold w-full">
+          Update Balances
+        </button>
+      </div>
     </div>
-    <div class="bg-white/10 p-4 rounded-xl shadow-md backdrop-blur-md">
-      <h2 class="text-sm font-semibold text-white/70">Total Balance</h2>
-      <p id="totalBalance" class="text-2xl font-bold text-white mt-2">€0.00</p>
+
+    <div id="notifyModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+      <div class="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-lg text-white relative">
+        <button onclick="toggleNotifyModal()" class="absolute top-2 right-3 text-white/60 hover:text-red-500 text-xl">×</button>
+        <h2 class="text-xl font-bold mb-4">Send Notification</h2>
+        <label class="block text-sm mb-1">Select User:</label>
+        <select id="notifyUserSelect" class="w-full p-2 mb-3 rounded bg-gray-700 text-white"></select>
+        <label class="block text-sm mb-1">Subject:</label>
+        <input id="notifySubject" class="w-full p-2 mb-3 rounded bg-gray-700 text-white" placeholder="Subject"/>
+        <label class="block text-sm mb-1">Message:</label>
+        <textarea id="notifyMessage" class="w-full p-2 mb-4 rounded bg-gray-700 text-white" placeholder="Message" rows="4"></textarea>
+        <button onclick="sendNotification()" class="bg-cyan-600 hover:bg-cyan-700 px-4 py-2 rounded text-white font-semibold w-full">
+          Send
+        </button>
+      </div>
     </div>
-    <div class="bg-white/10 p-4 rounded-xl shadow-md backdrop-blur-md">
-      <h2 class="text-sm font-semibold text-white/70">Blocked Users</h2>
-      <p id="blockedUsers" class="text-2xl font-bold text-white mt-2">0</p>
+
+    <div id="fakeTxnModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+      <div class="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-lg text-white relative">
+        <button onclick="toggleFakeTxnModal()" class="absolute top-2 right-3 text-white/60 hover:text-red-500 text-xl">×</button>
+        <h2 class="text-xl font-bold mb-4">Inject Fake Transactions</h2>
+        <label for="fakeTxnUserSelect" class="text-sm text-white/60">Select User:</label>
+        <select id="fakeTxnUserSelect" class="w-full p-2 mb-4 rounded bg-gray-700 text-white"></select>
+        <label for="fakeTxnCount" class="text-sm text-white/60">Number of Fake Transactions:</label>
+        <input id="fakeTxnCount" type="number" value="25" min="1" max="100" class="w-full p-2 mb-4 rounded bg-gray-700 text-white" />
+        <button onclick="submitFakeTxnInjection()" class="bg-cyan-600 hover:bg-cyan-700 px-4 py-2 rounded text-white font-semibold w-full">
+          Inject Transactions
+        </button>
+      </div>
     </div>
-  </section>
-
-  <section class="mb-10">
-    <h3 class="text-lg font-bold mb-4">Quick Actions</h3>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-<button onclick="document.getElementById('pendingTransfersTableBody').scrollIntoView({ behavior: 'smooth' })"
-  class="bg-cyan-600 hover:bg-cyan-700 p-4 rounded-xl text-white font-semibold shadow">
-  Approve Transfers
-</button>
-
-<button onclick="document.getElementById('pendingTransfersTableBody').scrollIntoView({ behavior: 'smooth' })"
-  class="bg-red-600 hover:bg-red-700 p-4 rounded-xl text-white font-semibold shadow">
-  Reject Transfers
-</button>
-
-    <button onclick="toggleBlockUserModal()"
-  class="bg-cyan-600 hover:bg-cyan-700 p-4 rounded-xl text-white font-semibold shadow">
-  Block User
-</button>
-
-      <button onclick="toggleNotifyModal()" class="bg-cyan-600 hover:bg-cyan-700 p-4 rounded-xl text-white font-semibold shadow">
-  Send Notification
-</button>
-     <button onclick="toggleEditBalanceModal()"
-  class="bg-cyan-600 hover:bg-cyan-700 p-4 rounded-xl text-white font-semibold shadow">
-  Edit Balance
-</button>
-
-<button onclick="toggleFakeTxnModal()"
-  class="bg-cyan-600 hover:bg-cyan-700 p-4 rounded-xl text-white font-semibold shadow">
-  Inject Fake Transactions
-</button>
-
-
-    </div>
-  </section>
-
-  <section class="mb-12">
-    <h3 class="text-lg font-bold mb-4">All Users</h3>
-    <div class="overflow-x-auto rounded-xl shadow">
-      <table class="w-full text-left bg-white/5">
-        <thead class="bg-white/10 text-sm text-white/70">
-          <tr>
-            <th class="p-3">Email</th>
-            <th class="p-3">Balance</th>
-            <th class="p-3">IBAN</th>
-            <th class="p-3">Status</th>
-          </tr>
-        </thead>
-        <tbody id="userTableBody" class="text-white/90 text-sm"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="mb-12">
-    <h3 class="text-lg font-bold mb-4">Pending Transfers</h3>
-    <div class="overflow-x-auto rounded-xl shadow">
-      <table class="w-full text-left bg-white/5">
-        <thead class="bg-white/10 text-sm text-white/70">
-          <tr>
-            <th class="p-3">Sender</th>
-            <th class="p-3">Recipient</th>
-            <th class="p-3">Amount</th>
-            <th class="p-3">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="pendingTransfersTableBody" class="text-white/90 text-sm"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="mb-12">
-    <h3 class="text-lg font-bold mb-4">Transfer History</h3>
-    <div class="overflow-x-auto rounded-xl shadow">
-      <table class="w-full text-left bg-white/5">
-        <thead class="bg-white/10 text-sm text-white/70">
-          <tr>
-            <th class="p-3">Date</th>
-            <th class="p-3">Sender</th>
-            <th class="p-3">Receiver</th>
-            <th class="p-3">Amount</th>
-            <th class="p-3">Status</th>
-          </tr>
-        </thead>
-        <tbody id="transfer-body" class="text-white/90 text-sm"></tbody>
-      </table>
-    </div>
-  </section>
-  <!-- 🪙 Pending Top-Up Requests -->
-<section class="mb-12">
-  <h3 class="text-lg font-bold mb-4">Pending Top-Ups</h3>
-  <div class="overflow-x-auto rounded-xl shadow">
-    <table class="w-full text-left bg-white/5">
-      <thead class="bg-white/10 text-sm text-white/70">
-        <tr>
-          <th class="p-3">User Email</th>
-          <th class="p-3">Amount</th>
-          <th class="p-3">Date</th>
-          <th class="p-3">Actions</th>
-        </tr>
-      </thead>
-      <tbody id="topup-body" class="text-white/90 text-sm">
-        <tr><td colspan="4" class="p-4 text-center text-white/40">Loading top-ups...</td></tr>
-      </tbody>
-    </table>
   </div>
-</section>
 
-</main>
-</div>
+  <script>
+    const BASE_URL = "https://credibe-backends.onrender.com/api/admin";
 
-<script>
-// Check token on page load
-const token = localStorage.getItem("adminToken");
-if (!token) {
-  alert("Unauthorized access. Please log in.");
-  window.location.href = "Adminlogin.html";
-}
+    async function loadDashboardStats() {
+      try {
+        const res = await fetch(`${BASE_URL}/stats`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          document.getElementById("totalUsers").textContent = data.totalUsers || 0;
+          document.getElementById("totalTxns").textContent = data.totalTxns || 0;
+          document.getElementById("totalBalance").textContent = `€${(data.totalBalance || 0).toFixed(2)}`;
+          document.getElementById("blockedUsers").textContent = data.blockedUsers || 0;
+        } else {
+          console.error("❌ Failed to load stats:", data.error);
+        }
+      } catch (err) {
+        console.error("❌ Failed to load stats:", err.message);
+      }
+    }
 
-// Centralized fetch function for authenticated requests
-async function makeAuthenticatedRequest(url, method = "GET", body = null) {
-  const token = localStorage.getItem("adminToken");
-  if (!token) {
-    alert("No admin token found. Please log in.");
-    window.location.href = "Adminlogin.html";
-    return null;
-  }
+    async function loadUsers() {
+      try {
+        const res = await fetch(`${BASE_URL}/users`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+        });
+        const data = await res.json();
+        const tbody = document.getElementById("userTableBody");
+        tbody.innerHTML = "";
+        if (!Array.isArray(data)) {
+          tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-white/40">No users found.</td></tr>`;
+          return;
+        }
+        data.forEach(user => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td class="p-3 border">${user.email || "N/A"}</td>
+            <td class="p-3 border">€${(user.balance || 0).toFixed(2)}</td>
+            <td class="p-3 border">${user.iban || "N/A"}</td>
+            <td class="p-3 border">
+              <span class="px-2 py-1 rounded ${user.isBlocked ? "bg-red-200 text-red-800" : "bg-green-200 text-green-800"}">
+                ${user.isBlocked ? "Blocked" : "Active"}
+              </span>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (err) {
+        console.error("❌ Failed to load users:", err.message);
+      }
+    }
 
-  const headers = {
-    "Authorization": `Bearer ${token}`,
-    ...(body && { "Content-Type": "application/json" })
-  };
+    async function loadTransferHistory() {
+      try {
+        const res = await fetch(`${BASE_URL}/transfers/history`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+        });
+        const data = await res.json();
+        const tableBody = document.getElementById("transfer-body");
+        tableBody.innerHTML = "";
+        if (!Array.isArray(data)) {
+          tableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-white/40">No transfer history.</td></tr>`;
+          return;
+        }
+        data.forEach(txn => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td class="p-2 border">${new Date(txn.createdAt).toLocaleString()}</td>
+            <td class="p-2 border">${txn.from?.email || "N/A"}</td>
+            <td class="p-2 border">${txn.to?.email || txn.recipient || "N/A"}</td>
+            <td class="p-2 border">€${(txn.amount || 0).toFixed(2)}</td>
+            <td class="p-2 border">
+              <span class="px-2 py-1 rounded ${txn.status === "approved" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}">
+                ${txn.status}
+              </span>
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+      } catch (err) {
+        console.error("❌ Failed to load transfers:", err.message);
+      }
+    }
 
-  try {
-    const response = await fetch(url, {
-      method,
-      headers,
-      ...(body && { body: JSON.stringify(body) })
+    async function loadPendingTransfers() {
+      try {
+        const res = await fetch(`${BASE_URL}/transfers/pending`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+        });
+        const data = await res.json();
+        const tbody = document.getElementById("pendingTransfersTableBody");
+        tbody.innerHTML = "";
+        if (!Array.isArray(data) || data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-white/40">No pending transfers.</td></tr>`;
+          return;
+        }
+        data.forEach(transfer => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td class="p-3 border">${transfer.from?.email || "N/A"}</td>
+            <td class="p-3 border">${transfer.to?.email || transfer.recipient || "N/A"}</td>
+            <td class="p-3 border">€${(transfer.amount || 0).toFixed(2)}</td>
+            <td class="p-3 border">
+              <button onclick="handleTransfer('${transfer._id}', 'approve')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs mr-2">Approve</button>
+              <button onclick="handleTransfer('${transfer._id}', 'reject')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (err) {
+        console.error("❌ Failed to load pending transfers:", err.message);
+        alert("Error loading pending transfers");
+      }
+    }
+
+    async function handleTransfer(id, action) {
+      const token = localStorage.getItem("adminToken");
+      if (!token) return alert("Admin not authenticated");
+      try {
+        const res = await fetch(`${BASE_URL}/transfers/action`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ transactionId: id, action })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          console.error("❌ Backend rejected:", data.error);
+          return alert(`Error: ${data.error || "Failed to process transaction"}`);
+        }
+        alert(data.message || `Transfer ${action}d successfully`);
+        await loadPendingTransfers();
+        await loadTransferHistory();
+      } catch (err) {
+        console.error(`❌ Failed to ${action} transfer:`, err.message);
+        alert(`Error: Failed to ${action} transfer`);
+      }
+    }
+
+    async function loadPendingTopUps() {
+      try {
+        const res = await fetch(`${BASE_URL}/topups/pending`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+        });
+        const data = await res.json();
+        const tbody = document.getElementById("topup-body");
+        tbody.innerHTML = "";
+        if (!Array.isArray(data) || data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-white/40">No pending top-ups.</td></tr>`;
+          return;
+        }
+        data.forEach(topup => {
+          const date = new Date(topup.createdAt).toLocaleDateString();
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td class="p-3 border">${topup.user?.email || "Unknown"}</td>
+            <td class="p-3 border">€${(topup.amount || 0).toFixed(2)}</td>
+            <td class="p-3 border">${date}</td>
+            <td class="p-3 border">
+              <button onclick="handleTopUp('${topup._id}', 'approve')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs mr-2">Approve</button>
+              <button onclick="handleTopUp('${topup._id}', 'reject')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (err) {
+        console.error("❌ Failed to load top-ups:", err.message);
+      }
+    }
+
+    async function handleTopUp(id, action) {
+      try {
+        const res = await fetch(`${BASE_URL}/topups/${id}/${action}`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert(data.message || `Top-up ${action}ed successfully`);
+          loadPendingTopUps();
+        } else {
+          alert(data.error || `Failed to ${action} top-up`);
+        }
+      } catch (err) {
+        console.error(`❌ Failed to ${action} top-up:`, err.message);
+        alert(`Error: Failed to ${action} top-up`);
+      }
+    }
+
+    function toggleBlockUserModal() {
+      const modal = document.getElementById("blockUserModal");
+      const select = document.getElementById("userSelect");
+      if (modal.classList.contains("hidden")) {
+        modal.classList.remove("hidden");
+        fetch(`${BASE_URL}/users`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+        })
+          .then(res => res.json())
+          .then(data => {
+            select.innerHTML = "";
+            data.forEach(user => {
+              const opt = document.createElement("option");
+              opt.value = user._id;
+              opt.textContent = `${user.email} — ${user.isBlocked ? "Blocked" : "Active"}`;
+              select.appendChild(opt);
+            });
+          });
+      } else {
+        modal.classList.add("hidden");
+      }
+    }
+
+    function blockOrUnblockUser() {
+      const userId = document.getElementById("userSelect").value;
+      if (!userId) return alert("Please select a user");
+      fetch(`${BASE_URL}/users/block/${userId}`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message || "Status updated");
+          toggleBlockUserModal();
+          loadUsers();
+        })
+        .catch(err => {
+          console.error("❌ Failed to toggle user:", err.message);
+          alert("Failed to block/unblock user");
+        });
+    }
+
+    function toggleNotifyModal() {
+      const modal = document.getElementById("notifyModal");
+      const select = document.getElementById("notifyUserSelect");
+      if (modal.classList.contains("hidden")) {
+        modal.classList.remove("hidden");
+        fetch(`${BASE_URL}/users`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+        })
+          .then(res => res.json())
+          .then(users => {
+            select.innerHTML = "";
+            users.forEach(user => {
+              const opt = document.createElement("option");
+              opt.value = user._id;
+              opt.textContent = user.email;
+              select.appendChild(opt);
+            });
+          });
+      } else {
+        modal.classList.add("hidden");
+      }
+    }
+
+    function sendNotification() {
+      const userId = document.getElementById("notifyUserSelect").value;
+      const subject = document.getElementById("notifySubject").value;
+      const message = document.getElementById("notifyMessage").value;
+      if (!userId || !subject || !message) {
+        return alert("Please fill out all fields");
+      }
+      fetch(`${BASE_URL}/notify`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`
+        },
+        body: JSON.stringify({ userId, subject, message })
+      })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message || "Notification sent");
+          toggleNotifyModal();
+        })
+        .catch(err => {
+          console.error("❌ Failed to send notification:", err.message);
+          alert("Error sending notification");
+        });
+    }
+
+    function toggleEditBalanceModal() {
+      const modal = document.getElementById("editBalanceModal");
+      const select = document.getElementById("editUserSelect");
+      if (modal.classList.contains("hidden")) {
+        modal.classList.remove("hidden");
+        fetch(`${BASE_URL}/users`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+        })
+          .then(res => res.json())
+          .then(users => {
+            select.innerHTML = "";
+            users.forEach(user => {
+              const opt = document.createElement("option");
+              opt.value = user._id;
+              opt.textContent = `${user.email}`;
+              select.appendChild(opt);
+            });
+          });
+      } else {
+        modal.classList.add("hidden");
+      }
+    }
+
+    function submitBalanceEdit() {
+      const userId = document.getElementById("editUserSelect").value;
+      const totalCredit = parseFloat(document.getElementById("editTotalBalance").value);
+      const savings = parseFloat(document.getElementById("editSavings").value);
+      const credits = parseFloat(document.getElementById("editCredit").value);
+      if (!userId) return alert("Select a user");
+      fetch(`${BASE_URL}/users/edit/${userId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`
+        },
+        body: JSON.stringify({ totalCredit, savings, credits })
+      })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message || "Balance updated");
+          toggleEditBalanceModal();
+          loadUsers();
+        })
+        .catch(err => {
+          console.error("❌ Balance update error:", err.message);
+          alert("Failed to update balance");
+        });
+    }
+
+    function toggleFakeTxnModal() {
+      const modal = document.getElementById("fakeTxnModal");
+      const select = document.getElementById("fakeTxnUserSelect");
+      if (modal.classList.contains("hidden")) {
+        modal.classList.remove("hidden");
+        fetch(`${BASE_URL}/users`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+        })
+          .then(res => res.json())
+          .then(users => {
+            select.innerHTML = "";
+            users.forEach(user => {
+              const opt = document.createElement("option");
+              opt.value = user._id;
+              opt.textContent = `${user.email}`;
+              select.appendChild(opt);
+            });
+          });
+      } else {
+        modal.classList.add("hidden");
+      }
+    }
+
+    function submitFakeTxnInjection() {
+      const userId = document.getElementById("fakeTxnUserSelect").value;
+      const count = parseInt(document.getElementById("fakeTxnCount").value) || 25;
+      if (!userId) return alert("Please select a user");
+      fetch(`${BASE_URL}/inject-fake-transactions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`
+        },
+        body: JSON.stringify({ userId, count })
+      })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message || "Fake transactions injected");
+          toggleFakeTxnModal();
+          loadTransferHistory();
+        })
+        .catch(err => {
+          console.error("❌ Failed to inject txns:", err.message);
+          alert("Error injecting transactions");
+        });
+    }
+
+    document.getElementById("fakeTxnForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const userId = document.getElementById("fakeTxnUserSelect").value;
+      const count = parseInt(document.getElementById("txnCount").value) || 25;
+      if (!userId) return alert("Please select a user");
+      try {
+        const res = await fetch(`${BASE_URL}/inject-fake-transactions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("adminToken")}`
+          },
+          body: JSON.stringify({ userId, count })
+        });
+        const result = await res.json();
+        if (res.ok) {
+          document.getElementById("injectStatus").classList.remove("hidden");
+          loadTransferHistory();
+        } else {
+          alert(result.error || "Failed to inject transactions");
+        }
+      } catch (err) {
+        console.error("❌ Failed to inject transactions:", err.message);
+        alert("Error injecting transactions");
+      }
     });
 
-    if (response.status === 401) {
-      alert("Session expired or unauthorized. Please log in again.");
-      window.location.href = "Adminlogin.html";
-      return null;
-    }
-
-    if (!response.ok) {
-      throw new Error(`Request failed with status ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (err) {
-    console.error(`❌ Fetch error for ${url}:`, err.message);
-    alert(`Error: Failed to fetch data from ${url}. Please try again.`);
-    return null;
-  }
-}
-
-// Load dashboard metrics (Total Users, Total Transactions, Total Balance, Blocked Users)
-async function loadDashboardMetrics() {
-  const data = await makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/users");
-  if (!data || !Array.isArray(data)) return;
-
-  const totalUsers = data.length;
-  const blockedUsers = data.filter(user => user.isBlocked).length;
-  const totalBalance = data.reduce((sum, user) => sum + (user.balance || 0), 0);
-
-  const txnData = await makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/transfer-history");
-  const totalTxns = Array.isArray(txnData) ? txnData.length : 0;
-
-  document.getElementById("totalUsers").textContent = totalUsers;
-  document.getElementById("blockedUsers").textContent = blockedUsers;
-  document.getElementById("totalBalance").textContent = `€${totalBalance.toFixed(2)}`;
-  document.getElementById("totalTxns").textContent = totalTxns;
-}
-
-// Load all users
-async function loadUsers() {
-  const data = await makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/users");
-  if (!data || !Array.isArray(data)) return;
-
-  const tbody = document.getElementById("userTableBody");
-  tbody.innerHTML = "";
-
-  data.forEach(user => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td class="p-3 border">${user.email || "N/A"}</td>
-      <td class="p-3 border">€${(user.balance || 0).toFixed(2)}</td>
-      <td class="p-3 border">${user.iban || "N/A"}</td>
-      <td class="p-3 border">
-        <span class="px-2 py-1 rounded ${user.isBlocked ? "bg-red-200 text-red-800" : "bg-green-200 text-green-800"}">
-          ${user.isBlocked ? "Blocked" : "Active"}
-        </span>
-      </td>
-    `;
-    tbody.appendChild(row);
-  });
-}
-
-// Load transfer history
-async function loadTransferHistory() {
-  const data = await makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/transfer-history");
-  if (!data || !Array.isArray(data)) return;
-
-  const tbody = document.getElementById("transfer-body");
-  tbody.innerHTML = "";
-
-  data.forEach(txn => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td class="p-2 border">${new Date(txn.createdAt).toLocaleString()}</td>
-      <td class="p-2 border">${txn.from?.email || "N/A"}</td>
-      <td class="p-2 border">${txn.to?.email || txn.recipient || "N/A"}</td>
-      <td class="p-2 border">€${txn.amount.toFixed(2)}</td>
-      <td class="p-2 border">
-        <span class="px-2 py-1 rounded ${txn.status === "approved" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}">
-          ${txn.status}
-        </span>
-      </td>
-    `;
-    tbody.appendChild(row);
-  });
-}
-
-// Load pending transfers
-async function loadPendingTransfers() {
-  const data = await makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/pending-transactions");
-  const tbody = document.getElementById("pendingTransfersTableBody");
-  tbody.innerHTML = "";
-
-  if (!data || !Array.isArray(data) || data.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-white/40">No pending transfers.</td></tr>`;
-    return;
-  }
-
-  data.forEach(transfer => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td class="p-3 border">${transfer.from?.email || "N/A"}</td>
-      <td class="p-3 border">${transfer.to?.email || "N/A"}</td>
-      <td class="p-3 border">€${transfer.amount.toFixed(2)}</td>
-      <td class="p-3 border">
-        <button onclick="handleTransfer('${transfer._id}', 'approve')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs mr-2">Approve</button>
-        <button onclick="handleTransfer('${transfer._id}', 'reject')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</button>
-      </td>
-    `;
-    tbody.appendChild(row);
-  });
-}
-
-// Handle transfer approval/rejection
-async function handleTransfer(id, action) {
-  const data = await makeAuthenticatedRequest(
-    "https://credibe-backends.onrender.com/api/admin/handle-transaction",
-    "POST",
-    { transactionId: id, action }
-  );
-  if (data) {
-    alert(data.message || `Transfer ${action}d successfully`);
-    await Promise.all([loadPendingTransfers(), loadTransferHistory()]);
-  }
-}
-
-// Load pending top-ups
-async function loadPendingTopUps() {
-  const data = await makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/topups/pending");
-  const tbody = document.getElementById("topup-body");
-  tbody.innerHTML = "";
-
-  if (!data || !Array.isArray(data) || data.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-white/40">No pending top-ups.</td></tr>`;
-    return;
-  }
-
-  data.forEach(topup => {
-    const date = new Date(topup.createdAt).toLocaleDateString();
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td class="p-3 border">${topup.user?.email || "Unknown"}</td>
-      <td class="p-3 border">€${topup.amount.toFixed(2)}</td>
-      <td class="p-3 border">${date}</td>
-      <td class="p-3 border">
-        <button onclick="handleTopUp('${topup._id}', 'approve')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs mr-2">Approve</button>
-        <button onclick="handleTopUp('${topup._id}', 'reject')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</button>
-      </td>
-    `;
-    tbody.appendChild(row);
-  });
-}
-
-// Handle top-up approval/rejection
-async function handleTopUp(id, action) {
-  const data = await makeAuthenticatedRequest(
-    `https://credibe-backends.onrender.com/api/admin/topups/${id}/${action}`,
-    "POST"
-  );
-  if (data) {
-    alert(data.message || `Top-up ${action}ed successfully`);
-    await loadPendingTopUps();
-  }
-}
-
-// Block/unblock user
-async function blockOrUnblockUser() {
-  const userId = document.getElementById("userSelect").value;
-  if (!userId) return alert("Please select a user");
-
-  const data = await makeAuthenticatedRequest(
-    `https://credibe-backends.onrender.com/api/admin/block-user/${userId}`,
-    "PATCH"
-  );
-  if (data) {
-    alert(data.message || "Status updated");
-    toggleBlockUserModal();
-    location.reload();
-  }
-}
-
-// Send notification
-async function sendNotification() {
-  const userId = document.getElementById("notifyUserSelect").value;
-  const subject = document.getElementById("notifySubject").value;
-  const message = document.getElementById("notifyMessage").value;
-
-  if (!userId || !subject || !message) return alert("Please fill out all fields");
-
-  const data = await makeAuthenticatedRequest(
-    "https://credibe-backends.onrender.com/api/admin/notify",
-    "POST",
-    { userId, subject, message }
-  );
-  if (data) {
-    alert(data.message || "Notification sent");
-    toggleNotifyModal();
-  }
-}
-
-// Edit balance
-async function submitBalanceEdit() {
-  const userId = document.getElementById("editUserSelect").value;
-  const balance = parseFloat(document.getElementById("editTotalBalance").value);
-  const savings = parseFloat(document.getElementById("editSavings").value);
-  const credits = parseFloat(document.getElementById("editCredit").value);
-
-  if (!userId) return alert("Select a user");
-
-  const data = await makeAuthenticatedRequest(
-    `https://credibe-backends.onrender.com/api/admin/edit-balance/${userId}`,
-    "PATCH",
-    { balance, savings, credits }
-  );
-  if (data) {
-    alert(data.message || "Balance updated");
-    toggleEditBalanceModal();
-    location.reload();
-  }
-}
-
-// Inject fake transactions
-async function submitFakeTxnInjection() {
-  const userId = document.getElementById("fakeTxnUserSelect").value;
-  const count = parseInt(document.getElementById("fakeTxnCount").value) || 100;
-
-  if (!userId) return alert("Please select a user");
-
-  const data = await makeAuthenticatedRequest(
-    "https://credibe-backends.onrender.com/api/admin/inject-fake-txns",
-    "POST",
-    { userId, count }
-  );
-  if (data) {
-    alert(data.message || "Fake transactions injected");
-    toggleFakeTxnModal();
-    await loadTransferHistory();
-  }
-}
-
-// Inject fake transactions (form version)
-document.getElementById("fakeTxnForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const email = document.getElementById("userEmail").value;
-  const count = parseInt(document.getElementById("txnCount").value);
-
-  const data = await makeAuthenticatedRequest(
-    "https://credibe-backends.onrender.com/api/admin/inject-fake-transactions",
-    "POST",
-    { email, count }
-  );
-  if (data) {
-    document.getElementById("injectStatus").classList.remove("hidden");
-    await loadTransferHistory();
-  }
-});
-
-// Modal toggle functions
-function toggleBlockUserModal() {
-  const modal = document.getElementById("blockUserModal");
-  const select = document.getElementById("userSelect");
-
-  if (modal.classList.contains("hidden")) {
-    modal.classList.remove("hidden");
-    makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/users")
-      .then(data => {
-        if (!data || !Array.isArray(data)) {
-          alert("Failed to load users. You may be unauthorized.");
-          return;
-        }
-        select.innerHTML = "";
-        data.forEach(user => {
-          const opt = document.createElement("option");
-          opt.value = user._id;
-          opt.textContent = `${user.email} — ${user.isBlocked ? "Blocked" : "Active"}`;
-          select.appendChild(opt);
-        });
-      });
-  } else {
-    modal.classList.add("hidden");
-  }
-}
-
-function toggleNotifyModal() {
-  const modal = document.getElementById("notifyModal");
-  const select = document.getElementById("notifyUserSelect");
-
-  if (modal.classList.contains("hidden")) {
-    modal.classList.remove("hidden");
-    makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/users")
-      .then(data => {
-        if (!data || !Array.isArray(data)) {
-          alert("Failed to load users. You may be unauthorized.");
-          return;
-        }
-        select.innerHTML = "";
-        data.forEach(user => {
-          const opt = document.createElement("option");
-          opt.value = user._id;
-          opt.textContent = user.email;
-          select.appendChild(opt);
-        });
-      });
-  } else {
-    modal.classList.add("hidden");
-  }
-}
-
-function toggleEditBalanceModal() {
-  const modal = document.getElementById("editBalanceModal");
-  const select = document.getElementById("editUserSelect");
-
-  if (modal.classList.contains("hidden")) {
-    modal.classList.remove("hidden");
-    makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/users")
-      .then(data => {
-        if (!data || !Array.isArray(data)) {
-          alert("Failed to load users. You may be unauthorized.");
-          return;
-        }
-        select.innerHTML = "";
-        data.forEach(user => {
-          const opt = document.createElement("option");
-          opt.value = user._id;
-          opt.textContent = user.email;
-          select.appendChild(opt);
-        });
-      });
-  } else {
-    modal.classList.add("hidden");
-  }
-}
-
-function toggleFakeTxnModal() {
-  const modal = document.getElementById("fakeTxnModal");
-  const select = document.getElementById("fakeTxnUserSelect");
-
-  if (modal.classList.contains("hidden")) {
-    modal.classList.remove("hidden");
-    makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/users")
-      .then(data => {
-        if (!data || !Array.isArray(data)) {
-          alert("Failed to load users. You may be unauthorized.");
-          return;
-        }
-        select.innerHTML = "";
-        data.forEach(user => {
-          const opt = document.createElement("option");
-          opt.value = user._id;
-          opt.textContent = user.email;
-          select.appendChild(opt);
-        });
-      });
-  } else {
-    modal.classList.add("hidden");
-  }
-}
-
-// Load data on page load
-document.addEventListener("DOMContentLoaded", async () => {
-  await Promise.all([
-    loadDashboardMetrics(),
-    loadUsers(),
-    loadTransferHistory(),
-    loadPendingTransfers(),
-    loadPendingTopUps()
-  ]);
-});
-</script>
-
-<!-- 👇 Block User Modal -->
-<div id="blockUserModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
-  <div class="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-lg text-white relative">
-    <button onclick="toggleBlockUserModal()" class="absolute top-2 right-3 text-white/60 hover:text-red-500 text-xl">×</button>
-    <h2 class="text-xl font-bold mb-4">Block/Unblock User</h2>
-    <select id="userSelect" class="w-full p-2 mb-4 rounded bg-gray-700 text-white"></select>
-    <button onclick="blockOrUnblockUser()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white font-semibold w-full">
-      Toggle Block Status
-    </button>
-  </div>
-</div>
-
-<!-- 👇 Edit Balance Modal -->
-<div id="editBalanceModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
-  <div class="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-lg text-white relative">
-    <button onclick="toggleEditBalanceModal()" class="absolute top-2 right-3 text-white/60 hover:text-red-500 text-xl">×</button>
-    <h2 class="text-xl font-bold mb-4">Edit User Balance</h2>
-    
-    <label for="editUserSelect" class="text-sm text-white/60">Select User:</label>
-    <select id="editUserSelect" class="w-full p-2 mb-4 rounded bg-gray-700 text-white"></select>
-
-    <label class="block mb-2">Total Balance</label>
-    <input id="editTotalBalance" type="number" class="w-full p-2 mb-3 rounded bg-gray-700 text-white" placeholder="e.g. 1000" />
-
-    <label class="block mb-2">Savings</label>
-    <input id="editSavings" type="number" class="w-full p-2 mb-3 rounded bg-gray-700 text-white" placeholder="e.g. 200" />
-
-    <label class="block mb-2">Credit</label>
-    <input id="editCredit" type="number" class="w-full p-2 mb-5 rounded bg-gray-700 text-white" placeholder="e.g. 300" />
-
-    <button onclick="submitBalanceEdit()" class="bg-cyan-600 hover:bg-cyan-700 px-4 py-2 rounded text-white font-semibold w-full">
-      Update Balances
-    </button>
-  </div>
-</div>
-
-<!-- 👇 Send Notification Modal -->
-<div id="notifyModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
-  <div class="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-lg text-white relative">
-    <button onclick="toggleNotifyModal()" class="absolute top-2 right-3 text-white/60 hover:text-red-500 text-xl">×</button>
-    <h2 class="text-xl font-bold mb-4">Send Notification</h2>
-
-    <label class="block text-sm mb-1">Select User:</label>
-    <select id="notifyUserSelect" class="w-full p-2 mb-3 rounded bg-gray-700 text-white"></select>
-
-    <label class="block text-sm mb-1">Subject:</label>
-    <input id="notifySubject" class="w-full p-2 mb-3 rounded bg-gray-700 text-white" placeholder="Subject"/>
-
-    <label class="block text-sm mb-1">Message:</label>
-    <textarea id="notifyMessage" class="w-full p-2 mb-4 rounded bg-gray-700 text-white" placeholder="Message" rows="4"></textarea>
-
-    <button onclick="sendNotification()" class="bg-cyan-600 hover:bg-cyan-700 px-4 py-2 rounded text-white font-semibold w-full">
-      Send
-    </button>
-  </div>
-</div>
-
-<!-- 👻 Inject Fake Transactions Modal -->
-<div id="fakeTxnModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
-  <div class="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-lg text-white relative">
-    <button onclick="toggleFakeTxnModal()" class="absolute top-2 right-3 text-white/60 hover:text-red-500 text-xl">×</button>
-    <h2 class="text-xl font-bold mb-4">Inject Fake Transactions</h2>
-
-    <label for="fakeTxnUserSelect" class="text-sm text-white/60">Select User:</label>
-    <select id="fakeTxnUserSelect" class="w-full p-2 mb-4 rounded bg-gray-700 text-white"></select>
-
-    <label for="fakeTxnCount" class="text-sm text-white/60">Number of Fake Transactions:</label>
-    <input id="fakeTxnCount" type="number" value="100" min="1" max="100" class="w-full p-2 mb-4 rounded bg-gray-700 text-white" />
-
-    <button onclick="submitFakeTxnInjection()" class="bg-cyan-600 hover:bg-cyan-700 px-4 py-2 rounded text-white font-semibold w-full">
-      Inject Transactions
-    </button>
-  </div>
-</div>
-
-<!-- 🔧 FAKE TRANSACTION INJECTOR -->
-<div class="mt-10 p-6 bg-gray-900 rounded-lg shadow-lg">
-  <h2 class="text-2xl font-bold mb-4 text-white">🧪 Inject Fake Transactions</h2>
-  <form id="fakeTxnForm" class="space-y-4">
-    <div>
-      <label for="userEmail" class="block text-white font-semibold mb-1">User Email</label>
-      <input type="email" id="userEmail" required placeholder="Enter user email"
-             class="w-full px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded-md">
-    </div>
-    <div>
-      <label for="txnCount" class="block text-white font-semibold mb-1">Number of Fake Transactions</label>
-      <input type="number" id="txnCount" required min="1" max="100"
-             class="w-full px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded-md">
-    </div>
-    <button type="submit"
-            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-      Inject
-    </button>
-    <p id="injectStatus" class="text-green-400 mt-2 hidden">✅ Transactions injected.</p>
-  </form>
-</div>
-
+    document.addEventListener("DOMContentLoaded", () => {
+      loadDashboardStats();
+      loadUsers();
+      loadTransferHistory();
+      loadPendingTransfers();
+      loadPendingTopUps();
+    });
+  </script>
 </body>
 </html>

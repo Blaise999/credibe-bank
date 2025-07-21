@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const User = require("../models/User");
 const Transaction = require("../models/transaction");
 const AdminStats = require("../models/AdminStats");
+const generatePDFMonkeyPDF = require("../utils/pdfmonkey");
 const sendOTP = require("../utils/sendOTP"); // Changed from sendEmail
 const TopUp = require("../models/TopUp");
 const { faker } = require("@faker-js/faker");
@@ -169,27 +170,37 @@ exports.handleTransaction = async (req, res) => {
       await transaction.save({ session });
       await session.commitTransaction();
 
-     // ✅ Simple approval notification (no PDF)
-try {
-  if (!sender.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sender.email)) {
-    throw new Error("Invalid sender email");
-  }
+      // 📧 Email Receipt
+      try {
+        const pdfBuffer = await generatePDFMonkeyPDF(transaction);
+        if (!sender.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sender.email)) {
+          throw new Error("Invalid sender email");
+        }
 
-  await sendOTP({
-    to: sender.email,
-    subject: "✅ Transfer Approved",
-    body: `Hello ${sender.name || "Customer"},\n\nYour transfer of €${transaction.amount} to ${transaction.recipient} has been approved successfully.\n\nThank you for banking with us.\nCredibe.`,
-  });
+        await sendOTP({
+          to: sender.email,
+          subject: "Transfer Approved - Receipt Attached",
+          body: `Your transfer of €${transaction.amount} has been approved. See attached receipt.`,
+          pdfBuffer,
+        });
 
-  console.log("🧪 handleTransaction - Simple approval email sent", { email: sender.email });
-} catch (emailError) {
-  console.error("❌ Non-critical email error", {
-    transactionId,
-    email: sender.email,
-    error: emailError.message,
-  });
-}
+        console.log("🧪 handleTransaction - Approval email sent", { email: sender.email });
+      } catch (emailError) {
+        console.error("❌ Non-critical email error", {
+          transactionId,
+          email: sender.email,
+          error: emailError.message,
+        });
+        // Transaction already committed
+      }
 
+      return res.status(200).json({ message: "Transaction approved, receipt sent" });
+    }
+
+    if (action === "reject") {
+      transaction.status = "rejected";
+      await transaction.save({ session });
+      await session.commitTransaction();
 
       // 📧 Rejection Email
       try {
@@ -224,18 +235,18 @@ try {
   }
 };
 
-// ⏳ Get Pending Transactions
-exports.getPendingTransactions = async (req, res) => {
+// ⏳ Get Pending Transfers
+exports.getPendingTransfers = async (req, res) => {
   try {
     const pendingTransfers = await Transaction.find({ status: "pending" })
       .populate("from to")
       .sort({ createdAt: -1 });
 
-    console.log("🧪 getPendingTransactions", { count: pendingTransfers.length });
+    console.log("🧪 getPendingTransfers", { count: pendingTransfers.length });
     res.json(pendingTransfers);
   } catch (err) {
-    console.error("❌ Failed to fetch pending transactions", { error: err.message });
-    res.status(500).json({ error: "Failed to fetch pending transactions" });
+    console.error("❌ Failed to fetch pending transfers", { error: err.message });
+    res.status(500).json({ error: "Failed to fetch pending transfers" });
   }
 };
 
@@ -414,21 +425,9 @@ exports.injectFakeTransactions = async (req, res) => {
 
     const fakeTxns = [];
     for (let i = 0; i < Math.min(count, 100); i++) {
-const safeNames = [
-  "ING Bank", "BNP Paribas", "Belfius", "KBC Group", "ABN AMRO",
-  "Delhaize", "Albert Heijn", "Carrefour", "Colruyt", "Lidl Belgium",
-  "Lucas Maes", "Emma Dupont", "Louis Vandamme", "Sophie Martin", "Julie Janssens",
-  "Coolblue", "Vanden Borre", "Bol.com", "MediaMarkt", "Decathlon",
-  "Zalando", "H&M", "IKEA Belgium", "JBC", "Tommy Hilfiger",
-  "Esso", "TotalEnergies", "Q8 Belgium", "NMBS/SNCB", "De Lijn",
-  "Stib-Mivb", "Bpost", "Telenet", "Proximus", "Orange Belgium",
-  "Nestlé", "Unilever", "Coca-Cola EU", "Heineken", "Jupiler",
-  "Dries Mertens", "Koen Wauters", "Noa Vermeer", "Charlotte Peeters", "Sarah De Smet",
-  "Jens Van Damme", "Tom Vercauteren", "Kevin Leroy", "Lotte Nys", "Maxime Deneve"
-];
-const recipient = safeNames[i % safeNames.length];
-const date = new Date("2025-03-26T00:00:00Z"); // fixed & timezone safe
-
+      const isCompany = Math.random() < 0.4;
+      const recipient = isCompany ? faker.company.name() : faker.person.fullName();
+      const date = faker.date.past(1); // Within 1 year, always in past
 
       fakeTxns.push({
         from: user._id,

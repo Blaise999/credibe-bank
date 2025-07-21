@@ -1,28 +1,47 @@
 const express = require("express");
 const router = express.Router();
-const adminController = require("../controllers/admin.controller");
+const {
+  getAllUsers,
+  toggleBlockUser,
+  editUserBalance,
+  getPendingTransfers,
+  handleTransaction,
+  getTransferHistory,
+  getPendingTopUps,    // ✅ Fixed typo
+  approveTopUp,        // ✅ Use correct function
+  rejectTopUp,         // ✅ Use correct function
+  sendNotification,
+  injectFakeTransactions,
+  getDashboardStats,
+} = require("../controllers/admin.controller");
+
 const { verifyToken, isAdmin } = require("../middleware/auth");
 
-// 👥 User Management
-router.get("/users", verifyToken, isAdmin, adminController.getAllUsers);
-router.patch("/block-user/:userId", verifyToken, isAdmin, adminController.toggleBlockUser);
-router.patch("/edit-balance/:userId", verifyToken, isAdmin, adminController.editUserBalance);
+// ✅ All routes below are protected
+router.use(verifyToken, isAdmin);
 
-// 💸 Transaction Management
-router.get("/pending-transactions", verifyToken, isAdmin, adminController.getPendingTransactions); // ✅ Used by AdminDashboard.html
-router.get("/transfer-history", verifyToken, isAdmin, adminController.getTransferHistory); // ✅ Used by AdminDashboard.html
-router.post("/handle-transaction", verifyToken, isAdmin, adminController.handleTransaction);
-router.post("/inject-fake-transactions", verifyToken, isAdmin, adminController.injectFakeTransactions); // ✅ Confirmed
+// Dashboard summary
+router.get("/stats", getDashboardStats);
 
-// ⬆️ Top-Up Management
-router.get("/topups/pending", verifyToken, isAdmin, adminController.getPendingTopUps); // ✅ Used by AdminDashboard.html
-router.post("/topups/:id/approve", verifyToken, isAdmin, adminController.approveTopUp);
-router.post("/topups/:id/reject", verifyToken, isAdmin, adminController.rejectTopUp);
+// User management
+router.get("/users/user/", getAllUsers);
+router.patch("/users/block/:id", toggleBlockUser);
+router.patch("/users/edit/:id", editUserBalance);
 
-// 📧 Admin Notifications
-router.post("/notify", verifyToken, isAdmin, adminController.sendNotification);
+// Transfers
+router.get("/transfers/pending", getPendingTransfers);
+router.get("/transfers/history", getTransferHistory);
+router.post("/transfers/action", handleTransaction);
 
-// 📊 Dashboard Stats
-router.get("/dashboard-stats", verifyToken, isAdmin, adminController.getDashboardStats);
+// Top-ups
+router.get("/topups/pending", getPendingTopUps);
+router.post("/topups/:id/approve", approveTopUp); // ✅ Fixed route
+router.post("/topups/:id/reject", rejectTopUp);   // ✅ Fixed route
+
+// Notifications
+router.post("/notify", sendNotification);
+
+// Fake data injection
+router.post("/inject-fake-transactions", injectFakeTransactions);
 
 module.exports = router;
