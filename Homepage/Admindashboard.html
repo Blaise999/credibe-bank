@@ -548,31 +548,44 @@
       }
     }
 
-    function submitBalanceEdit() {
-      const userId = document.getElementById("editUserSelect").value;
-      const totalCredit = parseFloat(document.getElementById("editTotalBalance").value);
-      const savings = parseFloat(document.getElementById("editSavings").value);
-      const credits = parseFloat(document.getElementById("editCredit").value);
-      if (!userId) return alert("Select a user");
-      fetch(`${BASE_URL}/users/edit/${userId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`
-        },
-        body: JSON.stringify({ totalCredit, savings, credits })
-      })
-        .then(res => res.json())
-        .then(data => {
-          alert(data.message || "Balance updated");
-          toggleEditBalanceModal();
-          loadUsers();
-        })
-        .catch(err => {
-          console.error("❌ Balance update error:", err.message);
-          alert("Failed to update balance");
-        });
-    }
+  function submitBalanceEdit() {
+  const userId = document.getElementById("editUserSelect").value;
+  const totalCreditRaw = document.getElementById("editTotalBalance").value;
+  const savingsRaw = document.getElementById("editSavings").value;
+  const creditsRaw = document.getElementById("editCredit").value;
+
+  const totalCredit = parseFloat(totalCreditRaw);
+  const savings = parseFloat(savingsRaw);
+  const credits = parseFloat(creditsRaw);
+
+  const payload = {};
+  if (!isNaN(totalCredit)) payload.totalCredit = totalCredit;
+  if (!isNaN(savings)) payload.savings = savings;
+  if (!isNaN(credits)) payload.credits = credits;
+
+  if (!userId) return alert("Select a user");
+  if (Object.keys(payload).length === 0) return alert("Enter at least one valid amount");
+
+  fetch(`${BASE_URL}/users/edit/${userId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("adminToken")}`
+    },
+    body: JSON.stringify(payload)
+  })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.message || "Balance updated");
+      toggleEditBalanceModal();
+      loadUsers();
+    })
+    .catch(err => {
+      console.error("❌ Balance update error:", err.message);
+      alert("Failed to update balance");
+    });
+}
+
 
     function toggleFakeTxnModal() {
       const modal = document.getElementById("fakeTxnModal");
