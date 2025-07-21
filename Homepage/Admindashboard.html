@@ -431,31 +431,52 @@
       }
     }
 
-   function blockOrUnblockUser() {
+  function blockOrUnblockUser() {
   const userId = document.getElementById("userSelect").value;
-  console.log("🧪 Clicked block button for userId:", userId);
+  console.log("🧪 Block button clicked");
 
-  if (!userId) return alert("Please select a user");
+  if (!userId) {
+    console.error("❌ No user selected");
+    alert("Please select a user");
+    return;
+  }
 
-  fetch(`${BASE_URL}/users/block/${userId}`, {
+  const url = `${BASE_URL}/users/block/${userId}`;
+  console.log("🧪 Sending PATCH to:", url);
+
+  fetch(url, {
     method: "PATCH",
-    headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("adminToken")}`
+    }
   })
     .then(res => {
       console.log("🧪 Response status:", res.status);
+      if (!res.ok) {
+        console.error("❌ Backend responded with error status:", res.status);
+      }
       return res.json();
     })
     .then(data => {
       console.log("🧪 Response data:", data);
-      alert(data.message || "Status updated");
+      if (data?.error) {
+        console.error("❌ Backend error:", data.error);
+        alert(`Backend error: ${data.error}`);
+        return;
+      }
+
+      alert(data.message || "User status updated.");
       toggleBlockUserModal();
       loadUsers();
     })
     .catch(err => {
-      console.error("❌ Fetch failed:", err.message);
-      alert("Failed to block/unblock user");
+      console.error("❌ Network/JS error in blockOrUnblockUser:", err);
+      alert("Something went wrong while blocking the user.");
     });
 }
+
+window.blockOrUnblockUser = blockOrUnblockUser;
+
 
     function toggleNotifyModal() {
       const modal = document.getElementById("notifyModal");
@@ -654,7 +675,7 @@ document.addEventListener("DOMContentLoaded", () => {
       loadPendingTransfers();
       loadPendingTopUps();
     });
-    window.blockOrUnblockUser = blockOrUnblockUser;
+    
   </script>
 </body>
 </html>
