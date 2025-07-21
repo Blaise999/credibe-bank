@@ -715,27 +715,35 @@
       }
     });
   });
+// Handle window resize to hide mobile menu on desktop
+const mobileMenu = document.getElementById("mobile-menu");
+const menuToggle = document.getElementById("menu-toggle");
 
-  // Handle window resize to hide mobile menu on desktop
-  const mobileMenu = document.getElementById("mobile-menu");
-  window.addEventListener('resize', () => {
-    if (window.innerWidth >= 768 && mobileMenu && !mobileMenu.classList.contains('closed')) {
-      mobileMenu.classList.add('closed');
-      mobileMenu.classList.remove('open');
-      document.getElementById("menu-toggle").textContent = '☰'; // Reset icon
-      console.log('Mobile menu hidden on resize to desktop');
+window.addEventListener('resize', () => {
+  if (window.innerWidth >= 768 && mobileMenu && !mobileMenu.classList.contains('closed')) {
+    mobileMenu.classList.add('closed');
+    mobileMenu.classList.remove('open');
+    if (menuToggle) menuToggle.textContent = '☰'; // Reset icon
+    console.log('Mobile menu hidden on resize to desktop');
+  }
+});
+
+// Mobile menu toggle (FIXED)
+if (menuToggle && mobileMenu) {
+  menuToggle.addEventListener("click", () => {
+    const isOpen = mobileMenu.classList.contains("open");
+
+    if (isOpen) {
+      mobileMenu.classList.remove("open");
+      mobileMenu.classList.add("closed");
+      menuToggle.textContent = '☰';
+    } else {
+      mobileMenu.classList.remove("closed");
+      mobileMenu.classList.add("open");
+      menuToggle.textContent = '✕';
     }
   });
-
-  // Mobile menu toggle
-  const menuToggle = document.getElementById("menu-toggle");
-  if (menuToggle && mobileMenu) {
-    menuToggle.addEventListener("click", () => {
-      mobileMenu.classList.toggle("closed");
-      mobileMenu.classList.toggle("open");
-      menuToggle.textContent = mobileMenu.classList.contains("open") ? '✕' : '☰';
-    });
-  }
+}
 
   // Page Switching with Skeleton Loader
   const navLinks = document.querySelectorAll('.nav-link');
