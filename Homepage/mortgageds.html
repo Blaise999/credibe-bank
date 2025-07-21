@@ -114,6 +114,13 @@
   <script>
     document.getElementById('mortgage-form').addEventListener('submit', function (e) {
       e.preventDefault();
+      // 🚫 Check if user is blocked
+  const isBlocked = localStorage.getItem("isBlocked") === "true";
+  if (isBlocked) {
+    window.location.href = "block.html";
+    return;
+  }
+
 
       const name = document.getElementById('fullName').value.trim();
       const email = document.getElementById('email').value.trim();

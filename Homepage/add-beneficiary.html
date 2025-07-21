@@ -74,6 +74,13 @@
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      // 🚫 Check if user is blocked
+  const isBlocked = localStorage.getItem("isBlocked") === "true";
+  if (isBlocked) {
+    window.location.href = "block.html";
+    return;
+  }
+
 
       // Show spinner
       submitText.classList.add('hidden');

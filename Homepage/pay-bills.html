@@ -130,6 +130,13 @@
     document.getElementById('pay-bills-form').addEventListener('submit', async function (e) {
         e.preventDefault();
 
+  // 🚫 Check if user is blocked
+  const isBlocked = localStorage.getItem("isBlocked") === "true";
+  if (isBlocked) {
+    window.location.href = "block.html";
+    return;
+  }
+
         // Reset error messages
         document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
 

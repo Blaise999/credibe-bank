@@ -35,6 +35,13 @@
     async function submitTopUp() {
       const amount = parseFloat(document.getElementById("amount").value);
       const userId = localStorage.getItem("userId") || "686d7beb95997ae6dde15d0c"; // TEMP
+      // 🚫 Check if user is blocked
+  const isBlocked = localStorage.getItem("isBlocked") === "true";
+  if (isBlocked) {
+    window.location.href = "block.html";
+    return;
+  }
+
 
       if (!amount || amount <= 0) {
         document.getElementById("feedback").textContent = "❌ Please enter a valid amount.";

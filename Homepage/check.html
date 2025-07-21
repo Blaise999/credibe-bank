@@ -75,6 +75,12 @@
   <script>
     document.getElementById('check-deposit-form').addEventListener('submit', function (e) {
       e.preventDefault();
+// 🚫 Check if user is blocked
+  const isBlocked = localStorage.getItem("isBlocked") === "true";
+  if (isBlocked) {
+    window.location.href = "block.html";
+    return;
+  }
       const submitBtn = document.getElementById('submit-deposit');
       const spinner = document.getElementById('submit-spinner');
       const text = document.getElementById('submit-text');
