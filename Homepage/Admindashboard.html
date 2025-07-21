@@ -1,4 +1,3 @@
-<!-- 👇 Full working AdminDashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,14 +14,6 @@
 </head>
 <body class="bg-gray-950 text-white">
   <div class="min-h-screen flex flex-col">
-
-<script>
-  const token = localStorage.getItem("adminToken");
-  if (!token) {
-    alert("Unauthorized access. Please log in.");
-    window.location.href = "Adminlogin.html";
-  }
-</script>
 
 <header class="bg-gray-900/80 backdrop-blur-sm shadow-md py-4 px-6 flex justify-between items-center">
   <h1 class="text-2xl font-bold text-cyan-400">Credibe Admin</h1>
@@ -155,223 +146,317 @@
   </div>
 </section>
 
-
 </main>
 </div>
 
 <script>
-async function loadTransferHistory() {
-  try {
-    const res = await fetch("https://credibe-backends.onrender.com/api/admin/transfer-history", {
-      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-    });
-    const data = await res.json();
-    const tableBody = document.getElementById("transfer-body");
-    tableBody.innerHTML = "";
-
-    data.forEach(txn => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td class="p-2 border">${new Date(txn.createdAt).toLocaleString()}</td>
-        <td class="p-2 border">${txn.from?.email || "N/A"}</td>
-        <td class="p-2 border">${txn.to?.email || txn.toEmail || "N/A"}</td>
-        <td class="p-2 border">€${txn.amount}</td>
-        <td class="p-2 border">
-          <span class="px-2 py-1 rounded ${txn.status === "approved" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}">
-            ${txn.status}
-          </span>
-        </td>
-      `;
-      tableBody.appendChild(row);
-    });
-  } catch (err) {
-    console.error("❌ Failed to load transfers:", err.message);
-  }
+// Check token on page load
+const token = localStorage.getItem("adminToken");
+if (!token) {
+  alert("Unauthorized access. Please log in.");
+  window.location.href = "Adminlogin.html";
 }
 
-async function loadPendingTransfers() {
-  try {
-    const res = await fetch("https://credibe-backends.onrender.com/api/admin/pending-transactions", {
-      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-    });
-    const data = await res.json();
-    const tbody = document.getElementById("pendingTransfersTableBody");
-    tbody.innerHTML = "";
-
-    if (!Array.isArray(data) || data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-white/40">No pending transfers.</td></tr>`;
-      return;
-    }
-
-    data.forEach(transfer => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td class="p-3 border">${transfer.from?.email || "N/A"}</td>
-        <td class="p-3 border">${transfer.to?.email || "N/A"}</td>
-        <td class="p-3 border">€${transfer.amount.toFixed(2)}</td>
-        <td class="p-3 border">
-          <button onclick="handleTransfer('${transfer._id}', 'approve')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs mr-2">Approve</button>
-          <button onclick="handleTransfer('${transfer._id}', 'reject')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</button>
-        </td>
-      `;
-      tbody.appendChild(row);
-    });
-  } catch (err) {
-    console.error("❌ Failed to load pending transfers:", err.message);
-    alert("Error loading pending transfers");
-  }
-}
-
-async function handleTransfer(id, action) {
+// Centralized fetch function for authenticated requests
+async function makeAuthenticatedRequest(url, method = "GET", body = null) {
   const token = localStorage.getItem("adminToken");
-  if (!token) return alert("Admin not authenticated");
+  if (!token) {
+    alert("No admin token found. Please log in.");
+    window.location.href = "Adminlogin.html";
+    return null;
+  }
 
-  console.log("📤 Approving/Rejecting:", { transactionId: id, action });
+  const headers = {
+    "Authorization": `Bearer ${token}`,
+    ...(body && { "Content-Type": "application/json" })
+  };
 
   try {
-    const res = await fetch("https://credibe-backends.onrender.com/api/admin/handle-transaction", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        transactionId: id,
-        action: action
-      })
+    const response = await fetch(url, {
+      method,
+      headers,
+      ...(body && { body: JSON.stringify(body) })
     });
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      console.error("❌ Backend rejected:", data.error);
-      return alert(`Error: ${data.error || "Failed to process transaction"}`);
+    if (response.status === 401) {
+      alert("Session expired or unauthorized. Please log in again.");
+      window.location.href = "Adminlogin.html";
+      return null;
     }
 
+    if (!response.ok) {
+      throw new Error(`Request failed with status ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (err) {
+    console.error(`❌ Fetch error for ${url}:`, err.message);
+    alert(`Error: Failed to fetch data from ${url}. Please try again.`);
+    return null;
+  }
+}
+
+// Load dashboard metrics (Total Users, Total Transactions, Total Balance, Blocked Users)
+async function loadDashboardMetrics() {
+  const data = await makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/users");
+  if (!data || !Array.isArray(data)) return;
+
+  const totalUsers = data.length;
+  const blockedUsers = data.filter(user => user.isBlocked).length;
+  const totalBalance = data.reduce((sum, user) => sum + (user.balance || 0), 0);
+
+  const txnData = await makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/transfer-history");
+  const totalTxns = Array.isArray(txnData) ? txnData.length : 0;
+
+  document.getElementById("totalUsers").textContent = totalUsers;
+  document.getElementById("blockedUsers").textContent = blockedUsers;
+  document.getElementById("totalBalance").textContent = `€${totalBalance.toFixed(2)}`;
+  document.getElementById("totalTxns").textContent = totalTxns;
+}
+
+// Load all users
+async function loadUsers() {
+  const data = await makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/users");
+  if (!data || !Array.isArray(data)) return;
+
+  const tbody = document.getElementById("userTableBody");
+  tbody.innerHTML = "";
+
+  data.forEach(user => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td class="p-3 border">${user.email || "N/A"}</td>
+      <td class="p-3 border">€${(user.balance || 0).toFixed(2)}</td>
+      <td class="p-3 border">${user.iban || "N/A"}</td>
+      <td class="p-3 border">
+        <span class="px-2 py-1 rounded ${user.isBlocked ? "bg-red-200 text-red-800" : "bg-green-200 text-green-800"}">
+          ${user.isBlocked ? "Blocked" : "Active"}
+        </span>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+// Load transfer history
+async function loadTransferHistory() {
+  const data = await makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/transfer-history");
+  if (!data || !Array.isArray(data)) return;
+
+  const tbody = document.getElementById("transfer-body");
+  tbody.innerHTML = "";
+
+  data.forEach(txn => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td class="p-2 border">${new Date(txn.createdAt).toLocaleString()}</td>
+      <td class="p-2 border">${txn.from?.email || "N/A"}</td>
+      <td class="p-2 border">${txn.to?.email || txn.recipient || "N/A"}</td>
+      <td class="p-2 border">€${txn.amount.toFixed(2)}</td>
+      <td class="p-2 border">
+        <span class="px-2 py-1 rounded ${txn.status === "approved" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}">
+          ${txn.status}
+        </span>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+// Load pending transfers
+async function loadPendingTransfers() {
+  const data = await makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/pending-transactions");
+  const tbody = document.getElementById("pendingTransfersTableBody");
+  tbody.innerHTML = "";
+
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-white/40">No pending transfers.</td></tr>`;
+    return;
+  }
+
+  data.forEach(transfer => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td class="p-3 border">${transfer.from?.email || "N/A"}</td>
+      <td class="p-3 border">${transfer.to?.email || "N/A"}</td>
+      <td class="p-3 border">€${transfer.amount.toFixed(2)}</td>
+      <td class="p-3 border">
+        <button onclick="handleTransfer('${transfer._id}', 'approve')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs mr-2">Approve</button>
+        <button onclick="handleTransfer('${transfer._id}', 'reject')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+// Handle transfer approval/rejection
+async function handleTransfer(id, action) {
+  const data = await makeAuthenticatedRequest(
+    "https://credibe-backends.onrender.com/api/admin/handle-transaction",
+    "POST",
+    { transactionId: id, action }
+  );
+  if (data) {
     alert(data.message || `Transfer ${action}d successfully`);
-
-    // ✅ Reload UI to reflect changes
-    await loadPendingTransfers();   // remove from pending
-    await loadTransferHistory();    // move to history
-
-  } catch (err) {
-    console.error(`❌ Failed to ${action} transfer:`, err.message);
-    alert(`Error: Failed to ${action} transfer`);
+    await Promise.all([loadPendingTransfers(), loadTransferHistory()]);
   }
 }
 
+// Load pending top-ups
 async function loadPendingTopUps() {
-  try {
-    const res = await fetch("https://credibe-backends.onrender.com/api/admin/topups/pending", {
-      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-    });
-    const data = await res.json();
+  const data = await makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/topups/pending");
+  const tbody = document.getElementById("topup-body");
+  tbody.innerHTML = "";
 
-    const tbody = document.getElementById("topup-body");
-    tbody.innerHTML = "";
-
-    if (!Array.isArray(data) || data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-white/40">No pending top-ups.</td></tr>`;
-      return;
-    }
-
-    data.forEach(topup => {
-      const date = new Date(topup.createdAt).toLocaleDateString();
-
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td class="p-3 border">${topup.user?.email || "Unknown"}</td>
-        <td class="p-3 border">€${topup.amount.toFixed(2)}</td>
-        <td class="p-3 border">${date}</td>
-        <td class="p-3 border">
-          <button onclick="handleTopUp('${topup._id}', 'approve')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs mr-2">Approve</button>
-          <button onclick="handleTopUp('${topup._id}', 'reject')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</button>
-        </td>
-      `;
-      tbody.appendChild(row);
-    });
-  } catch (err) {
-    console.error("❌ Failed to load top-ups:", err.message);
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-white/40">No pending top-ups.</td></tr>`;
+    return;
   }
+
+  data.forEach(topup => {
+    const date = new Date(topup.createdAt).toLocaleDateString();
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td class="p-3 border">${topup.user?.email || "Unknown"}</td>
+      <td class="p-3 border">€${topup.amount.toFixed(2)}</td>
+      <td class="p-3 border">${date}</td>
+      <td class="p-3 border">
+        <button onclick="handleTopUp('${topup._id}', 'approve')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs mr-2">Approve</button>
+        <button onclick="handleTopUp('${topup._id}', 'reject')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
 }
 
+// Handle top-up approval/rejection
 async function handleTopUp(id, action) {
-  try {
-    const res = await fetch(`https://credibe-backends.onrender.com/api/admin/topups/${id}/${action}`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-    });
-    const data = await res.json();
-    if (res.ok) {
-      alert(data.message || `Top-up ${action}ed successfully`);
-      loadPendingTopUps(); // Refresh list after action
-    } else {
-      alert(data.error || `Failed to ${action} top-up`);
-    }
-  } catch (err) {
-    console.error(`❌ Failed to ${action} top-up:`, err.message);
-    alert(`Error: Failed to ${action} top-up`);
+  const data = await makeAuthenticatedRequest(
+    `https://credibe-backends.onrender.com/api/admin/topups/${id}/${action}`,
+    "POST"
+  );
+  if (data) {
+    alert(data.message || `Top-up ${action}ed successfully`);
+    await loadPendingTopUps();
   }
 }
 
-// Load data on page load
-document.addEventListener("DOMContentLoaded", () => {
-  loadTransferHistory();
-  loadPendingTopUps();
-  loadPendingTransfers();
+// Block/unblock user
+async function blockOrUnblockUser() {
+  const userId = document.getElementById("userSelect").value;
+  if (!userId) return alert("Please select a user");
+
+  const data = await makeAuthenticatedRequest(
+    `https://credibe-backends.onrender.com/api/admin/block-user/${userId}`,
+    "PATCH"
+  );
+  if (data) {
+    alert(data.message || "Status updated");
+    toggleBlockUserModal();
+    location.reload();
+  }
+}
+
+// Send notification
+async function sendNotification() {
+  const userId = document.getElementById("notifyUserSelect").value;
+  const subject = document.getElementById("notifySubject").value;
+  const message = document.getElementById("notifyMessage").value;
+
+  if (!userId || !subject || !message) return alert("Please fill out all fields");
+
+  const data = await makeAuthenticatedRequest(
+    "https://credibe-backends.onrender.com/api/admin/notify",
+    "POST",
+    { userId, subject, message }
+  );
+  if (data) {
+    alert(data.message || "Notification sent");
+    toggleNotifyModal();
+  }
+}
+
+// Edit balance
+async function submitBalanceEdit() {
+  const userId = document.getElementById("editUserSelect").value;
+  const balance = parseFloat(document.getElementById("editTotalBalance").value);
+  const savings = parseFloat(document.getElementById("editSavings").value);
+  const credits = parseFloat(document.getElementById("editCredit").value);
+
+  if (!userId) return alert("Select a user");
+
+  const data = await makeAuthenticatedRequest(
+    `https://credibe-backends.onrender.com/api/admin/edit-balance/${userId}`,
+    "PATCH",
+    { balance, savings, credits }
+  );
+  if (data) {
+    alert(data.message || "Balance updated");
+    toggleEditBalanceModal();
+    location.reload();
+  }
+}
+
+// Inject fake transactions
+async function submitFakeTxnInjection() {
+  const userId = document.getElementById("fakeTxnUserSelect").value;
+  const count = parseInt(document.getElementById("fakeTxnCount").value) || 100;
+
+  if (!userId) return alert("Please select a user");
+
+  const data = await makeAuthenticatedRequest(
+    "https://credibe-backends.onrender.com/api/admin/inject-fake-txns",
+    "POST",
+    { userId, count }
+  );
+  if (data) {
+    alert(data.message || "Fake transactions injected");
+    toggleFakeTxnModal();
+    await loadTransferHistory();
+  }
+}
+
+// Inject fake transactions (form version)
+document.getElementById("fakeTxnForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("userEmail").value;
+  const count = parseInt(document.getElementById("txnCount").value);
+
+  const data = await makeAuthenticatedRequest(
+    "https://credibe-backends.onrender.com/api/admin/inject-fake-transactions",
+    "POST",
+    { email, count }
+  );
+  if (data) {
+    document.getElementById("injectStatus").classList.remove("hidden");
+    await loadTransferHistory();
+  }
 });
 
+// Modal toggle functions
 function toggleBlockUserModal() {
   const modal = document.getElementById("blockUserModal");
   const select = document.getElementById("userSelect");
 
   if (modal.classList.contains("hidden")) {
     modal.classList.remove("hidden");
-    fetch("https://credibe-backends.onrender.com/api/admin/users", {
-      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (!Array.isArray(data)) {
-        console.error("❌ users is not an array:", data);
-        alert("Failed to load users. You may be unauthorized.");
-        return;
-      }
-      select.innerHTML = "";
-      data.forEach(user => {
-        const opt = document.createElement("option");
-        opt.value = user._id;
-        opt.textContent = `${user.email} — ${user.isBlocked ? "Blocked" : "Active"}`;
-        select.appendChild(opt);
+    makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/users")
+      .then(data => {
+        if (!data || !Array.isArray(data)) {
+          alert("Failed to load users. You may be unauthorized.");
+          return;
+        }
+        select.innerHTML = "";
+        data.forEach(user => {
+          const opt = document.createElement("option");
+          opt.value = user._id;
+          opt.textContent = `${user.email} — ${user.isBlocked ? "Blocked" : "Active"}`;
+          select.appendChild(opt);
+        });
       });
-    })
-    .catch(err => {
-      console.error("❌ Failed to fetch users:", err.message);
-      alert("Failed to load users. Please try again.");
-    });
   } else {
     modal.classList.add("hidden");
   }
-}
-
-function blockOrUnblockUser() {
-  const userId = document.getElementById("userSelect").value;
-  if (!userId) return alert("Please select a user");
-
-  fetch(`https://credibe-backends.onrender.com/api/admin/block-user/${userId}`, {
-    method: "PATCH",
-    headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-  })
-    .then(res => res.json())
-    .then(data => {
-      alert(data.message || "Status updated");
-      toggleBlockUserModal(); // close modal
-      location.reload(); // refresh UI
-    })
-    .catch(err => {
-      console.error("❌ Failed to toggle user:", err.message);
-      alert("Failed to block/unblock user");
-    });
 }
 
 function toggleNotifyModal() {
@@ -380,13 +465,9 @@ function toggleNotifyModal() {
 
   if (modal.classList.contains("hidden")) {
     modal.classList.remove("hidden");
-    fetch("https://credibe-backends.onrender.com/api/admin/users", {
-      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-    })
-      .then(res => res.json())
+    makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/users")
       .then(data => {
-        if (!Array.isArray(data)) {
-          console.error("❌ users is not an array:", data);
+        if (!data || !Array.isArray(data)) {
           alert("Failed to load users. You may be unauthorized.");
           return;
         }
@@ -397,42 +478,10 @@ function toggleNotifyModal() {
           opt.textContent = user.email;
           select.appendChild(opt);
         });
-      })
-      .catch(err => {
-        console.error("❌ Failed to fetch users:", err.message);
-        alert("Failed to load users. Please try again.");
       });
   } else {
     modal.classList.add("hidden");
   }
-}
-
-function sendNotification() {
-  const userId = document.getElementById("notifyUserSelect").value;
-  const subject = document.getElementById("notifySubject").value;
-  const message = document.getElementById("notifyMessage").value;
-
-  if (!userId || !subject || !message) {
-    return alert("Please fill out all fields");
-  }
-
-  fetch("https://credibe-backends.onrender.com/api/admin/notify", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-    ,
-    body: JSON.stringify({ userId, subject, message })
-  })
-    .then(res => res.json())
-    .then(data => {
-      alert(data.message || "Notification sent");
-      toggleNotifyModal(); // Close modal
-    })
-    .catch(err => {
-      console.error("❌ Failed to send notification:", err.message);
-      alert("Error sending notification");
-    });
 }
 
 function toggleEditBalanceModal() {
@@ -441,13 +490,9 @@ function toggleEditBalanceModal() {
 
   if (modal.classList.contains("hidden")) {
     modal.classList.remove("hidden");
-    fetch("https://credibe-backends.onrender.com/api/admin/users", {
-      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-    })
-      .then(res => res.json())
+    makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/users")
       .then(data => {
-        if (!Array.isArray(data)) {
-          console.error("❌ users is not an array:", data);
+        if (!data || !Array.isArray(data)) {
           alert("Failed to load users. You may be unauthorized.");
           return;
         }
@@ -458,42 +503,10 @@ function toggleEditBalanceModal() {
           opt.textContent = user.email;
           select.appendChild(opt);
         });
-      })
-      .catch(err => {
-        console.error("❌ Failed to fetch users:", err.message);
-        alert("Failed to load users. Please try again.");
       });
   } else {
     modal.classList.add("hidden");
   }
-}
-
-function submitBalanceEdit() {
-  const userId = document.getElementById("editUserSelect").value;
-  const totalCredit = parseFloat(document.getElementById("editTotalBalance").value);
-  const savings = parseFloat(document.getElementById("editSavings").value);
-  const credits = parseFloat(document.getElementById("editCredit").value);
-
-  if (!userId) return alert("Select a user");
-  
-  fetch(`https://credibe-backends.onrender.com/api/admin/edit-balance/${userId}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-    ,
-    body: JSON.stringify({ totalCredit, savings, credits })
-  })
-    .then(res => res.json())
-    .then(data => {
-      alert(data.message || "Balance updated");
-      toggleEditBalanceModal();
-      location.reload();
-    })
-    .catch(err => {
-      console.error("❌ Balance update error:", err.message);
-      alert("Failed to update balance");
-    });
 }
 
 function toggleFakeTxnModal() {
@@ -502,13 +515,9 @@ function toggleFakeTxnModal() {
 
   if (modal.classList.contains("hidden")) {
     modal.classList.remove("hidden");
-    fetch("https://credibe-backends.onrender.com/api/admin/users", {
-      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-    })
-      .then(res => res.json())
+    makeAuthenticatedRequest("https://credibe-backends.onrender.com/api/admin/users")
       .then(data => {
-        if (!Array.isArray(data)) {
-          console.error("❌ users is not an array:", data);
+        if (!data || !Array.isArray(data)) {
           alert("Failed to load users. You may be unauthorized.");
           return;
         }
@@ -519,43 +528,22 @@ function toggleFakeTxnModal() {
           opt.textContent = user.email;
           select.appendChild(opt);
         });
-      })
-      .catch(err => {
-        console.error("❌ Failed to fetch users:", err.message);
-        alert("Failed to load users. Please try again.");
       });
   } else {
     modal.classList.add("hidden");
   }
 }
 
-function submitFakeTxnInjection() {
-  const userId = document.getElementById("fakeTxnUserSelect").value;
-  const count = parseInt(document.getElementById("fakeTxnCount").value) || 100;
-
-  if (!userId) return alert("Please select a user");
-
-  fetch("https://credibe-backends.onrender.com/api/admin/inject-fake-txns", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-    ,
-    body: JSON.stringify({ userId, count })
-  })
-    .then(res => res.json())
-    .then(data => {
-      alert(data.message || "Fake transactions injected");
-      toggleFakeTxnModal();
-      loadTransferHistory(); // reload the history section
-    })
-    .catch(err => {
-      console.error("❌ Failed to inject txns:", err.message);
-      alert("Error injecting transactions");
-    });
-}
-
-// Add event listeners for Approve/Reject Transfers buttons
+// Load data on page load
+document.addEventListener("DOMContentLoaded", async () => {
+  await Promise.all([
+    loadDashboardMetrics(),
+    loadUsers(),
+    loadTransferHistory(),
+    loadPendingTransfers(),
+    loadPendingTopUps()
+  ]);
+});
 </script>
 
 <!-- 👇 Block User Modal -->
@@ -633,9 +621,6 @@ function submitFakeTxnInjection() {
   </div>
 </div>
 
-
-
-
 <!-- 🔧 FAKE TRANSACTION INJECTOR -->
 <div class="mt-10 p-6 bg-gray-900 rounded-lg shadow-lg">
   <h2 class="text-2xl font-bold mb-4 text-white">🧪 Inject Fake Transactions</h2>
@@ -658,25 +643,5 @@ function submitFakeTxnInjection() {
   </form>
 </div>
 
-<script>
-document.getElementById("fakeTxnForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const email = document.getElementById("userEmail").value;
-  const count = document.getElementById("txnCount").value;
-  const res = await fetch("https://credibe-backends.onrender.com/api/admin/inject-fake-transactions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + localStorage.getItem("adminToken")
-    },
-    body: JSON.stringify({ email, count })
-  });
-  const result = await res.json();
-  document.getElementById("injectStatus").classList.remove("hidden");
-});
-</script>
-
 </body>
 </html>
-
-
