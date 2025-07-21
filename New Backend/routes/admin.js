@@ -24,7 +24,7 @@ router.use(verifyToken, isAdmin);
 router.get("/stats", getDashboardStats);
 
 // User management
-router.get("/users/user/", getAllUsers);
+router.get("/users", getAllUsers);
 router.patch("/users/block/:id", toggleBlockUser);
 router.patch("/users/edit/:id", editUserBalance);
 
