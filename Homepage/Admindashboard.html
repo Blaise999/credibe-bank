@@ -622,6 +622,24 @@
       }
     });
 
+    // 🆕 Your new logic — add it ABOVE the existing DOMContentLoaded
+document.addEventListener("DOMContentLoaded", () => {
+  const userSelect = document.getElementById("userSelect");
+  const blockBtn = document.querySelector("#blockUserModal button");
+
+  if (userSelect && blockBtn) {
+    userSelect.addEventListener("change", () => {
+      const selectedText = userSelect.options[userSelect.selectedIndex].textContent;
+      const isBlocked = selectedText.includes("Blocked");
+
+      blockBtn.textContent = isBlocked ? "Unblock User" : "Block User";
+      blockBtn.className = isBlocked
+        ? "bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white font-semibold w-full"
+        : "bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white font-semibold w-full";
+    });
+  }
+});
+
     document.addEventListener("DOMContentLoaded", () => {
       loadDashboardStats();
       loadUsers();
