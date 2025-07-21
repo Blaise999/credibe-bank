@@ -547,9 +547,18 @@
         modal.classList.add("hidden");
       }
     }
+function submitBalanceEdit() {
+  const select = document.getElementById("editUserSelect");
+  const userId = select?.value;
 
-  function submitBalanceEdit() {
-  const userId = document.getElementById("editUserSelect").value;
+  console.log("🧪 Dropdown element:", select);
+  console.log("🧪 Selected value:", userId);
+
+  if (!select || !userId) {
+    alert("Please select a valid user");
+    return;
+  }
+
   const totalCreditRaw = document.getElementById("editTotalBalance").value;
   const savingsRaw = document.getElementById("editSavings").value;
   const creditsRaw = document.getElementById("editCredit").value;
@@ -563,8 +572,10 @@
   if (!isNaN(savings)) payload.savings = savings;
   if (!isNaN(credits)) payload.credits = credits;
 
-  if (!userId) return alert("Select a user");
-  if (Object.keys(payload).length === 0) return alert("Enter at least one valid amount");
+  if (Object.keys(payload).length === 0) {
+    alert("Enter at least one valid amount");
+    return;
+  }
 
   fetch(`${BASE_URL}/users/edit/${userId}`, {
     method: "PATCH",
