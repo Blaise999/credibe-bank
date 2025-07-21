@@ -37,6 +37,7 @@ document.getElementById("login-form").addEventListener("submit", async function 
 
     if (res.ok && data.token) {
       localStorage.setItem("userToken", data.token);
+      localStorage.setItem("isBlocked", data.user.isBlocked); // 🚫 store block status
       localStorage.setItem("userId", data.user._id);
       localStorage.setItem("lastLogin", new Date().toLocaleString());
 
@@ -88,4 +89,6 @@ if (languageSwitcher) {
 // Load last login
 const lastLoginElement = document.getElementById("last-login");
 if (lastLoginElement) {
-  const lastLogin = localStorage.getItem("lastLogin")}
+  const lastLogin = localStorage.getItem("lastLogin");
+  lastLoginElement.textContent = lastLogin || "No previous login";
+}
