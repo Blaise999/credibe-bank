@@ -431,24 +431,31 @@
       }
     }
 
-    function blockOrUnblockUser() {
-      const userId = document.getElementById("userSelect").value;
-      if (!userId) return alert("Please select a user");
-      fetch(`${BASE_URL}/users/block/${userId}`, {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-      })
-        .then(res => res.json())
-        .then(data => {
-          alert(data.message || "Status updated");
-          toggleBlockUserModal();
-          loadUsers();
-        })
-        .catch(err => {
-          console.error("❌ Failed to toggle user:", err.message);
-          alert("Failed to block/unblock user");
-        });
-    }
+   function blockOrUnblockUser() {
+  const userId = document.getElementById("userSelect").value;
+  console.log("🧪 Clicked block button for userId:", userId);
+
+  if (!userId) return alert("Please select a user");
+
+  fetch(`${BASE_URL}/users/block/${userId}`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+  })
+    .then(res => {
+      console.log("🧪 Response status:", res.status);
+      return res.json();
+    })
+    .then(data => {
+      console.log("🧪 Response data:", data);
+      alert(data.message || "Status updated");
+      toggleBlockUserModal();
+      loadUsers();
+    })
+    .catch(err => {
+      console.error("❌ Fetch failed:", err.message);
+      alert("Failed to block/unblock user");
+    });
+}
 
     function toggleNotifyModal() {
       const modal = document.getElementById("notifyModal");
