@@ -10,6 +10,16 @@
     body {
       font-family: 'Poppins', sans-serif;
     }
+    #blockUserModal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+#blockUserModal > div {
+  position: relative;
+  z-index: 60; /* Ensure modal content is above the backdrop */
+}
   </style>
 </head>
 <body class="bg-gray-950 text-white">
@@ -156,16 +166,16 @@
       </div>
     </main>
 
-    <div id="blockUserModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
-      <div class="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-lg text-white relative">
-        <button onclick="toggleBlockUserModal()" class="absolute top-2 right-3 text-white/60 hover:text-red-500 text-xl">×</button>
-        <h2 class="text-xl font-bold mb-4">Block/Unblock User</h2>
-        <select id="userSelect" class="w-full p-2 mb-4 rounded bg-gray-700 text-white"></select>
-        <button onclick="blockOrUnblockUser()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white font-semibold w-full">
-          Toggle Block Status
-        </button>
-      </div>
-    </div>
+   <div id="blockUserModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+  <div class="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-lg text-white relative">
+    <button onclick="toggleBlockUserModal()" class="absolute top-2 right-3 text-white/60 hover:text-red-500 text-xl">×</button>
+    <h2 class="text-xl font-bold mb-4">Block/Unblock User</h2>
+    <select id="userSelect" class="w-full p-2 mb-4 rounded bg-gray-700 text-white"></select>
+    <button id="blockUnblockButton" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white font-semibold w-full">
+      Toggle Block Status
+    </button>
+  </div>
+</div>
 
     <div id="editBalanceModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
       <div class="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-lg text-white relative">
@@ -651,6 +661,12 @@ window.blockOrUnblockUser = blockOrUnblockUser;
     });
 
     // 🆕 Your new logic — add it ABOVE the existing DOMContentLoaded
+    document.addEventListener('click', (event) => {
+  if (event.target.matches('#blockUnblockButton')) {
+    console.log('🧪 Block/Unblock button clicked via delegation');
+    blockOrUnblockUser();
+  }
+});
 document.addEventListener("DOMContentLoaded", () => {
   const userSelect = document.getElementById("userSelect");
   const blockBtn = document.querySelector("#blockUserModal button");
