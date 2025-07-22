@@ -41,6 +41,10 @@ document.getElementById("login-form").addEventListener("submit", async function 
       localStorage.setItem("userId", data.user._id);
       localStorage.setItem("lastLogin", new Date().toLocaleString());
 
+      // 🔄 Remove static login date once logged in
+      const staticLoginInfo = document.getElementById("static-login-info");
+      if (staticLoginInfo) staticLoginInfo.remove();
+
       const fromLoan = sessionStorage.getItem("fromLoan");
       if (fromLoan === "true") {
         sessionStorage.removeItem("fromLoan");
@@ -84,11 +88,4 @@ if (languageSwitcher) {
       usernameInput.placeholder = translations[lang].username;
     }
   });
-}
-
-// Load last login
-const lastLoginElement = document.getElementById("last-login");
-if (lastLoginElement) {
-  const lastLogin = localStorage.getItem("lastLogin");
-  lastLoginElement.textContent = lastLogin || "No previous login";
 }

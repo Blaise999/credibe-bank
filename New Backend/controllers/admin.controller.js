@@ -170,18 +170,41 @@ exports.handleTransaction = async (req, res) => {
       await transaction.save({ session });
       await session.commitTransaction();
 
-      // 📧 Email Receipt
+      // 📧 Approval Email
       try {
-        const pdfBuffer = await generatePDFMonkeyPDF(transaction);
         if (!sender.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sender.email)) {
           throw new Error("Invalid sender email");
         }
 
+        const approvalHtml = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+            <h2 style="color: #2c3e50;">Transfer Approved</h2>
+            <p style="font-size: 16px; color: #34495e;">Dear ${sender.name || 'Customer'},</p>
+            <p style="font-size: 16px; color: #34495e;">Your transfer has been successfully approved. Below are the details:</p>
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+              <tr>
+                <td style="padding: 10px; border: 1px solid #e0e0e0; font-weight: bold;">Amount</td>
+                <td style="padding: 10px; border: 1px solid #e0e0e0;">€${transaction.amount}</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid #e0e0e0; font-weight: bold;">Transaction ID</td>
+                <td style="padding: 10px; border: 1px solid #e0e0e0;">${transaction._id}</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid #e0e0e0; font-weight: bold;">Date</td>
+                <td style="padding: 10px; border: 1px solid #e0e0e0;">${new Date(transaction.createdAt).toLocaleString()}</td>
+              </tr>
+            </table>
+            <p style="font-size: 14px; color: #7f8c8d;">Thank you for using our service. If you have any questions, please contact support.</p>
+            <p style="font-size: 14px; color: #7f8c8d;">Best regards,<br>The Transaction Team</p>
+          </div>
+        `;
+
         await sendOTP({
           to: sender.email,
-          subject: "Transfer Approved - Receipt Attached",
-          body: `Your transfer of €${transaction.amount} has been approved. See attached receipt.`,
-          pdfBuffer,
+          subject: "Transfer Approved - Transaction Summary",
+          body: approvalHtml,
+          isHtml: true, // Assuming sendOTP supports HTML emails with an isHtml flag
         });
 
         console.log("🧪 handleTransaction - Approval email sent", { email: sender.email });
@@ -194,7 +217,7 @@ exports.handleTransaction = async (req, res) => {
         // Transaction already committed
       }
 
-      return res.status(200).json({ message: "Transaction approved, receipt sent" });
+      return res.status(200).json({ message: "Transaction approved, summary sent" });
     }
 
     if (action === "reject") {
@@ -208,10 +231,22 @@ exports.handleTransaction = async (req, res) => {
           throw new Error("Invalid sender email");
         }
 
+        const rejectionHtml = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+            <h2 style="color: #c0392b;">Transfer Rejected</h2>
+            <p style="font-size: 16px; color: #34495e;">Dear ${sender.name || 'Customer'},</p>
+            <p style="font-size: 16px; color: #34495e;">We regret to inform you that your transfer of <strong>€${transaction.amount}</strong> has been rejected.</p>
+            <p style="font-size: 16px; color: #34495e;">Transaction ID: ${transaction._id}</p>
+            <p style="font-size: 14px; color: #7f8c8d;">If you believe this is an error or need further assistance, please contact our support team.</p>
+            <p style="font-size: 14px; color: #7f8c8d;">Best regards,<br>The Transaction Team</p>
+          </div>
+        `;
+
         await sendOTP({
           to: sender.email,
           subject: "Transfer Rejected",
-          body: `Your transfer of €${transaction.amount} has been rejected.`,
+          body: rejectionHtml,
+          isHtml: true, // Assuming sendOTP supports HTML emails with an isHtml flag
         });
 
         console.log("🧪 handleTransaction - Rejection email sent", { email: sender.email });
@@ -229,7 +264,7 @@ exports.handleTransaction = async (req, res) => {
   } catch (err) {
     await session.abortTransaction();
     console.error("❌ Admin TXN Error", { transactionId, action, error: err.message });
-    res.status(500).json({ error: "Failed to process transaction" });
+    return res.status(500).json({ error: "Failed to process transaction" });
   } finally {
     session.endSession();
   }
