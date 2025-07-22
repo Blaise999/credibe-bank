@@ -218,335 +218,354 @@
   </div>
 
   <script>
-    const BASE_URL = "https://credibe-backends.onrender.com/api/admin";
+  const BASE_URL = "https://thecredibe.com/api/admin";
 
-    async function loadDashboardStats() {
-      try {
-        const res = await fetch(`${BASE_URL}/stats`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-        });
-        const data = await res.json();
-        if (res.ok) {
-          document.getElementById("totalUsers").textContent = data.totalUsers || 0;
-          document.getElementById("totalTxns").textContent = data.totalTxns || 0;
-          document.getElementById("totalBalance").textContent = `€${(data.totalBalance || 0).toFixed(2)}`;
-          document.getElementById("blockedUsers").textContent = data.blockedUsers || 0;
-        } else {
-          console.error("❌ Failed to load stats:", data.error);
-        }
-      } catch (err) {
-        console.error("❌ Failed to load stats:", err.message);
-      }
+// 📊 Load dashboard stats
+async function loadDashboardStats() {
+  try {
+    const res = await fetch(`${BASE_URL}/stats`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    });
+    const data = await res.json();
+    if (res.ok) {
+      document.getElementById("totalUsers").textContent = data.totalUsers || 0;
+      document.getElementById("totalTxns").textContent = data.totalTxns || 0;
+      document.getElementById("totalBalance").textContent = `€${(data.totalBalance || 0).toFixed(2)}`;
+      document.getElementById("blockedUsers").textContent = data.blockedUsers || 0;
+    } else {
+      console.error("❌ Failed to load stats:", data.error);
     }
+  } catch (err) {
+    console.error("❌ Failed to load stats:", err.message);
+  }
+}
 
-    async function loadUsers() {
-      try {
-        const res = await fetch(`${BASE_URL}/users`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-        });
-        const data = await res.json();
-        const tbody = document.getElementById("userTableBody");
-        tbody.innerHTML = "";
-        if (!Array.isArray(data)) {
-          tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-white/40">No users found.</td></tr>`;
-          return;
-        }
+// 👥 Load users
+async function loadUsers() {
+  try {
+    const res = await fetch(`${BASE_URL}/users`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    });
+    const data = await res.json();
+    const tbody = document.getElementById("userTableBody");
+    tbody.innerHTML = "";
+    if (!Array.isArray(data)) {
+      tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-white/40">No users found.</td></tr>`;
+      return;
+    }
+    data.forEach(user => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td class="p-3 border">${user.email || "N/A"}</td>
+        <td class="p-3 border">€${(user.balance || 0).toFixed(2)}</td>
+        <td class="p-3 border">${user.iban || "N/A"}</td>
+        <td class="p-3 border">
+          <span class="px-2 py-1 rounded ${user.isBlocked ? "bg-red-200 text-red-800" : "bg-green-200 text-green-800"}">
+            ${user.isBlocked ? "Blocked" : "Active"}
+          </span>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  } catch (err) {
+    console.error("❌ Failed to load users:", err.message);
+  }
+}
+
+// 📜 Load transfer history
+async function loadTransferHistory() {
+  try {
+    const res = await fetch(`${BASE_URL}/transfers/history`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    });
+    const data = await res.json();
+    const tableBody = document.getElementById("transfer-body");
+    tableBody.innerHTML = "";
+    if (!Array.isArray(data)) {
+      tableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-white/40">No transfer history.</td></tr>`;
+      return;
+    }
+    data.forEach(txn => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td class="p-2 border">${new Date(txn.createdAt).toLocaleString()}</td>
+        <td class="p-2 border">${txn.from?.email || "N/A"}</td>
+        <td class="p-2 border">${txn.to?.email || txn.recipient || "N/A"}</td>
+        <td class="p-2 border">€${(txn.amount || 0).toFixed(2)}</td>
+        <td class="p-2 border">
+          <span class="px-2 py-1 rounded ${txn.status === "approved" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}">
+            ${txn.status}
+          </span>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
+  } catch (err) {
+    console.error("❌ Failed to load transfers:", err.message);
+  }
+}
+
+// ⏳ Load pending transfers
+async function loadPendingTransfers() {
+  try {
+    const res = await fetch(`${BASE_URL}/transfers/pending`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    });
+    const data = await res.json();
+    const tbody = document.getElementById("pendingTransfersTableBody");
+    tbody.innerHTML = "";
+    if (!Array.isArray(data) || data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-white/40">No pending transfers.</td></tr>`;
+      return;
+    }
+    data.forEach(transfer => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td class="p-3 border">${transfer.from?.email || "N/A"}</td>
+        <td class="p-3 border">${transfer.to?.email || transfer.recipient || "N/A"}</td>
+        <td class="p-3 border">€${(transfer.amount || 0).toFixed(2)}</td>
+        <td class="p-3 border">
+          <button onclick="handleTransfer('${transfer._id}', 'approve')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs mr-2">Approve</button>
+          <button onclick="handleTransfer('${transfer._id}', 'reject')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  } catch (err) {
+    console.error("❌ Failed to load pending transfers:", err.message);
+    alert("Error loading pending transfers");
+  }
+}
+
+// ✅ Handle transfer actions
+async function handleTransfer(id, action) {
+  const token = localStorage.getItem("adminToken");
+  if (!token) return alert("Admin not authenticated");
+  try {
+    const res = await fetch(`${BASE_URL}/transfers/action`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ transactionId: id, action })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      console.error("❌ Backend rejected:", data.error);
+      return alert(`Error: ${data.error || "Failed to process transaction"}`);
+    }
+    alert(data.message || `Transfer ${action}d successfully`);
+    await loadPendingTransfers();
+    await loadTransferHistory();
+  } catch (err) {
+    console.error(`❌ Failed to ${action} transfer:`, err.message);
+    alert(`Error: Failed to ${action} transfer`);
+  }
+}
+
+// 💸 Load pending top-ups
+async function loadPendingTopUps() {
+  try {
+    const res = await fetch(`${BASE_URL}/topups/pending`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    });
+    const data = await res.json();
+    const tbody = document.getElementById("topup-body");
+    tbody.innerHTML = "";
+    if (!Array.isArray(data) || data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-white/40">No pending top-ups.</td></tr>`;
+      return;
+    }
+    data.forEach(topup => {
+      const date = new Date(topup.createdAt).toLocaleDateString();
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td class="p-3 border">${topup.user?.email || "Unknown"}</td>
+        <td class="p-3 border">€${(topup.amount || 0).toFixed(2)}</td>
+        <td class="p-3 border">${date}</td>
+        <td class="p-3 border">
+          <button onclick="handleTopUp('${topup._id}', 'approve')" class="bg-green-600 hover:bg-green-700 text-white px-3 aventListener("DOMContentLoaded", () => {
+  // 📊 Load dashboard data
+  loadDashboardStats();
+  loadUsers();
+  loadTransferHistory();
+  loadPendingTransfers();
+  loadPendingTopUps();
+
+  // 🔁 Setup dynamic block button label
+  const userSelect = document.getElementById("userSelect");
+  const blockBtn = document.querySelector("#blockUserModal button");
+
+  if (userSelect && blockBtn) {
+    userSelect.addEventListener("change", () => {
+      const selectedText = userSelect.options[userSelect.selectedIndex]?.textContent || "";
+      const isBlocked = selectedText.includes("Blocked");
+
+      blockBtn.textContent = isBlocked ? "Unblock User" : "Block User";
+      blockBtn.className = isBlocked
+        ? "bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white font-semibold w-full"
+        : "bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white font-semibold w-full";
+    });
+  }
+});:user px-3 py-1 rounded text-xs mr-2">Approve</button>
+          <button onclick="handleTopUp('${topup._id}', 'reject')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  } catch (err) {
+    console.error("❌ Failed to load top-ups:", err.message);
+  }
+}
+
+// ✅ Handle top-up actions
+async function handleTopUp(id, action) {
+  try {
+    const res = await fetch(`${BASE_URL}/topups/${id}/${action}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert(data.message || `Top-up ${action}ed successfully`);
+      loadPendingTopUps();
+    } else {
+      alert(data.error || `Failed to ${action} top-up`);
+    }
+  } catch (err) {
+    console.error(`❌ Failed to ${action} top-up:`, err.message);
+    alert(`Error: Failed to ${action} top-up`);
+  }
+}
+
+// 🔁 Toggle Block Modal + Populate Users
+function toggleBlockUserModal() {
+  const modal = document.getElementById("blockUserModal");
+  const select = document.getElementById("userSelect");
+  if (modal.classList.contains("hidden")) {
+    modal.classList.remove("hidden");
+    fetch("https://thecredibe.com/api/admin/users", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        select.innerHTML = "";
         data.forEach(user => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td class="p-3 border">${user.email || "N/A"}</td>
-            <td class="p-3 border">€${(user.balance || 0).toFixed(2)}</td>
-            <td class="p-3 border">${user.iban || "N/A"}</td>
-            <td class="p-3 border">
-              <span class="px-2 py-1 rounded ${user.isBlocked ? "bg-red-200 text-red-800" : "bg-green-200 text-green-800"}">
-                ${user.isBlocked ? "Blocked" : "Active"}
-              </span>
-            </td>
-          `;
-          tbody.appendChild(row);
+          const opt = document.createElement("option");
+          opt.value = user._id;
+          opt.textContent = `${user.email} — ${user.isBlocked ? "Blocked" : "Active"}`;
+          select.appendChild(opt);
         });
-      } catch (err) {
-        console.error("❌ Failed to load users:", err.message);
-      }
-    }
-
-    async function loadTransferHistory() {
-      try {
-        const res = await fetch(`${BASE_URL}/transfers/history`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-        });
-        const data = await res.json();
-        const tableBody = document.getElementById("transfer-body");
-        tableBody.innerHTML = "";
-        if (!Array.isArray(data)) {
-          tableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-white/40">No transfer history.</td></tr>`;
-          return;
-        }
-        data.forEach(txn => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td class="p-2 border">${new Date(txn.createdAt).toLocaleString()}</td>
-            <td class="p-2 border">${txn.from?.email || "N/A"}</td>
-            <td class="p-2 border">${txn.to?.email || txn.recipient || "N/A"}</td>
-            <td class="p-2 border">€${(txn.amount || 0).toFixed(2)}</td>
-            <td class="p-2 border">
-              <span class="px-2 py-1 rounded ${txn.status === "approved" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}">
-                ${txn.status}
-              </span>
-            </td>
-          `;
-          tableBody.appendChild(row);
-        });
-      } catch (err) {
-        console.error("❌ Failed to load transfers:", err.message);
-      }
-    }
-
-    async function loadPendingTransfers() {
-      try {
-        const res = await fetch(`${BASE_URL}/transfers/pending`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-        });
-        const data = await res.json();
-        const tbody = document.getElementById("pendingTransfersTableBody");
-        tbody.innerHTML = "";
-        if (!Array.isArray(data) || data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-white/40">No pending transfers.</td></tr>`;
-          return;
-        }
-        data.forEach(transfer => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td class="p-3 border">${transfer.from?.email || "N/A"}</td>
-            <td class="p-3 border">${transfer.to?.email || transfer.recipient || "N/A"}</td>
-            <td class="p-3 border">€${(transfer.amount || 0).toFixed(2)}</td>
-            <td class="p-3 border">
-              <button onclick="handleTransfer('${transfer._id}', 'approve')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs mr-2">Approve</button>
-              <button onclick="handleTransfer('${transfer._id}', 'reject')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</button>
-            </td>
-          `;
-          tbody.appendChild(row);
-        });
-      } catch (err) {
-        console.error("❌ Failed to load pending transfers:", err.message);
-        alert("Error loading pending transfers");
-      }
-    }
-
-    async function handleTransfer(id, action) {
-      const token = localStorage.getItem("adminToken");
-      if (!token) return alert("Admin not authenticated");
-      try {
-        const res = await fetch(`${BASE_URL}/transfers/action`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({ transactionId: id, action })
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          console.error("❌ Backend rejected:", data.error);
-          return alert(`Error: ${data.error || "Failed to process transaction"}`);
-        }
-        alert(data.message || `Transfer ${action}d successfully`);
-        await loadPendingTransfers();
-        await loadTransferHistory();
-      } catch (err) {
-        console.error(`❌ Failed to ${action} transfer:`, err.message);
-        alert(`Error: Failed to ${action} transfer`);
-      }
-    }
-
-    async function loadPendingTopUps() {
-      try {
-        const res = await fetch(`${BASE_URL}/topups/pending`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-        });
-        const data = await res.json();
-        const tbody = document.getElementById("topup-body");
-        tbody.innerHTML = "";
-        if (!Array.isArray(data) || data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-white/40">No pending top-ups.</td></tr>`;
-          return;
-        }
-        data.forEach(topup => {
-          const date = new Date(topup.createdAt).toLocaleDateString();
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td class="p-3 border">${topup.user?.email || "Unknown"}</td>
-            <td class="p-3 border">€${(topup.amount || 0).toFixed(2)}</td>
-            <td class="p-3 border">${date}</td>
-            <td class="p-3 border">
-              <button onclick="handleTopUp('${topup._id}', 'approve')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs mr-2">Approve</button>
-              <button onclick="handleTopUp('${topup._id}', 'reject')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</button>
-            </td>
-          `;
-          tbody.appendChild(row);
-        });
-      } catch (err) {
-        console.error("❌ Failed to load top-ups:", err.message);
-      }
-    }
-
-    async function handleTopUp(id, action) {
-      try {
-        const res = await fetch(`${BASE_URL}/topups/${id}/${action}`, {
-          method: "POST",
-          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-        });
-        const data = await res.json();
-        if (res.ok) {
-          alert(data.message || `Top-up ${action}ed successfully`);
-          loadPendingTopUps();
-        } else {
-          alert(data.error || `Failed to ${action} top-up`);
-        }
-      } catch (err) {
-        console.error(`❌ Failed to ${action} top-up:`, err.message);
-        alert(`Error: Failed to ${action} top-up`);
-      }
-    }
-
-    function toggleBlockUserModal() {
-      const modal = document.getElementById("blockUserModal");
-      const select = document.getElementById("userSelect");
-      if (modal.classList.contains("hidden")) {
-        modal.classList.remove("hidden");
-        fetch(`${BASE_URL}/users`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-        })
-          .then(res => res.json())
-          .then(data => {
-            select.innerHTML = "";
-            data.forEach(user => {
-              const opt = document.createElement("option");
-              opt.value = user._id;
-              opt.textContent = `${user.email} — ${user.isBlocked ? "Blocked" : "Active"}`;
-              select.appendChild(opt);
-            });
-          });
-      } else {
-        modal.classList.add("hidden");
-      }
-    }
-
- <!-- 🧠 Block Logic + Modal JS -->
-       async function blockOrUnblockUser() {
-        const userId = document.getElementById("userSelect").value;
-        console.log("🧪 Clicked block button for userId:", userId);
-        if (!userId) return alert("Please select a user");
-
-        try {
-          const res = await fetch("https://thecredibe.com/api/admin/users/block/" + userId, {
-            method: "PATCH",
-            headers: {
-              "Authorization": "Bearer " + localStorage.getItem("adminToken"),
-              "Content-Type": "application/json"
-            }
-          });
-
-          console.log("🧪 Response status:", res.status);
-          const data = await res.json();
-          console.log("🧪 Response data:", data);
-          alert(data.message || "Status updated");
-          toggleBlockUserModal();
-          if (typeof loadUsers === 'function') loadUsers();
-        } catch (err) {
-          console.error("❌ Fetch failed:", err);
-          alert("Failed to block/unblock user");
-        }
-      }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        const userSelect = document.getElementById("userSelect");
-        const blockBtn = document.querySelector("#blockUserModal button");
-
-        if (userSelect && blockBtn) {
-          userSelect.addEventListener("change", () => {
-            const selectedText = userSelect.options[userSelect.selectedIndex]?.textContent || "";
-            const isBlocked = selectedText.includes("Blocked");
-
-            blockBtn.textContent = isBlocked ? "Unblock User" : "Block User";
-            blockBtn.className = isBlocked
-              ? "bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white font-semibold w-full"
-              : "bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white font-semibold w-full";
-          });
-        }
       });
+  } else {
+    modal.classList.add("hidden");
+  }
+}
 
-    function toggleNotifyModal() {
-      const modal = document.getElementById("notifyModal");
-      const select = document.getElementById("notifyUserSelect");
-      if (modal.classList.contains("hidden")) {
-        modal.classList.remove("hidden");
-        fetch(`${BASE_URL}/users`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-        })
-          .then(res => res.json())
-          .then(users => {
-            select.innerHTML = "";
-            users.forEach(user => {
-              const opt = document.createElement("option");
-              opt.value = user._id;
-              opt.textContent = user.email;
-              select.appendChild(opt);
-            });
-          });
-      } else {
-        modal.classList.add("hidden");
-      }
-    }
+// 🧠 Block/Unblock Handler
+async function blockOrUnblockUser() {
+  const userId = document.getElementById("userSelect").value;
+  console.log("🧪 Clicked block button for userId:", userId);
+  if (!userId) return alert("Please select a user");
 
-    function sendNotification() {
-      const userId = document.getElementById("notifyUserSelect").value;
-      const subject = document.getElementById("notifySubject").value;
-      const message = document.getElementById("notifyMessage").value;
-      if (!userId || !subject || !message) {
-        return alert("Please fill out all fields");
+  try {
+    const res = await fetch("https://thecredibe.com/api/admin/users/block/" + userId, {
+      method: "PATCH",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("adminToken"),
+        "Content-Type": "application/json"
       }
-      fetch(`${BASE_URL}/notify`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`
-        },
-        body: JSON.stringify({ userId, subject, message })
-      })
-        .then(res => res.json())
-        .then(data => {
-          alert(data.message || "Notification sent");
-          toggleNotifyModal();
-        })
-        .catch(err => {
-          console.error("❌ Failed to send notification:", err.message);
-          alert("Error sending notification");
+    });
+
+    console.log("🧪 Response status:", res.status);
+    const data = await res.json();
+    console.log("🧪 Response data:", data);
+    alert(data.message || "Status updated");
+    toggleBlockUserModal();
+    if (typeof loadUsers === "function") loadUsers();
+  } catch (err) {
+    console.error("❌ Fetch failed:", err);
+    alert("Failed to block/unblock user");
+  }
+}
+
+// 📢 Toggle notify modal
+function toggleNotifyModal() {
+  const modal = document.getElementById("notifyModal");
+  const select = document.getElementById("notifyUserSelect");
+  if (modal.classList.contains("hidden")) {
+    modal.classList.remove("hidden");
+    fetch(`${BASE_URL}/users`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    })
+      .then(res => res.json())
+      .then(users => {
+        select.innerHTML = "";
+        users.forEach(user => {
+          const opt = document.createElement("option");
+          opt.value = user遵4
+          opt.textContent = user.email;
+          select.appendChild(opt);
         });
-    }
+      });
+  } else {
+    modal.classList.add("hidden");
+  }
+}
 
-    function toggleEditBalanceModal() {
-      const modal = document.getElementById("editBalanceModal");
-      const select = document.getElementById("editUserSelect");
-      if (modal.classList.contains("hidden")) {
-        modal.classList.remove("hidden");
-        fetch(`${BASE_URL}/users`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-        })
-          .then(res => res.json())
-          .then(users => {
-            select.innerHTML = "";
-            users.forEach(user => {
-              const opt = document.createElement("option");
-              opt.value = user._id;
-              opt.textContent = `${user.email}`;
-              select.appendChild(opt);
-            });
-          });
-      } else {
-        modal.classList.add("hidden");
-      }
-    }
+// 📢 Send notification
+function sendNotification() {
+  const userId = document.getElementById("notifyUserSelect").value;
+  const subject = document.getElementById("notifySubject").value;
+  const message = document.getElementById("notifyMessage").value;
+  if (!userId || !subject || !message) {
+    return alert("Please fill out all fields");
+  }
+  fetch(`${BASE_URL}/notify`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("adminToken")}`
+    },
+    body: JSON.stringify({ userId, subject, message })
+  })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.message || "Notification sent");
+      toggleNotifyModal();
+    })
+    .catch(err => {
+      console.error("❌ Failed to send notification:", err.message);
+      alert("Error sending notification");
+    });
+}
+
+// 💰 Toggle edit balance modal
+function toggleEditBalanceModal() {
+  const modal = document.getElementById("editBalanceModal");
+  const select = document.getElementById("editUserSelect");
+  if (modal.classList.contains("hidden")) {
+    modal.classList.remove("hidden");
+    fetch(`${BASE_URL}/users`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    })
+      .then(res => res.json())
+      .then(users => {
+        select.innerHTML = "";
+        users.forEach(user => {
+          const opt = document.createElement("option");
+          opt.value = user._id;
+          opt.textContent = `${user.email}`;
+          select.appendChild(opt);
+        });
+      });
+  } else {
+    modal.classList.add("hidden");
+  }
+}
+
+// 💰 Submit balance edit
 function submitBalanceEdit() {
   console.log("🧪 SELECT INNER HTML:", document.getElementById("editUserSelect").innerHTML);
   const select = document.getElementById("editUserSelect");
@@ -561,9 +580,8 @@ function submitBalanceEdit() {
   }
 
   const totalCreditRaw = document.getElementById("editTotalBalance").value.trim();
-const savingsRaw = document.getElementById("editSavings").value.trim();
-const creditsRaw = document.getElementById("editCredit").value.trim();
-
+  const savingsRaw = document.getElementById("editSavings").value.trim();
+  const creditsRaw = document.getElementById("editCredit").value.trim();
 
   const totalCredit = parseFloat(totalCreditRaw);
   const savings = parseFloat(savingsRaw);
@@ -574,7 +592,6 @@ const creditsRaw = document.getElementById("editCredit").value.trim();
   if (!isNaN(savings)) payload.savings = savings;
   if (!isNaN(credits)) payload.credits = credits;
   console.log("🧪 Payload being sent:", payload);
-
 
   if (Object.keys(payload).length === 0) {
     alert("Enter at least one valid amount");
@@ -601,95 +618,99 @@ const creditsRaw = document.getElementById("editCredit").value.trim();
     });
 }
 
-
-    function toggleFakeTxnModal() {
-      const modal = document.getElementById("fakeTxnModal");
-      const select = document.getElementById("fakeTxnUserSelect");
-      if (modal.classList.contains("hidden")) {
-        modal.classList.remove("hidden");
-        fetch(`${BASE_URL}/users`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-        })
-          .then(res => res.json())
-          .then(users => {
-            select.innerHTML = "";
-            users.forEach(user => {
-              const opt = document.createElement("option");
-              opt.value = user._id;
-              opt.textContent = `${user.email}`;
-              select.appendChild(opt);
-            });
-          });
-      } else {
-        modal.classList.add("hidden");
-      }
-    }
-
-    function submitFakeTxnInjection() {
-      const userId = document.getElementById("fakeTxnUserSelect").value;
-      const count = parseInt(document.getElementById("fakeTxnCount").value) || 25;
-      if (!userId) return alert("Please select a user");
-      fetch(`${BASE_URL}/inject-fake-transactions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`
-        },
-        body: JSON.stringify({ userId, count })
-      })
-        .then(res => res.json())
-        .then(data => {
-          alert(data.message || "Fake transactions injected");
-          toggleFakeTxnModal();
-          loadTransferHistory();
-        })
-        .catch(err => {
-          console.error("❌ Failed to inject txns:", err.message);
-          alert("Error injecting transactions");
+// 🧪 Toggle fake transaction modal
+function toggleFakeTxnModal() {
+  const modal = document.getElementById("fakeTxnModal");
+  const select = document.getElementById("fakeTxnUserSelect");
+  if (modal.classList.contains("hidden")) {
+    modal.classList.remove("hidden");
+    fetch(`${BASE_URL}/users`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+    })
+      .then(res => res.json())
+      .then(users => {
+        select.innerHTML = "";
+        users.forEach(user => {
+          const opt = document.createElement("option");
+          opt.value = user._id;
+          opt.textContent = `${user.email}`;
+          select.appendChild(opt);
         });
-    }
+      });
+  } else {
+    modal.classList.add("hidden");
+  }
+}
 
-    document.getElementById("fakeTxnForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const userId = document.getElementById("fakeTxnUserSelect").value;
-      const count = parseInt(document.getElementById("txnCount").value) || 25;
-      if (!userId) return alert("Please select a user");
-      try {
-        const res = await fetch(`${BASE_URL}/inject-fake-transactions`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("adminToken")}`
-          },
-          body: JSON.stringify({ userId, count })
-        });
-        const result = await res.json();
-        if (res.ok) {
-          document.getElementById("injectStatus").classList.remove("hidden");
-          loadTransferHistory();
-        } else {
-          alert(result.error || "Failed to inject transactions");
-        }
-      } catch (err) {
-        console.error("❌ Failed to inject transactions:", err.message);
-        alert("Error injecting transactions");
-      }
+// 🧪 Submit fake transaction injection
+function submitFakeTxnInjection() {
+  const userId = document.getElementById("fakeTxnUserSelect").value;
+  const count = parseInt(document.getElementById("fakeTxnCount").value) || 25;
+  if (!userId) return alert("Please select a user");
+  fetch(`${BASE_URL}/inject-fake-transactions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("adminToken")}`
+    },
+    body: JSON.stringify({ userId, count })
+  })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.message || "Fake transactions injected");
+      toggleFakeTxnModal();
+      loadTransferHistory();
+    })
+    .catch(err => {
+      console.error("❌ Failed to inject txns:", err.message);
+      alert("Error injecting transactions");
     });
+}
 
-    // 🆕 Your new logic — add it ABOVE the existing DOMContentLoaded
-    document.addEventListener('click', (event) => {
-  if (event.target.matches('#blockUnblockButton')) {
-    console.log('🧪 Block/Unblock button clicked via delegation');
-    blockOrUnblockUser();
+// 🧪 Fake transaction form submit
+document.getElementById("fakeTxnForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const userId = document.getElementById("fakeTxnUserSelect").value;
+  const count = parseInt(document.getElementById("txnCount").value) || 25;
+  if (!userId) return alert("Please select a user");
+  try {
+    const res = await fetch(`${BASE_URL}/inject-fake-transactions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("adminToken")}`
+      },
+      body: JSON.stringify({ userId, count })
+    });
+    const result = await res.json();
+    if (res.ok) {
+      document.getElementById("injectStatus").classList.remove("hidden");
+      loadTransferHistory();
+    } else {
+      alert(result.error || "Failed to inject transactions");
+    }
+  } catch (err) {
+    console.error("❌ Failed to inject transactions:", err.message);
+    alert("Error injecting transactions");
   }
 });
+
+// ✅ Combined DOMContentLoaded
 document.addEventListener("DOMContentLoaded", () => {
+  // 📊 Load dashboard data
+  loadDashboardStats();
+  loadUsers();
+  loadTransferHistory();
+  loadPendingTransfers();
+  loadPendingTopUps();
+
+  // 🔁 Setup dynamic block button label
   const userSelect = document.getElementById("userSelect");
   const blockBtn = document.querySelector("#blockUserModal button");
 
   if (userSelect && blockBtn) {
     userSelect.addEventListener("change", () => {
-      const selectedText = userSelect.options[userSelect.selectedIndex].textContent;
+      const selectedText = userSelect.options[userSelect.selectedIndex]?.textContent || "";
       const isBlocked = selectedText.includes("Blocked");
 
       blockBtn.textContent = isBlocked ? "Unblock User" : "Block User";
@@ -699,14 +720,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
-
-    document.addEventListener("DOMContentLoaded", () => {
-      loadDashboardStats();
-      loadUsers();
-      loadTransferHistory();
-      loadPendingTransfers();
-      loadPendingTopUps();
-    });
     
   </script>
 </body>
