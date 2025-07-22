@@ -153,13 +153,12 @@
 <!-- Header with Credibe Logo Right, Menu Left -->
 <header class="bg-[#2d2d2d] p-3 sm:p-6 flex items-center justify-between sticky top-0 z-50 w-full shadow-md">
   <!-- 🍔 Hamburger + Greeting -->
-<div class="flex items-center space-x-2">
-  <button id="menu-toggle" class="text-white text-2xl md:hidden focus:outline-none" aria-label="Toggle mobile menu">
-    ☰
-  </button>
-  <span id="mobile-greeting" class="text-white text-base md:hidden"></span>
-</div>
-
+  <div class="flex items-center space-x-2">
+    <button id="menu-toggle" class="text-white text-2xl md:hidden focus:outline-none" aria-label="Toggle mobile menu">
+      ☰
+    </button>
+    <span id="mobile-greeting" class="text-white text-base md:hidden"></span>
+  </div>
 
   <!-- 🏦 Logo + Text Right -->
   <div class="flex items-center space-x-4 ml-auto">
@@ -190,15 +189,15 @@
             </nav>
         </aside>
 
-        <<!-- Mobile Menu -->
-<nav id="mobile-menu" class="mobile-menu fixed top-[4rem] left-0 w-64 bg-[#2d2d2d] h-full p-2 space-y-2 transform transition-transform duration-300 ease-in-out md:hidden closed">
-    <a href="#" data-page="dashboard" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">🏠 Dashboard</a>
-    <a href="#" data-page="accounts" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">💳 Accounts</a>
-    <a href="#" data-page="transfers" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">💸 Transfers</a>
-    <a href="#" data-page="transactions" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">📄 Transactions</a>
-    <a href="#" data-page="analytics" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">📊 Analytics</a>
-    <a href="#" data-page="security" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">🔒 Security</a>
-    <a href="#" data-page="settings" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">⚙️ Settings</a>
+       <!-- Mobile Menu -->
+<nav id="mobile-menu" class="mobile-menu fixed top-[4rem] left-0 w-64 bg-[#2d2d2d] h-[calc(100vh-4rem)] p-2 space-y-2 transform transition-transform duration-300 ease-in-out md:hidden closed z-40">
+  <a href="#" data-page="dashboard" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">🏠 Dashboard</a>
+  <a href="#" data-page="accounts" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">💳 Accounts</a>
+  <a href="#" data-page="transfers" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">💸 Transfers</a>
+  <a href="#" data-page="transactions" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">📄 Transactions</a>
+  <a href="#" data-page="analytics" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">📊 Analytics</a>
+  <a href="#" data-page="security" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">🔒 Security</a>
+  <a href="#" data-page="settings" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">⚙️ Settings</a>
 </nav>
 
         <!-- Main Content Area -->
@@ -716,26 +715,36 @@
       }
     });
   });
-// Mobile menu toggle and resize handler
+/// Mobile menu toggle and tap-outside-to-close
 const mobileMenu = document.getElementById("mobile-menu");
 const menuToggle = document.getElementById("menu-toggle");
 
 if (menuToggle && mobileMenu) {
-  menuToggle.addEventListener("click", () => {
+  menuToggle.addEventListener("click", (e) => {
+    e.stopPropagation(); // Prevent click from bubbling to document
     const isOpen = mobileMenu.classList.contains("open");
 
     if (isOpen) {
       mobileMenu.classList.remove("open");
       mobileMenu.classList.add("closed");
-      mobileMenu.classList.add("hidden"); // Hide menu when closed
-      menuToggle.textContent = "☰"; // Show hamburger icon
     } else {
       mobileMenu.classList.remove("closed");
-      mobileMenu.classList.remove("hidden"); // Ensure menu is visible
       mobileMenu.classList.add("open");
-      menuToggle.textContent = "✕"; // Show close icon
     }
     console.log(`Mobile menu toggled: ${isOpen ? "closed" : "open"}`);
+  });
+
+  // Tap-outside-to-close
+  document.addEventListener("click", (e) => {
+    const isMenuOpen = mobileMenu.classList.contains("open");
+    const isClickInsideMenu = mobileMenu.contains(e.target);
+    const isClickOnToggle = menuToggle.contains(e.target);
+
+    if (isMenuOpen && !isClickInsideMenu && !isClickOnToggle) {
+      mobileMenu.classList.remove("open");
+      mobileMenu.classList.add("closed");
+      console.log("Mobile menu closed by tapping outside");
+    }
   });
 }
 
@@ -744,8 +753,6 @@ window.addEventListener("resize", () => {
   if (window.innerWidth >= 768 && mobileMenu && mobileMenu.classList.contains("open")) {
     mobileMenu.classList.remove("open");
     mobileMenu.classList.add("closed");
-    mobileMenu.classList.add("hidden"); // Hide menu on desktop
-    if (menuToggle) menuToggle.textContent = "☰"; // Reset to hamburger icon
     console.log("Mobile menu hidden on resize to desktop");
   }
 });
