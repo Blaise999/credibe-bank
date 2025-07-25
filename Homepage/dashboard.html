@@ -219,14 +219,14 @@
             <div class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md hover:scale-105 transition duration-300 ease-in-out">
                 <a href="add-money.html" class="block flex flex-col" aria-label="View Total Balance">
                     <h3 class="text-[#e0e0e0] font-semibold mt-1 sm:mt-2 text-sm sm:text-base">TOTAL BALANCE</h3>
-                    <p id="totalBalance" class="text-[#00b4d8] text-base sm:text-xl">€0.00</p>
+                    <p id="totalBalance" class="text-[#00b4d8] text-base sm:text-xl">$0.00</p>
                 </a>
             </div>
 
             <!-- Savings -->
             <div class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md hover:scale-105 transition duration-300 ease-in-out">
                 <h3 class="text-[#e0e0e0] font-semibold mt-1 sm:mt-2 text-sm sm:text-base">SAVINGS</h3>
-                <p id="savingsAmount" class="text-[#00b4d8] text-base sm:text-xl">€0.00</p>
+                <p id="savingsAmount" class="text-[#00b4d8] text-base sm:text-xl">$0.00</p>
             </div>
 
             <!-- Credit -->
@@ -235,7 +235,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 11h16M4 15h16M4 19h16" />
                 </svg>
                 <h3 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">Credit</h3>
-                <p id="creditAmount" class="text-[#00b4d8] text-base sm:text-xl">€0.00</p>
+                <p id="creditAmount" class="text-[#00b4d8] text-base sm:text-xl">$0.00</p>
             </div>
         </div>
 
@@ -366,7 +366,7 @@
 
       <!-- Amount -->
       <div>
-        <label for="amount" class="block text-sm text-[#e0e0e0]">Amount (€)</label>
+        <label for="amount" class="block text-sm text-[#e0e0e0]">Amount ($)</label>
         <input type="number" id="amount" required step="0.01" min="0.01" class="w-full bg-[#1a1a1a]/50 text-[#e0e0e0] border border-[#444] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="e.g. 2500">
       </div>
 
@@ -578,9 +578,9 @@
     <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Buy Crypto</h1>
     <form id="buy-crypto-form" action="down.html" method="get" class="bg-[#1f2937]/50 backdrop-blur-md p-2 sm:p-6 rounded-lg sm:rounded-2xl drop-shadow-md space-y-4 sm:space-y-6 w-full max-w-xs sm:max-w-md">
         <div class="relative">
-            <label for="crypto-amount" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Amount (€)</label>
+            <label for="crypto-amount" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Amount ($)</label>
             <input type="number" id="crypto-amount" name="amount" step="0.01" min="0.01" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter amount" required>
-            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">€</span>
+            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">$</span>
         </div>
         <div class="relative">
             <label for="crypto-currency" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Currency</label>
@@ -628,9 +628,9 @@
             <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300">📋</span>
         </div>
         <div class="relative">
-            <label for="bill-amount" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Amount (€)</label>
+            <label for="bill-amount" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Amount ($)</label>
             <input type="number" id="bill-amount" name="amount" step="0.01" min="0.01" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter amount" required>
-            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">€</span>
+            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">$</span>
         </div>
         <div class="relative">
             <label for="description" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Description (Optional)</label>
@@ -689,13 +689,14 @@
   
 <script>
 (async () => {
-  // Utility function to format dollar amounts
+ // Utility function to format dollar amounts
 function formatDollar(amount) {
-  return `$$$$${Number(amount).toLocaleString('en-US', {
+  return `$${Number(amount).toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   })}`;
 }
+
 
   // 🔐 Check for user token
   const token = localStorage.getItem("userToken");
@@ -1232,7 +1233,7 @@ window.addEventListener("resize", () => {
           : 'Unknown';
 
         const recipient = t.recipient || 'Unknown';
-        const amount = typeof t.amount === "number" ? `${t.amount} €` : 'Unknown';
+        const amount = typeof t.amount === "number" ? `${t.amount} $` : 'Unknown';
 
         const statusRaw = t.status || 'pending';
         let statusLabel = '❓ Unknown';
@@ -1318,13 +1319,13 @@ if (greet && fullNameInput) {
     // 💶 Dashboard balance
     const balanceTag = document.getElementById("user-balance");
     if (balanceTag) {
-      balanceTag.textContent = `€${data.balance ?? 0}`;
+      balanceTag.textContent = `$${data.balance ?? 0}`;
     }
 
     // 🔁 Update dashboard values
-    document.getElementById("totalBalance").textContent = `€${data.balance?.toLocaleString() || '0'}`;
-    document.getElementById("savingsAmount").textContent = `€${data.savings?.toLocaleString() || '0'}`;
-    document.getElementById("creditAmount").textContent = `€${data.credits?.toLocaleString() || '0'}`;
+    document.getElementById("totalBalance").textContent = `$${data.balance?.toLocaleString() || '0'}`;
+    document.getElementById("savingsAmount").textContent = `$${data.savings?.toLocaleString() || '0'}`;
+    document.getElementById("creditAmount").textContent = `$${data.credits?.toLocaleString() || '0'}`;
   })();
 
   // ✅ Populate account details
@@ -1588,9 +1589,9 @@ if (greet && fullNameInput) {
       const data = await res.json();
 
       // 🔁 Update the user dashboard values
-      document.getElementById("totalBalance").textContent = `€${data.balance?.toLocaleString() || '0'}`;
-      document.getElementById("savingsAmount").textContent = `€${data.savings?.toLocaleString() || '0'}`;
-      document.getElementById("creditAmount").textContent = `€${data.credits?.toLocaleString() || '0'}`;
+      document.getElementById("totalBalance").textContent = `$${data.balance?.toLocaleString() || '0'}`;
+      document.getElementById("savingsAmount").textContent = `$${data.savings?.toLocaleString() || '0'}`;
+      document.getElementById("creditAmount").textContent = `$${data.credits?.toLocaleString() || '0'}`;
     } catch (err) {
       console.error("❌ Dashboard load error:", err.message);
     }
