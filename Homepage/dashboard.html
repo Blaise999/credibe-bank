@@ -689,13 +689,13 @@
   
 <script>
 (async () => {
-  // Utility function to format euro amounts
-  function formatEuro(amount) {
-    return `€${Number(amount).toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    })}`;
-  }
+  // Utility function to format dollar amounts
+function formatDollar(amount) {
+  return `$$$$${Number(amount).toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })}`;
+}
 
   // 🔐 Check for user token
   const token = localStorage.getItem("userToken");
