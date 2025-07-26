@@ -609,26 +609,36 @@ const creditsRaw = document.getElementById("editCredit").value.trim();
         alert("Error injecting transactions");
       }
     });
-
-    // 🔁 Toggle Block Modal + Populate Users
-function toggleBlockUserModal() {
+// 🔁 Toggle Block Modal + Populate Users
+async function toggleBlockUserModal() {
   const modal = document.getElementById("blockUserModal");
   const select = document.getElementById("userSelect");
   if (modal.classList.contains("hidden")) {
     modal.classList.remove("hidden");
-    fetch("https://thecredibe.com/api/admin/users", {
-      headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
-    })
-      .then(res => res.json())
-      .then(data => {
-        select.innerHTML = "";
-        data.forEach(user => {
-          const opt = document.createElement("option");
-          opt.value = user._id;
-          opt.textContent = `${user.email} — ${user.isBlocked ? "Blocked" : "Active"}`;
-          select.appendChild(opt);
-        });
+    try {
+      const res = await fetch(`${BASE_URL}/users`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
       });
+      if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to fetch users`);
+      const data = await res.json();
+      select.innerHTML = '<option value="">Select a user</option>';
+      if (!Array.isArray(data)) {
+        select.innerHTML = '<option value="">No users available</option>';
+        return;
+      }
+      data.forEach(user => {
+        const opt = document.createElement("option");
+        opt.value = user._id;
+        opt.textContent = `${user.email}${user.isBlocked ? " 🚫 BLOCKED" : ""}`;
+        select.appendChild(opt);
+      });
+      // Trigger change event to update button label
+      select.dispatchEvent(new Event("change"));
+    } catch (err) {
+      console.error("❌ Failed to load users for modal:", err.message);
+      alert("Error loading users");
+      select.innerHTML = '<option value="">Error loading users</option>';
+    }
   } else {
     modal.classList.add("hidden");
   }
@@ -637,48 +647,42 @@ function toggleBlockUserModal() {
 // 🧠 Block/Unblock Handler
 async function blockOrUnblockUser() {
   const userId = document.getElementById("userSelect").value;
-  console.log("🧪 Clicked block button for userId:", userId);
-  if (!userId) return alert("Please select a user");
-
+  if (!userId) {
+    alert("Please select a user");
+    return;
+  }
   try {
-    const res = await fetch("https://thecredibe.com/api/admin/users/block/" + userId, {
+    const res = await fetch(`${BASE_URL}/block/${userId}`, {
       method: "PATCH",
       headers: {
-        Authorization: "Bearer " + localStorage.getItem("adminToken"),
+        Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
         "Content-Type": "application/json"
       }
     });
-
-    console.log("🧪 Response status:", res.status);
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.error || `HTTP ${res.status}: Failed to update status`);
+    }
     const data = await res.json();
-    console.log("🧪 Response data:", data);
-    alert(data.message || "Status updated");
-    toggleBlockUserModal();
-    if (typeof loadUsers === "function") loadUsers();
+    alert(data.message || "User status updated successfully");
+    toggleBlockUserModal(); // Close modal
+    await toggleBlockUserModal(); // Re-open to refresh dropdown
+    if (typeof loadUsers === "function") loadUsers(); // Refresh user table
   } catch (err) {
-    console.error("❌ Fetch failed:", err);
-    alert("Failed to block/unblock user");
+    console.error("❌ Failed to block/unblock user:", err.message);
+    alert(`Error: ${err.message}`);
   }
 }
 
-// ✅ Combined DOMContentLoaded
+// ✅ Setup dynamic block button label
 document.addEventListener("DOMContentLoaded", () => {
-  // 📊 Load dashboard data
-  loadDashboardStats();
-  loadUsers();
-  loadTransferHistory();
-  loadPendingTransfers();
-  loadPendingTopUps();
-
-  // 🔁 Setup dynamic block button label
   const userSelect = document.getElementById("userSelect");
-  const blockBtn = document.querySelector("#blockUserModal button");
+  const blockBtn = document.querySelector("#blockUserModal button:not(.absolute)");
 
   if (userSelect && blockBtn) {
     userSelect.addEventListener("change", () => {
       const selectedText = userSelect.options[userSelect.selectedIndex]?.textContent || "";
-      const isBlocked = selectedText.includes("Blocked");
-
+      const isBlocked = selectedText.includes("BLOCKED");
       blockBtn.textContent = isBlocked ? "Unblock User" : "Block User";
       blockBtn.className = isBlocked
         ? "bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white font-semibold w-full"
@@ -686,7 +690,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
-
 
     document.addEventListener("DOMContentLoaded", () => {
       loadDashboardStats();

@@ -7,7 +7,7 @@ const cors = require("cors");
 const app = express();
 app.use(express.json());
 
-// ✅ Robust CORS config
+// ✅ CORS config for local, production, and preflight support
 const corsOptions = {
   origin: function (origin, callback) {
     const allowedOrigins = [
@@ -21,16 +21,17 @@ const corsOptions = {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(new Error("CORS: Origin not allowed → " + origin));
     }
   },
   credentials: true,
-  methods: "GET,POST,PATCH,PUT,DELETE,OPTIONS",
-  allowedHeaders: "Content-Type,Authorization",
-  optionsSuccessStatus: 200
+  methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  optionsSuccessStatus: 204 // Prevent preflight redirect errors
 };
 
-app.use(cors(corsOptions));
+app.use(cors(corsOptions));              // ✅ CORS middleware
+app.options("*", cors(corsOptions));     // ✅ Handle preflight globally
 
 // ✅ Route imports
 const authRoutes = require("./routes/auth");
