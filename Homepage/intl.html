@@ -130,30 +130,16 @@
 
     const token = localStorage.getItem("userToken");
 
-    // 🧠 Decode email safely
-    let email = null;
-    try {
-      if (!token) throw new Error("Missing token");
-      const decoded = JSON.parse(atob(token.split('.')[1]));
-      email = decoded?.email;
-      if (!email) throw new Error("Email not found in token");
-    } catch (err) {
-      alert("⚠️ Could not find your email. Please log in again.");
-      return;
-    }
-
     if (!details.otp) {
-     
-   // Better version — same as regular transfer
-const res = await fetch("https://credibe-backends.onrender.com/api/transfer/send-otp", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "Authorization": `Bearer ${token}`
-  },
-  body: JSON.stringify({ type: "transfer" })
-});
-
+      try {
+        const res = await fetch("https://credibe-backends.onrender.com/api/transfer/send-otp", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({ type: "transfer" })
+        });
 
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "OTP error");
@@ -167,13 +153,13 @@ const res = await fetch("https://credibe-backends.onrender.com/api/transfer/send
       }
     }
 
-    // Step 2: Submit Transfer
+    // ✅ Step 2: Submit Transfer
     try {
       const res = await fetch("https://credibe-backends.onrender.com/api/transfer/initiate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify({
           toIban: details.swift,
@@ -198,7 +184,6 @@ const res = await fetch("https://credibe-backends.onrender.com/api/transfer/send
         transferId: data.transactionId
       }));
 
-      // ✅ Redirect to pending page
       window.location.href = "transfer-pending-intl.html";
     } catch (err) {
       alert("❌ Transfer Failed: " + err.message);
