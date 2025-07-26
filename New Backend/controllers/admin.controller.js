@@ -94,9 +94,11 @@ exports.editUserBalance = async (req, res) => {
   }
 };
 
-// 💸 Approve/Reject Transfer
+/// 💸 Approve/Reject Transfer
 exports.handleTransaction = async (req, res) => {
   const { transactionId, action } = req.body;
+
+  // Validate inputs
   if (!mongoose.Types.ObjectId.isValid(transactionId)) {
     console.log("🧪 handleTransaction - Invalid transactionId", { transactionId });
     return res.status(400).json({ error: "Invalid transaction ID" });
@@ -116,7 +118,10 @@ exports.handleTransaction = async (req, res) => {
       timestamp: new Date().toLocaleString("en-US", { timeZone: "Africa/Lagos" }),
     });
 
-    const transaction = await Transaction.findById(transactionId).populate("from to").session(session);
+    // Fetch transaction with populated sender and receiver
+    const transaction = await Transaction.findById(transactionId)
+      .populate("from to")
+      .session(session);
     if (!transaction || transaction.status !== "pending") {
       console.log("🧪 handleTransaction - Invalid transaction", {
         transactionId,
@@ -133,6 +138,10 @@ exports.handleTransaction = async (req, res) => {
       return res.status(404).json({ error: "Sender not found" });
     }
 
+    // Initialize email variables
+    let emailSubject, emailHtml;
+
+    // Handle approval or rejection
     if (action === "approve") {
       if (sender.balance < transaction.amount) {
         console.log("🧪 handleTransaction - Insufficient balance", {
@@ -165,124 +174,99 @@ exports.handleTransaction = async (req, res) => {
           transactionId,
         });
       }
-
       await sender.save({ session });
-      await transaction.save({ session });
-      await session.commitTransaction();
 
-      // 📧 Approval Email
-      try {
-        if (!sender.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sender.email)) {
-          throw new Error("Invalid sender email");
-        }
-
-        const approvalHtml = `
-          <div style="font-family:Poppins, sans-serif; max-width:600px; margin:auto; padding:2rem; background:#121212; color:#f5f5f5; border-radius:10px; border:1px solid #333;">
-  <img src="https://thecredibe.com/credibe.png" alt="Credibe" style="height:40px; margin-bottom:1.5rem;" />
-
-  <h2 style="color:#00b4d8;">✅ Transfer Approved</h2>
-
-  <p style="font-size:15px; margin:1rem 0;">
-    Hi {{name}},
-  </p>
-
-  <p style="font-size:14px; line-height:1.6;">
-    Your <strong>local transfer</strong> has been successfully approved by Credibe.
-  </p>
-
-  <div style="margin:1.5rem 0; padding:1rem; background:#1f1f1f; border-radius:8px; border:1px solid #444;">
-    <p><strong>💳 Amount:</strong> €{{amount}}</p>
-    <p><strong>📨 Recipient:</strong> {{recipient}}</p>
-    <p><strong>🏦 IBAN:</strong> {{iban}}</p>
-    <p><strong>📝 Note:</strong> {{note}}</p>
-    <p><strong>🆔 Transaction ID:</strong> {{transactionId}}</p>
-    <p><strong>📅 Date:</strong> {{date}}</p>
-  </div>
-
-  <p style="font-size:14px;">
-    You can view this transaction on your dashboard. If you did not authorize this, please contact <a href="mailto:support@credibe.com" style="color:#00b4d8;">support@credibe.com</a> immediately.
-  </p>
-
-  <hr style="border:none; border-top:1px solid #333; margin:2rem 0;" />
-
-  <p style="font-size:12px; color:#888; text-align:center;">
-    This is a system-generated notification from Credibe (Europe HQ).<br />
-    <span style="font-size:11px;">Sent: {{dateTime}} | Timezone: CET (Brussels)</span>
-  </p>
-</div>
-
-        `;
-
-        await sendOTP({
-          to: sender.email,
-          subject: "Transfer Approved - Transaction Summary",
-          body: approvalHtml,
-          isHtml: true, // Assuming sendOTP supports HTML emails with an isHtml flag
-        });
-
-        console.log("🧪 handleTransaction - Approval email sent", { email: sender.email });
-      } catch (emailError) {
-        console.error("❌ Non-critical email error", {
-          transactionId,
-          email: sender.email,
-          error: emailError.message,
-        });
-        // Transaction already committed
-      }
-
-      return res.status(200).json({ message: "Transaction approved, summary sent" });
-    }
-
-    if (action === "reject") {
-      transaction.status = "rejected";
-      await transaction.save({ session });
-      await session.commitTransaction();
-
-      // 📧 Rejection Email
-      try {
-        if (!sender.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sender.email)) {
-          throw new Error("Invalid sender email");
-        }
-
-        const rejectionHtml = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
-            <h2 style="color: #c0392b;">Transfer Rejected</h2>
-            <p style="font-size: 16px; color: #34495e;">Dear ${sender.name || 'Customer'},</p>
-            <p style="font-size: 16px; color: #34495e;">We regret to inform you that your transfer of <strong>€${transaction.amount}</strong> has been rejected.</p>
-            <p style="font-size: 16px; color: #34495e;">Transaction ID: ${transaction._id}</p>
-            <p style="font-size: 14px; color: #7f8c8d;">If you believe this is an error or need further assistance, please contact our support team.</p>
-            <p style="font-size: 14px; color: #7f8c8d;">Best regards,<br>The Transaction Team</p>
+      // Approval email template
+      emailSubject = "Transfer Approved - Transaction Summary";
+      emailHtml = `
+        <div style="font-family:Poppins, sans-serif; max-width:600px; margin:auto; padding:2rem; background:#121212; color:#f5f5f5; border-radius:10px; border:1px solid #333;">
+          <img src="https://thecredibe.com/credibe.png" alt="Credibe" style="height:40px; margin-bottom:1.5rem;" />
+          <h2 style="color:#00b4d8;">✅ Transfer Approved</h2>
+          <p style="font-size:15px; margin:1rem 0;">Hi {{name}},</p>
+          <p style="font-size:14px; line-height:1.6;">Your <strong>local transfer</strong> has been successfully approved by Credibe.</p>
+          <div style="margin:1.5rem 0; padding:1rem; background:#1f1f1f; border-radius:8px; border:1px solid #444;">
+            <p><strong>💳 Amount:</strong> €{{amount}}</p>
+            <p><strong>📨 Recipient:</strong> {{recipient}}</p>
+            <p><strong>🏦 IBAN:</strong> {{iban}}</p>
+            <p><strong>📝 Note:</strong> {{note}}</p>
+            <p><strong>🆔 Transaction ID:</strong> {{transactionId}}</p>
+            <p><strong>📅 Date:</strong> {{date}}</p>
           </div>
-        `;
-
-        await sendOTP({
-          to: sender.email,
-          subject: "Transfer Rejected",
-          body: rejectionHtml,
-          isHtml: true, // Assuming sendOTP supports HTML emails with an isHtml flag
-        });
-
-        console.log("🧪 handleTransaction - Rejection email sent", { email: sender.email });
-      } catch (emailError) {
-        console.error("❌ Non-critical email error", {
-          transactionId,
-          email: sender.email,
-          error: emailError.message,
-        });
-      }
-
-      return res.status(200).json({ message: "Transaction rejected" });
+          <p style="font-size:14px;">You can view this transaction on your dashboard. If you did not authorize this, please contact <a href="mailto:support@credibe.com" style="color:#00b4d8;">support@credibe.com</a> immediately.</p>
+          <hr style="border:none; border-top:1px solid #333; margin:2rem 0;" />
+          <p style="font-size:12px; color:#888; text-align:center;">
+            This is a system-generated notification from Credibe (Europe HQ).<br />
+            <span style="font-size:11px;">Sent: {{dateTime}} | Timezone: CET (Brussels)</span>
+          </p>
+        </div>
+      `;
+    } else {
+      transaction.status = "rejected";
+      // Rejection email template
+      emailSubject = "Transfer Rejected";
+      emailHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+          <h2 style="color: #c0392b;">Transfer Rejected</h2>
+          <p style="font-size: 16px; color: #34495e;">Dear {{name}},</p>
+          <p style="font-size: 16px; color: #34495e;">We regret to inform you that your transfer of <strong>€{{amount}}</strong> has been rejected.</p>
+          <p style="font-size: 16px; color: #34495e;">Transaction ID: {{transactionId}}</p>
+          <p style="font-size: 14px; color: #7f8c8d;">If you believe this is an error or need further assistance, please contact our support team.</p>
+          <p style="font-size: 14px; color: #7f8c8d;">Best regards,<br>The Transaction Team</p>
+        </div>
+      `;
     }
 
+    // Save transaction changes
+    await transaction.save({ session });
+    await session.commitTransaction();
+
+    // Send email notification
+    try {
+      if (!sender.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sender.email)) {
+        throw new Error("Invalid sender email");
+      }
+
+      const interpolatedHtml = emailHtml
+        .replace(/{{name}}/g, sender.name || "Customer")
+        .replace(/{{amount}}/g, transaction.amount != null ? transaction.amount.toFixed(2) : "0.00")
+        .replace(/{{recipient}}/g, transaction.recipient || "N/A")
+        .replace(/{{iban}}/g, transaction.toIban || "N/A")
+        .replace(/{{note}}/g, transaction.note || "N/A")
+        .replace(/{{transactionId}}/g, transaction._id?.toString() || "N/A")
+        .replace(/{{date}}/g, new Date().toLocaleDateString("en-GB"))
+        .replace(/{{dateTime}}/g, new Date().toLocaleString("en-GB", { timeZone: "Europe/Brussels" }));
+
+      await sendOTP({
+        to: sender.email,
+        subject: emailSubject,
+        body: interpolatedHtml,
+        isHtml: true,
+      });
+
+      console.log(`🧪 handleTransaction - ${action} email sent`, { email: sender.email });
+    } catch (emailError) {
+      console.error("❌ Non-critical email error", {
+        transactionId,
+        email: sender.email,
+        error: emailError.message,
+        stack: emailError.stack,
+      });
+    }
+
+    return res.status(200).json({ message: `Transaction ${action}d` });
   } catch (err) {
     await session.abortTransaction();
-    console.error("❌ Admin TXN Error", { transactionId, action, error: err.message });
+    console.error("❌ Admin TXN Error", {
+      transactionId,
+      action,
+      error: err.message,
+      stack: err.stack,
+    });
     return res.status(500).json({ error: "Failed to process transaction" });
   } finally {
     session.endSession();
   }
 };
-
 // ⏳ Get Pending Transfers
 exports.getPendingTransfers = async (req, res) => {
   try {
