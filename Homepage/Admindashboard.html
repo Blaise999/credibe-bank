@@ -619,11 +619,15 @@ async function toggleBlockUserModal() {
       const res = await fetch(`${BASE_URL}/users`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to fetch users`);
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`HTTP ${res.status}: ${text.startsWith("<!DOCTYPE") ? "Received HTML instead of JSON (check endpoint or auth)" : text}`);
+      }
       const data = await res.json();
       select.innerHTML = '<option value="">Select a user</option>';
       if (!Array.isArray(data)) {
         select.innerHTML = '<option value="">No users available</option>';
+        console.warn("⚠️ API returned non-array data:", data);
         return;
       }
       data.forEach(user => {
@@ -632,11 +636,10 @@ async function toggleBlockUserModal() {
         opt.textContent = `${user.email}${user.isBlocked ? " 🚫 BLOCKED" : ""}`;
         select.appendChild(opt);
       });
-      // Trigger change event to update button label
-      select.dispatchEvent(new Event("change"));
+      select.dispatchEvent(new Event("change")); // Update button label
     } catch (err) {
       console.error("❌ Failed to load users for modal:", err.message);
-      alert("Error loading users");
+      alert(`Error loading users: ${err.message.includes("HTML") ? "Invalid API response or authentication failure" : err.message}`);
       select.innerHTML = '<option value="">Error loading users</option>';
     }
   } else {
@@ -660,8 +663,8 @@ async function blockOrUnblockUser() {
       }
     });
     if (!res.ok) {
-      const data = await res.json();
-      throw new Error(data.error || `HTTP ${res.status}: Failed to update status`);
+      const text = await res.text();
+      throw new Error(`HTTP ${res.status}: ${text.startsWith("<!DOCTYPE") ? "Received HTML instead of JSON (check endpoint or auth)" : text}`);
     }
     const data = await res.json();
     alert(data.message || "User status updated successfully");
@@ -670,7 +673,7 @@ async function blockOrUnblockUser() {
     if (typeof loadUsers === "function") loadUsers(); // Refresh user table
   } catch (err) {
     console.error("❌ Failed to block/unblock user:", err.message);
-    alert(`Error: ${err.message}`);
+    alert(`Error: ${err.message.includes("HTML") ? "Invalid API response or authentication failure" : err.message}`);
   }
 }
 
