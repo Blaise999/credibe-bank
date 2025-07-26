@@ -7,33 +7,30 @@ const cors = require("cors");
 const app = express();
 app.use(express.json());
 
-// ✅ CORS config for local, production, and preflight support
-const allowedOrigins = [
-  'http://localhost:5500',
-  'http://127.0.0.1:5500',
-  'http://localhost:3000',
-  'https://thecredibe.com',
-  'https://www.thecredibe.com',
-  'https://credibe-frontend.onrender.com'
-];
+// ✅ Robust CORS config
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'http://localhost:5500',
+      'http://127.0.0.1:5500',
+      'http://localhost:3000',
+      'https://thecredibe.com',
+      'https://www.thecredibe.com',
+      'https://credibe-frontend.onrender.com'
+    ];
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: "GET,POST,PATCH,PUT,DELETE,OPTIONS",
+  allowedHeaders: "Content-Type,Authorization",
+  optionsSuccessStatus: 200
+};
 
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-    res.setHeader("Vary", "Origin"); // important to avoid caching origin
-  }
-
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,PUT,DELETE,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200); // Preflight OK
-  }
-
-  next();
-});
+app.use(cors(corsOptions));
 
 // ✅ Route imports
 const authRoutes = require("./routes/auth");
