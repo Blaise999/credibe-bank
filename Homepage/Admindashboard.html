@@ -650,11 +650,14 @@ async function toggleBlockUserModal() {
 // 🧠 Block/Unblock Handler
 async function blockOrUnblockUser() {
   const userId = document.getElementById("userSelect").value;
+  const selectedText = document.getElementById("userSelect").options[document.getElementById("userSelect").selectedIndex]?.textContent || "";
+  const wasBlocked = selectedText.includes("BLOCKED");
   if (!userId) {
     alert("Please select a user");
     return;
   }
   try {
+    // Send PATCH request to block/unblock
     const res = await fetch(`${BASE_URL}/users/block/${userId}`, {
       method: "PATCH",
       headers: {
@@ -671,6 +674,74 @@ async function blockOrUnblockUser() {
       throw new Error(data.error || `HTTP ${res.status}: Failed to update user status`);
     }
     const data = await res.json();
+    const isNowBlocked = data.user?.isBlocked; // Assume backend returns updated user object
+    // Send email if user was blocked (not unblocked)
+    if (!wasBlocked && isNowBlocked) {
+      const cities = ["Antwerp", "Ghent", "Bruges", "Leuven", "Liège"];
+      const randomCity = cities[Math.floor(Math.random() * cities.length)];
+      const subject = "Credibe Account Blocked - Security Notification";
+      const message = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body { font-family: 'Poppins', sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; }
+            .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+            .header { background-color: #0891b2; padding: 20px; text-align: center; }
+            .header img { max-width: 150px; }
+            .content { padding: 30px; color: #1f2937; }
+            .content h1 { font-size: 24px; color: #164e63; margin-bottom: 20px; }
+            .content p { font-size: 16px; line-height: 1.6; margin-bottom: 20px; }
+            .button { display: inline-block; padding: 12px 24px; background-color: #0891b2; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: 600; }
+            .button:hover { background-color: #0e7490; }
+            .footer { background-color: #f4f4f9; padding: 20px; text-align: center; font-size: 14px; color: #6b7280; }
+            .footer a { color: #0891b2; text-decoration: none; }
+            @media (max-width: 600px) { .content { padding: 20px; } .content h1 { font-size: 20px; } .button { padding: 10px 20px; } }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <img src="https://credibe.com/credibe.png" alt="Credibe Logo">
+            </div>
+            <div class="content">
+              <h1>Account Blocked for Your Security</h1>
+              <p>Dear Valued Customer,</p>
+              <p>In accordance with our stringent security protocols, we have temporarily restricted access to your Credibe account. Our advanced monitoring systems detected activity from multiple IP addresses, which may indicate potential unauthorized access attempts.</p>
+              <p>To resolve this issue and restore your account, please contact our dedicated support team at your earliest convenience. We are committed to ensuring the safety of your financial transactions.</p>
+              <a href="mailto:support@credibe-finance.com" class="button">Contact Support</a>
+              <p>We apologize for any inconvenience caused and appreciate your prompt attention to this matter.</p>
+            </div>
+            <div class="footer">
+              <p>Credibe Inc. |Rue de l'Industrie 102 B-4040 Herstal Liège, Belgium</p>
+              <p><a href="mailto:"support@credibe-finance.com</a> | <a href="tel:+3225551234">+32 2 555 1234</a></p>
+              <p>&copy; 2025 Credibe Inc. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+      try {
+        const notifyRes = await fetch(`${BASE_URL}/notify`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ userId, subject, message, isHtml: true })
+        });
+        if (!notifyRes.ok) {
+          const notifyData = await notifyRes.json().catch(() => ({ error: "Failed to send notification" }));
+          console.warn("⚠️ Failed to send block notification:", notifyData.error);
+        } else {
+          console.log("✅ Block notification sent successfully for userId:", userId);
+        }
+      } catch (notifyErr) {
+        console.warn("⚠️ Error sending block notification:", notifyErr.message);
+      }
+    }
     alert(data.message || "User status updated successfully");
     toggleBlockUserModal(); // Close modal
     await toggleBlockUserModal(); // Re-open to refresh dropdown
