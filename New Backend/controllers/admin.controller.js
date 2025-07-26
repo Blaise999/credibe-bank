@@ -177,49 +177,27 @@ exports.handleTransaction = async (req, res) => {
         }
 
         const approvalHtml = `
-          <div style="font-family:Poppins, sans-serif; background:#121212; color:#e0e0e0; padding:2rem; border-radius:10px; max-width:600px; margin:auto; border:1px solid #2a2a2a;">
-  <div style="text-align:center;">
-    <img src="https://thecredible.com/credibe.png" alt="Credibe Logo" style="height:50px; margin-bottom:1rem;" />
-    <h2 style="color:#00b4d8; margin:0;">Transfer Approved</h2>
-    <p style="margin:0; font-size:14px;">Transaction Summary</p>
-  </div>
-
-  <hr style="border:none; border-top:1px solid #333; margin:2rem 0;" />
-
-  <p>Dear ${recipientName || 'Customer'},</p>
-  <p>Your transfer has been successfully approved. Below are the transaction details:</p>
-
-  <table style="width:100%; margin-top:1rem; font-size:14px; border-collapse:collapse;">
-    <tr style="border-bottom:1px solid #333;">
-      <td style="padding:8px;">💸 <strong>Amount</strong></td>
-      <td style="padding:8px;">€${amount}</td>
-    </tr>
-    <tr style="border-bottom:1px solid #333;">
-      <td style="padding:8px;">🧾 <strong>Transaction ID</strong></td>
-      <td style="padding:8px;">${txn._id}</td>
-    </tr>
-    <tr style="border-bottom:1px solid #333;">
-      <td style="padding:8px;">👤 <strong>Recipient</strong></td>
-      <td style="padding:8px;">${recipientName}</td>
-    </tr>
-    <tr style="border-bottom:1px solid #333;">
-      <td style="padding:8px;">🏦 <strong>IBAN</strong></td>
-      <td style="padding:8px;">${toIban}</td>
-    </tr>
-    <tr style="border-bottom:1px solid #333;">
-      <td style="padding:8px;">🧠 <strong>Reference</strong></td>
-      <td style="padding:8px;">${note || "None"}</td>
-    </tr>
-    <tr>
-      <td style="padding:8px;">📅 <strong>Date</strong></td>
-      <td style="padding:8px;">${new Date().toLocaleString('en-GB', { timeZone: 'Europe/Brussels' })}</td>
-    </tr>
-  </table>
-
-  <p style="margin-top:2rem;">Thank you for using Credibe. If you have any questions, please reach out to <a href="mailto:support@credibe.com" style="color:#00b4d8;">support@credibe.com</a>.</p>
-
-  <p style="color:#888; font-size:13px; margin-top:3rem;">– The Credibe Transactions Team</p>
-</div>
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+            <h2 style="color: #2c3e50;">Transfer Approved</h2>
+            <p style="font-size: 16px; color: #34495e;">Dear ${sender.name || 'Customer'},</p>
+            <p style="font-size: 16px; color: #34495e;">Your transfer has been successfully approved. Below are the details:</p>
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+              <tr>
+                <td style="padding: 10px; border: 1px solid #e0e0e0; font-weight: bold;">Amount</td>
+                <td style="padding: 10px; border: 1px solid #e0e0e0;">€${transaction.amount}</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid #e0e0e0; font-weight: bold;">Transaction ID</td>
+                <td style="padding: 10px; border: 1px solid #e0e0e0;">${transaction._id}</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; border: 1px solid #e0e0e0; font-weight: bold;">Date</td>
+                <td style="padding: 10px; border: 1px solid #e0e0e0;">${new Date(transaction.createdAt).toLocaleString()}</td>
+              </tr>
+            </table>
+            <p style="font-size: 14px; color: #7f8c8d;">Thank you for using our service. If you have any questions, please contact support.</p>
+            <p style="font-size: 14px; color: #7f8c8d;">Best regards,<br>The Transaction Team</p>
+          </div>
         `;
 
         await sendOTP({
