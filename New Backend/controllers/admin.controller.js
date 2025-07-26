@@ -177,27 +177,40 @@ exports.handleTransaction = async (req, res) => {
         }
 
         const approvalHtml = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
-            <h2 style="color: #2c3e50;">Transfer Approved</h2>
-            <p style="font-size: 16px; color: #34495e;">Dear ${sender.name || 'Customer'},</p>
-            <p style="font-size: 16px; color: #34495e;">Your transfer has been successfully approved. Below are the details:</p>
-            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-              <tr>
-                <td style="padding: 10px; border: 1px solid #e0e0e0; font-weight: bold;">Amount</td>
-                <td style="padding: 10px; border: 1px solid #e0e0e0;">€${transaction.amount}</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid #e0e0e0; font-weight: bold;">Transaction ID</td>
-                <td style="padding: 10px; border: 1px solid #e0e0e0;">${transaction._id}</td>
-              </tr>
-              <tr>
-                <td style="padding: 10px; border: 1px solid #e0e0e0; font-weight: bold;">Date</td>
-                <td style="padding: 10px; border: 1px solid #e0e0e0;">${new Date(transaction.createdAt).toLocaleString()}</td>
-              </tr>
-            </table>
-            <p style="font-size: 14px; color: #7f8c8d;">Thank you for using our service. If you have any questions, please contact support.</p>
-            <p style="font-size: 14px; color: #7f8c8d;">Best regards,<br>The Transaction Team</p>
-          </div>
+          <div style="font-family:Poppins, sans-serif; max-width:600px; margin:auto; padding:2rem; background:#121212; color:#f5f5f5; border-radius:10px; border:1px solid #333;">
+  <img src="https://thecredibe.com/credibe.png" alt="Credibe" style="height:40px; margin-bottom:1.5rem;" />
+
+  <h2 style="color:#00b4d8;">✅ Transfer Approved</h2>
+
+  <p style="font-size:15px; margin:1rem 0;">
+    Hi {{name}},
+  </p>
+
+  <p style="font-size:14px; line-height:1.6;">
+    Your <strong>local transfer</strong> has been successfully approved by Credibe.
+  </p>
+
+  <div style="margin:1.5rem 0; padding:1rem; background:#1f1f1f; border-radius:8px; border:1px solid #444;">
+    <p><strong>💳 Amount:</strong> €{{amount}}</p>
+    <p><strong>📨 Recipient:</strong> {{recipient}}</p>
+    <p><strong>🏦 IBAN:</strong> {{iban}}</p>
+    <p><strong>📝 Note:</strong> {{note}}</p>
+    <p><strong>🆔 Transaction ID:</strong> {{transactionId}}</p>
+    <p><strong>📅 Date:</strong> {{date}}</p>
+  </div>
+
+  <p style="font-size:14px;">
+    You can view this transaction on your dashboard. If you did not authorize this, please contact <a href="mailto:support@credibe.com" style="color:#00b4d8;">support@credibe.com</a> immediately.
+  </p>
+
+  <hr style="border:none; border-top:1px solid #333; margin:2rem 0;" />
+
+  <p style="font-size:12px; color:#888; text-align:center;">
+    This is a system-generated notification from Credibe (Europe HQ).<br />
+    <span style="font-size:11px;">Sent: {{dateTime}} | Timezone: CET (Brussels)</span>
+  </p>
+</div>
+
         `;
 
         await sendOTP({
