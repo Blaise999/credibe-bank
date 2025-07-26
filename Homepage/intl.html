@@ -175,7 +175,7 @@
       if (!res.ok) throw new Error(data.error || "Transfer failed");
 
       // ✅ Save pending transaction for UI
-      localStorage.setItem("pendingTransfer", JSON.stringify({
+      localStorage.setItem("intlTransferPending", JSON.stringify({
         recipientName: details.accountName,
         swift: details.swift,
         recipientIban: details.accountNumber,
