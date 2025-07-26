@@ -108,7 +108,7 @@
   </main>
 
   <!-- Script -->
-  <script>
+ <script>
   const form = document.getElementById("intl-transfer-form");
   const transferOtpSection = document.getElementById("transferOtpSection");
 
@@ -130,17 +130,30 @@
 
     const token = localStorage.getItem("userToken");
 
+    // 🧠 Decode email safely
+    let email = null;
+    try {
+      if (!token) throw new Error("Missing token");
+      const decoded = JSON.parse(atob(token.split('.')[1]));
+      email = decoded?.email;
+      if (!email) throw new Error("Email not found in token");
+    } catch (err) {
+      alert("⚠️ Could not find your email. Please log in again.");
+      return;
+    }
+
     if (!details.otp) {
-      // Step 1: Send OTP
+      // Step 1: Send OTP if not already visible
       try {
-        const email = JSON.parse(atob(token.split('.')[1])).email;
         const res = await fetch("https://credibe-backends.onrender.com/api/transfer/send-direct-otp", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ type: "transfer", email })
         });
+
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "OTP error");
+
         alert("📩 OTP sent to your email.");
         transferOtpSection.classList.remove("hidden");
         return;
@@ -150,7 +163,7 @@
       }
     }
 
-    // Step 2: Submit transfer
+    // Step 2: Submit Transfer
     try {
       const res = await fetch("https://credibe-backends.onrender.com/api/transfer/initiate", {
         method: "POST",
@@ -159,18 +172,29 @@
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          ...details,
-          toIban: details.swift, // just to satisfy backend structure
+          toIban: details.swift,
           recipient: details.accountName,
+          amount: details.amount,
           note: details.reference || "International Transfer",
-          type: "international",
+          otp: details.otp,
+          type: "international"
         }),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Transfer failed");
 
-      localStorage.setItem("intlTransferPending", JSON.stringify(details));
+      // ✅ Save pending transaction for UI
+      localStorage.setItem("pendingTransfer", JSON.stringify({
+        recipientName: details.accountName,
+        swift: details.swift,
+        recipientIban: details.accountNumber,
+        amount: details.amount,
+        note: details.reference,
+        transferId: data.transactionId
+      }));
+
+      // ✅ Redirect to pending page
       window.location.href = "transfer-pending-intl.html";
     } catch (err) {
       alert("❌ Transfer Failed: " + err.message);
