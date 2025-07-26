@@ -175,14 +175,18 @@
       if (!res.ok) throw new Error(data.error || "Transfer failed");
 
       // ✅ Save pending transaction for UI
-      localStorage.setItem("intlTransferPending", JSON.stringify({
-        recipientName: details.accountName,
-        swift: details.swift,
-        recipientIban: details.accountNumber,
-        amount: details.amount,
-        note: details.reference,
-        transferId: data.transactionId
-      }));
+     localStorage.setItem("intlTransferPending", JSON.stringify({
+  bankName: details.bankName,
+  accountName: details.accountName,
+  accountType: details.accountType,
+  accountNumber: details.accountNumber,
+  routingNumber: details.routingNumber,
+  swift: details.swift,
+  bankAddress: details.bankAddress,
+  amount: details.amount,
+  reference: details.reference,
+  transferId: data.transactionId
+}));
 
       window.location.href = "transfer-pending-intl.html";
     } catch (err) {

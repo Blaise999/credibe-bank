@@ -48,14 +48,16 @@
     const box = document.getElementById("details-box");
 
     if (details) {
-      box.innerHTML = `
-        <p><strong>Bank:</strong> ${details.bankName}</p>
-        <p><strong>Account Holder:</strong> ${details.accountName}</p>
-        <p><strong>Account Type:</strong> ${details.accountType}</p>
-        <p><strong>Amount:</strong> $${Number(details.amount).toLocaleString()}</p>
-        <p><strong>Reference:</strong> ${details.reference || 'N/A'}</p>
-        <p><strong>Status:</strong> <span class="text-yellow-400 font-semibold">Pending</span></p>
-      `;
+ box.innerHTML = `
+  <p><strong>Bank:</strong> ${details.bankName || 'N/A'}</p>
+  <p><strong>Account Holder:</strong> ${details.accountName || 'N/A'}</p>
+  <p><strong>Account Type:</strong> ${details.accountType || 'N/A'}</p>
+  <p><strong>Routing Number:</strong> ${details.routingNumber || 'N/A'}</p>
+  <p><strong>SWIFT / BIC:</strong> ${details.swift || 'N/A'}</p>
+  <p><strong>Amount:</strong> $${Number(details.amount || 0).toLocaleString()}</p>
+  <p><strong>Reference:</strong> ${details.reference || 'N/A'}</p>
+  <p><strong>Status:</strong> <span class="text-yellow-400 font-semibold">Pending</span></p>
+`;
     }
   </script>
 </body>
