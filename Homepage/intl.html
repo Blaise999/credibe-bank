@@ -143,13 +143,17 @@
     }
 
     if (!details.otp) {
-      // Step 1: Send OTP if not already visible
-      try {
-        const res = await fetch("https://credibe-backends.onrender.com/api/transfer/send-direct-otp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: "transfer", email })
-        });
+     
+   // Better version — same as regular transfer
+const res = await fetch("https://credibe-backends.onrender.com/api/transfer/send-otp", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`
+  },
+  body: JSON.stringify({ type: "transfer" })
+});
+
 
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "OTP error");
