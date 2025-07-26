@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Credibe - International Transfer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+    input, select, textarea {
+      background-color: #1f1f1f;
+      border-color: #444;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #00b4d8;
+      outline: none;
+      box-shadow: 0 0 0 1px #00b4d8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="bg-[#1e1e1e] py-6 px-8 shadow-md flex justify-between items-center">
+    <!-- Logo -->
+    <div class="flex items-center space-x-3">
+      <img src="credibe.png" alt="Credibe Logo" class="h-9 w-9 sm:h-10 sm:w-10 rounded-full object-contain bg-white p-[2px]" />
+      <span class="text-xl sm:text-2xl font-bold text-[#00b4d8] tracking-wide">Credibe</span>
+    </div>
+
+    <!-- Back -->
+    <a href="dashboard.html" class="text-[#00b4d8] hover:text-[#009bc2] text-2xl sm:text-3xl transition" title="Back">←</a>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-3xl mx-auto py-12 px-6">
+    <h2 class="text-3xl font-bold text-[#00b4d8] mb-6">International Bank Transfer</h2>
+    
+    <form id="intl-transfer-form" class="grid grid-cols-1 gap-6">
+      <div>
+        <label class="block mb-2">Bank Name</label>
+        <input type="text" id="bank-name" required class="w-full px-4 py-2 rounded-md border" placeholder="e.g. Bank of America" />
+      </div>
+
+      <div>
+        <label class="block mb-2">Account Holder Name</label>
+        <input type="text" id="account-name" required class="w-full px-4 py-2 rounded-md border" placeholder="e.g. John McGuinn" />
+      </div>
+
+      <div>
+        <label class="block mb-2">Account Type</label>
+        <select id="account-type" required class="w-full px-4 py-2 rounded-md border">
+          <option value="" disabled selected>Select Type</option>
+          <option value="Checking">Checking</option>
+          <option value="Savings">Savings</option>
+          <option value="Business">Business</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block mb-2">Account Number</label>
+        <input type="text" id="account-number" required class="w-full px-4 py-2 rounded-md border" placeholder="e.g. 1234567890" />
+      </div>
+
+      <div>
+        <label class="block mb-2">Routing Number</label>
+        <input type="text" id="routing-number" required class="w-full px-4 py-2 rounded-md border" placeholder="e.g. 026009593" />
+      </div>
+
+      <div>
+        <label class="block mb-2">SWIFT / BIC Code</label>
+        <input type="text" id="swift" required class="w-full px-4 py-2 rounded-md border" placeholder="e.g. BOFAUS3N" />
+      </div>
+
+      <div>
+        <label class="block mb-2">Bank Address</label>
+        <textarea id="bank-address" required rows="3" class="w-full px-4 py-2 rounded-md border" placeholder="e.g. 123 Main Street, New York, NY, USA"></textarea>
+      </div>
+
+      <div>
+        <label class="block mb-2">Transfer Amount (USD)</label>
+        <input type="number" id="amount" required class="w-full px-4 py-2 rounded-md border" placeholder="e.g. 5000" />
+      </div>
+
+      <div>
+        <label class="block mb-2">Reference / Purpose</label>
+        <input type="text" id="reference" class="w-full px-4 py-2 rounded-md border" placeholder="e.g. Tuition Payment" />
+      </div>
+
+      <!-- OTP Section -->
+      <div id="transferOtpSection" class="hidden">
+        <label class="block mb-2">OTP</label>
+        <input type="text" id="transfer-otp" class="w-full px-4 py-2 rounded-md border" placeholder="Enter OTP" />
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" id="submit-transfer" class="w-full bg-[#00b4d8] hover:bg-[#009bc2] text-white font-semibold py-3 rounded-md mt-4 transition">
+        Initiate Transfer
+      </button>
+    </form>
+  </main>
+
+  <!-- Script -->
+  <script>
+  const form = document.getElementById("intl-transfer-form");
+  const transferOtpSection = document.getElementById("transferOtpSection");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const details = {
+      bankName: document.getElementById("bank-name").value.trim(),
+      accountName: document.getElementById("account-name").value.trim(),
+      accountType: document.getElementById("account-type").value,
+      accountNumber: document.getElementById("account-number").value.trim(),
+      routingNumber: document.getElementById("routing-number").value.trim(),
+      swift: document.getElementById("swift").value.trim(),
+      bankAddress: document.getElementById("bank-address").value.trim(),
+      amount: parseFloat(document.getElementById("amount").value),
+      reference: document.getElementById("reference").value.trim(),
+      otp: document.getElementById("transfer-otp").value.trim(),
+    };
+
+    const token = localStorage.getItem("userToken");
+
+    if (!details.otp) {
+      // Step 1: Send OTP
+      try {
+        const email = JSON.parse(atob(token.split('.')[1])).email;
+        const res = await fetch("https://credibe-backends.onrender.com/api/transfer/send-direct-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "transfer", email })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "OTP error");
+        alert("📩 OTP sent to your email.");
+        transferOtpSection.classList.remove("hidden");
+        return;
+      } catch (err) {
+        alert("❌ Error sending OTP: " + err.message);
+        return;
+      }
+    }
+
+    // Step 2: Submit transfer
+    try {
+      const res = await fetch("https://credibe-backends.onrender.com/api/transfer/initiate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...details,
+          toIban: details.swift, // just to satisfy backend structure
+          recipient: details.accountName,
+          note: details.reference || "International Transfer",
+          type: "international",
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Transfer failed");
+
+      localStorage.setItem("intlTransferPending", JSON.stringify(details));
+      window.location.href = "transfer-pending-intl.html";
+    } catch (err) {
+      alert("❌ Transfer Failed: " + err.message);
+    }
+  });
+</script>
+</body>
+</html>
