@@ -655,7 +655,7 @@ async function blockOrUnblockUser() {
     return;
   }
   try {
-    const res = await fetch(`${BASE_URL}/block/${userId}`, {
+    const res = await fetch(`${BASE_URL}/users/block/${userId}`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
@@ -673,7 +673,7 @@ async function blockOrUnblockUser() {
     if (typeof loadUsers === "function") loadUsers(); // Refresh user table
   } catch (err) {
     console.error("❌ Failed to block/unblock user:", err.message);
-    alert(`Error: ${err.message.includes("HTML") ? "Invalid API response or authentication failure" : err.message}`);
+    alert(`Error: ${err.message.includes("HTML") ? "Invalid API response or authentication failure. Ensure the endpoint /api/admin/users/block/:userId exists and the token is valid." : err.message}`);
   }
 }
 
