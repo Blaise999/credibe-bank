@@ -72,27 +72,22 @@ exports.getUserTransactions = async (req, res) => {
   try {
     const query = { from: userId };
 
-    // Optional filter by ?days
-  if (daysQuery !== 'all') {
-  const days = parseInt(daysQuery);
-  if (!isNaN(days) && days > 0) {
-    const fromDate = new Date();
-    fromDate.setDate(fromDate.getDate() - days);
+    // If not 'all', apply custom date rules
+    if (daysQuery !== 'all') {
+      const days = parseInt(daysQuery);
 
-    // Show real transactions ONLY from July 26, 2025
-    const july26Start = new Date("2025-07-26T00:00:00.000Z");
-    const july26End = new Date("2025-07-27T00:00:00.000Z");
+      if (!isNaN(days) && days > 0) {
+        const july26Start = new Date("2025-07-26T00:00:00.000Z");
+        const july26End = new Date("2025-07-27T00:00:00.000Z");
+        const march26Cap = new Date("2025-03-26T23:59:59.999Z");
 
-    // Show fake ones on or before March 26, 2025
-    const march26 = new Date("2025-03-26T23:59:59.999Z");
-
-    query.$or = [
-      { date: { $gte: july26Start, $lt: july26End } },       // Real ones from July 26 only
-      { date: { $lte: march26 } }                            // Fake ones up to March 26
-    ];
-  }
-}
-
+        // 🧠 Filter: show real txns ONLY from July 26, and fake txns ONLY up to March 26
+        query.$or = [
+          { date: { $gte: july26Start, $lt: july26End } },
+          { date: { $lte: march26Cap } }
+        ];
+      }
+    }
 
     const transactions = await Transaction.find(query).sort({ date: -1 });
     console.log('🧪 Transactions fetched:', { count: transactions.length, userId });
@@ -103,4 +98,3 @@ exports.getUserTransactions = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
-
