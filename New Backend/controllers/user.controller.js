@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('../models/User');
-const Transaction = require('../models/transaction');
+const Transaction = require('../models/Transaction');
 
 // 📌 Create user with initial fake transactions
 exports.createUser = async (req, res) => {
