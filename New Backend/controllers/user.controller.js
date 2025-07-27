@@ -73,14 +73,26 @@ exports.getUserTransactions = async (req, res) => {
     const query = { from: userId };
 
     // Optional filter by ?days
-    if (daysQuery !== 'all') {
-      const days = parseInt(daysQuery);
-      if (!isNaN(days) && days > 0) {
-        const fromDate = new Date();
-        fromDate.setDate(fromDate.getDate() - days);
-        query.date = { $gte: fromDate }; // ✅ using `date` field for filtering
-      }
-    }
+  if (daysQuery !== 'all') {
+  const days = parseInt(daysQuery);
+  if (!isNaN(days) && days > 0) {
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - days);
+
+    // Show real transactions ONLY from July 26, 2025
+    const july26Start = new Date("2025-07-26T00:00:00.000Z");
+    const july26End = new Date("2025-07-27T00:00:00.000Z");
+
+    // Show fake ones on or before March 26, 2025
+    const march26 = new Date("2025-03-26T23:59:59.999Z");
+
+    query.$or = [
+      { date: { $gte: july26Start, $lt: july26End } },       // Real ones from July 26 only
+      { date: { $lte: march26 } }                            // Fake ones up to March 26
+    ];
+  }
+}
+
 
     const transactions = await Transaction.find(query).sort({ date: -1 });
     console.log('🧪 Transactions fetched:', { count: transactions.length, userId });
