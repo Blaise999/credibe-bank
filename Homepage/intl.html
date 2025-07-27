@@ -26,16 +26,12 @@
   </style>
 </head>
 <body>
-
   <!-- Header -->
   <header class="bg-[#1e1e1e] py-6 px-8 shadow-md flex justify-between items-center">
-    <!-- Logo -->
     <div class="flex items-center space-x-3">
       <img src="credibe.png" alt="Credibe Logo" class="h-9 w-9 sm:h-10 sm:w-10 rounded-full object-contain bg-white p-[2px]" />
       <span class="text-xl sm:text-2xl font-bold text-[#00b4d8] tracking-wide">Credibe</span>
     </div>
-
-    <!-- Back -->
     <a href="dashboard.html" class="text-[#00b4d8] hover:text-[#009bc2] text-2xl sm:text-3xl transition" title="Back">←</a>
   </header>
 
@@ -48,12 +44,10 @@
         <label class="block mb-2">Bank Name</label>
         <input type="text" id="bank-name" required class="w-full px-4 py-2 rounded-md border" placeholder="e.g. Bank of America" />
       </div>
-
       <div>
         <label class="block mb-2">Account Holder Name</label>
         <input type="text" id="account-name" required class="w-full px-4 py-2 rounded-md border" placeholder="e.g. John McGuinn" />
       </div>
-
       <div>
         <label class="block mb-2">Account Type</label>
         <select id="account-type" required class="w-full px-4 py-2 rounded-md border">
@@ -63,136 +57,189 @@
           <option value="Business">Business</option>
         </select>
       </div>
-
       <div>
         <label class="block mb-2">Account Number</label>
         <input type="text" id="account-number" required class="w-full px-4 py-2 rounded-md border" placeholder="e.g. 1234567890" />
       </div>
-
       <div>
         <label class="block mb-2">Routing Number</label>
         <input type="text" id="routing-number" required class="w-full px-4 py-2 rounded-md border" placeholder="e.g. 026009593" />
       </div>
-
       <div>
         <label class="block mb-2">SWIFT / BIC Code</label>
         <input type="text" id="swift" required class="w-full px-4 py-2 rounded-md border" placeholder="e.g. BOFAUS3N" />
       </div>
-
       <div>
         <label class="block mb-2">Bank Address</label>
         <textarea id="bank-address" required rows="3" class="w-full px-4 py-2 rounded-md border" placeholder="e.g. 123 Main Street, New York, NY, USA"></textarea>
       </div>
-
       <div>
         <label class="block mb-2">Transfer Amount (USD)</label>
         <input type="number" id="amount" required class="w-full px-4 py-2 rounded-md border" placeholder="e.g. 5000" />
       </div>
-
       <div>
         <label class="block mb-2">Reference / Purpose</label>
         <input type="text" id="reference" class="w-full px-4 py-2 rounded-md border" placeholder="e.g. Tuition Payment" />
       </div>
-
-      <!-- OTP Section -->
       <div id="transferOtpSection" class="hidden">
         <label class="block mb-2">OTP</label>
         <input type="text" id="transfer-otp" class="w-full px-4 py-2 rounded-md border" placeholder="Enter OTP" />
       </div>
-
-      <!-- Submit -->
-      <button type="submit" id="submit-transfer" class="w-full bg-[#00b4d8] hover:bg-[#009bc2] text-white font-semibold py-3 rounded-md mt-4 transition">
-        Initiate Transfer
+      <button type="submit" id="submit-transfer" class="w-full bg-[#00b4d8] hover:bg-[#009bc2] text-white font-semibold py-3 rounded-md mt-4 transition flex items-center justify-center gap-2">
+        <span id="submit-text">Initiate Transfer</span>
+        <svg id="submit-spinner" class="hidden animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
       </button>
     </form>
   </main>
 
-  <!-- Script -->
- <script>
-  const form = document.getElementById("intl-transfer-form");
-  const transferOtpSection = document.getElementById("transferOtpSection");
+  <script>
+    const form = document.getElementById("intl-transfer-form");
+    const transferOtpSection = document.getElementById("transferOtpSection");
+    const submitBtn = document.getElementById("submit-transfer");
+    const submitText = document.getElementById("submit-text");
+    const submitSpinner = document.getElementById("submit-spinner");
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-    const details = {
-      bankName: document.getElementById("bank-name").value.trim(),
-      accountName: document.getElementById("account-name").value.trim(),
-      accountType: document.getElementById("account-type").value,
-      accountNumber: document.getElementById("account-number").value.trim(),
-      routingNumber: document.getElementById("routing-number").value.trim(),
-      swift: document.getElementById("swift").value.trim(),
-      bankAddress: document.getElementById("bank-address").value.trim(),
-      amount: parseFloat(document.getElementById("amount").value),
-      reference: document.getElementById("reference").value.trim(),
-      otp: document.getElementById("transfer-otp").value.trim(),
-    };
+      // Check if user is blocked in localStorage
+      if (localStorage.getItem("isBlocked") === "true") {
+        window.location.href = "blocked.html";
+        return;
+      }
 
-    const token = localStorage.getItem("userToken");
+      // Get form details
+      const details = {
+        bankName: document.getElementById("bank-name").value.trim(),
+        accountName: document.getElementById("account-name").value.trim(),
+        accountType: document.getElementById("account-type").value,
+        accountNumber: document.getElementById("account-number").value.trim(),
+        routingNumber: document.getElementById("routing-number").value.trim(),
+        swift: document.getElementById("swift").value.trim(),
+        bankAddress: document.getElementById("bank-address").value.trim(),
+        amount: parseFloat(document.getElementById("amount").value),
+        reference: document.getElementById("reference").value.trim(),
+        otp: document.getElementById("transfer-otp").value.trim(),
+      };
 
-    if (!details.otp) {
+      // Validate inputs
+      if (!details.bankName || !details.accountName || !details.accountType || !details.accountNumber || !details.routingNumber || !details.swift || !details.bankAddress || isNaN(details.amount) || details.amount <= 0) {
+        alert("Please fill all required fields with valid data.");
+        return;
+      }
+
+      if (!/^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2,5}$/.test(details.swift)) {
+        alert("Invalid SWIFT/BIC format (must be 8 or 11 uppercase letters/digits).");
+        return;
+      }
+
+      if (!/^\d{9}$/.test(details.routingNumber)) {
+        alert("Invalid routing number (must be 9 digits).");
+        return;
+      }
+
+      // Show spinner
+      submitText.classList.add("hidden");
+      submitSpinner.classList.remove("hidden");
+      submitBtn.disabled = true;
+
+      const token = localStorage.getItem("userToken");
+
+      // Step 1: Request OTP if not provided
+      if (!details.otp) {
+        try {
+          const res = await fetch("https://credibe-backends.onrender.com/api/transfer/send-otp", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ type: "transfer" })
+          });
+
+          const data = await res.json();
+          if (!res.ok) {
+            if (data.error === "user blocked") {
+              localStorage.setItem("isBlocked", "true");
+              window.location.href = "blocked.html";
+              return;
+            }
+            throw new Error(data.error || "Failed to send OTP");
+          }
+
+          alert("📩 OTP sent to your email.");
+          transferOtpSection.classList.remove("hidden");
+        } catch (err) {
+          console.error("❌ OTP send error:", err.message);
+          alert("❌ Error sending OTP: " + err.message);
+        } finally {
+          submitText.classList.remove("hidden");
+          submitSpinner.classList.add("hidden");
+          submitBtn.disabled = false;
+        }
+        return;
+      }
+
+      // Step 2: Submit Transfer
       try {
-        const res = await fetch("https://credibe-backends.onrender.com/api/transfer/send-otp", {
+        const res = await fetch("https://credibe-backends.onrender.com/api/transfer/initiate", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${token}`,
           },
-          body: JSON.stringify({ type: "transfer" })
+          body: JSON.stringify({
+            toIban: details.swift,
+            recipient: details.accountName,
+            amount: details.amount,
+            note: details.reference || "International Transfer",
+            otp: details.otp,
+            type: "international",
+            bankName: details.bankName,
+            accountType: details.accountType,
+            accountNumber: details.accountNumber,
+            routingNumber: details.routingNumber,
+            bankAddress: details.bankAddress
+          }),
         });
 
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "OTP error");
+        if (!res.ok) {
+          if (data.error === "user blocked") {
+            localStorage.setItem("isBlocked", "true");
+            window.location.href = "blocked.html";
+            return;
+          }
+          throw new Error(data.error || "Transfer failed");
+        }
 
-        alert("📩 OTP sent to your email.");
-        transferOtpSection.classList.remove("hidden");
-        return;
-      } catch (err) {
-        alert("❌ Error sending OTP: " + err.message);
-        return;
-      }
-    }
-
-    // ✅ Step 2: Submit Transfer
-    try {
-      const res = await fetch("https://credibe-backends.onrender.com/api/transfer/initiate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          toIban: details.swift,
-          recipient: details.accountName,
+        // Save pending transaction for UI
+        localStorage.setItem("intlTransferPending", JSON.stringify({
+          bankName: details.bankName,
+          accountName: details.accountName,
+          accountType: details.accountType,
+          accountNumber: details.accountNumber,
+          routingNumber: details.routingNumber,
+          swift: details.swift,
+          bankAddress: details.bankAddress,
           amount: details.amount,
-          note: details.reference || "International Transfer",
-          otp: details.otp,
-          type: "international"
-        }),
-      });
+          reference: details.reference,
+          transferId: data.transactionId
+        }));
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Transfer failed");
-
-      // ✅ Save pending transaction for UI
-     localStorage.setItem("intlTransferPending", JSON.stringify({
-  bankName: details.bankName,
-  accountName: details.accountName,
-  accountType: details.accountType,
-  accountNumber: details.accountNumber,
-  routingNumber: details.routingNumber,
-  swift: details.swift,
-  bankAddress: details.bankAddress,
-  amount: details.amount,
-  reference: details.reference,
-  transferId: data.transactionId
-}));
-
-      window.location.href = "transfer-pending-intl.html";
-    } catch (err) {
-      alert("❌ Transfer Failed: " + err.message);
-    }
-  });
-</script>
+        window.location.href = "transfer-pending-intl.html";
+      } catch (err) {
+        console.error("❌ Transfer error:", err.message);
+        alert("❌ Transfer Failed: " + err.message);
+      } finally {
+        submitText.classList.remove("hidden");
+        submitSpinner.classList.add("hidden");
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
 </body>
 </html>
