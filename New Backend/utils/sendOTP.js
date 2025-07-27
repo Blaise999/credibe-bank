@@ -36,7 +36,7 @@ const sendOTP = async ({ to, subject, body, isHtml = false, pdfBuffer = null }) 
     console.log('📤 Preparing to send email to:', to);
 
     const response = await resend.emails.send({
-      from: 'support@credibe-finance.com',
+      from: 'support@thecredibe.com',
       to,
       subject,
       html: emailContent,

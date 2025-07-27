@@ -188,7 +188,7 @@ exports.handleTransaction = async (req, res) => {
             <p><strong>🆔 Transaction ID:</strong> {{transactionId}}</p>
             <p><strong>📅 Date:</strong> {{date}}</p>
           </div>
-          <p style="font-size:14px;">You can view this transaction on your dashboard. If you did not authorize this, please contact <a href="mailto:support@credibe-finance.com" style="color:#00b4d8;">support@credibe-finance.com</a> immediately.</p>
+          <p style="font-size:14px;">You can view this transaction on your dashboard. If you did not authorize this, please contact <a href="mailto:support@thecredibe.com" style="color:#00b4d8;">support@thecredibe.com</a> immediately.</p>
           <hr style="border:none; border-top:1px solid #333; margin:2rem 0;" />
           <p style="font-size:12px; color:#888; text-align:center;">
             This is a system-generated notification from Credibe (Europe HQ).<br />
