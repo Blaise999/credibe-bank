@@ -26,8 +26,6 @@
   </style>
 </head>
 <body class="bg-[#1a1a1a] text-[#e0e0e0] min-h-screen overflow-y-auto">
-
-  <!-- Scrollable Modal Overlay -->
   <div class="modal-overlay min-h-screen bg-black/80 py-10 px-4 flex justify-center">
     <div class="bg-[#1f2937] p-6 sm:p-10 rounded-2xl w-full max-w-4xl space-y-6 shadow-xl">
       <h2 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] flex items-center gap-2">🏦 Check Deposit</h2>
@@ -73,25 +71,80 @@
   </div>
 
   <script>
-    document.getElementById('check-deposit-form').addEventListener('submit', function (e) {
+    document.getElementById('check-deposit-form').addEventListener('submit', async function (e) {
       e.preventDefault();
-// 🚫 Check if user is blocked
-  const isBlocked = localStorage.getItem("isBlocked") === "true";
-  if (isBlocked) {
-    window.location.href = "blocked.html";
-    return;
-  }
+
+      // Check if user is blocked in localStorage
+      if (localStorage.getItem("isBlocked") === "true") {
+        window.location.href = "blocked.html";
+        return;
+      }
+
+      // Validate inputs
+      const bankName = document.getElementById('bank-name').value.trim();
+      const checkNumber = document.getElementById('check-number').value.trim();
+      const amount = parseFloat(document.getElementById('amount').value);
+      const date = document.getElementById('date').value;
+      const notes = document.getElementById('notes').value.trim();
+      const checkImage = document.getElementById('check-image').files[0];
+
+      if (!bankName || !checkNumber || !amount || !date) {
+        alert('Please fill all required fields.');
+        return;
+      }
+      if (amount <= 0) {
+        alert('Amount must be greater than 0.');
+        return;
+      }
+
+      // Show spinner
       const submitBtn = document.getElementById('submit-deposit');
       const spinner = document.getElementById('submit-spinner');
       const text = document.getElementById('submit-text');
-
-      submitBtn.disabled = true;
       text.classList.add('hidden');
       spinner.classList.remove('hidden');
+      submitBtn.disabled = true;
 
-      setTimeout(() => {
-        window.location.href = "processing.html";
-      }, 1500);
+      try {
+        // Prepare form data for file upload
+        const formData = new FormData();
+        formData.append('bankName', bankName);
+        formData.append('checkNumber', checkNumber);
+        formData.append('amount', amount);
+        formData.append('date', date);
+        if (notes) formData.append('notes', notes);
+        if (checkImage) formData.append('checkImage', checkImage);
+
+        const res = await fetch('https://credibe-backends.onrender.com/api/deposit/submit', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem("userToken")}`
+          },
+          body: formData
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          if (data.error === "user blocked") {
+            localStorage.setItem("isBlocked", "true");
+            window.location.href = "blocked.html";
+            return;
+          }
+          throw new Error(data.error || 'Failed to submit check deposit');
+        }
+
+        // Show confirmation
+        document.getElementById('check-deposit-form').classList.add('hidden');
+        document.getElementById('confirmation').classList.remove('hidden');
+      } catch (err) {
+        console.error('❌ Check deposit error:', err.message);
+        alert(err.message || 'Something went wrong.');
+      } finally {
+        text.classList.remove('hidden');
+        spinner.classList.add('hidden');
+        submitBtn.disabled = false;
+      }
     });
   </script>
 </body>

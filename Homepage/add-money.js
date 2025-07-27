@@ -1,6 +1,12 @@
 // add-money.js
 
 async function submitTopUp() {
+  // Check if user is blocked in localStorage
+  if (localStorage.getItem("isBlocked") === "true") {
+    window.location.href = "blocked.html";
+    return;
+  }
+
   const amount = parseFloat(document.getElementById("topUpAmount").value);
   const userId = localStorage.getItem("userId"); // Temporary
 

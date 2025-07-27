@@ -11,20 +11,20 @@
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #1a1a1a 0%, #2d3748 100%);
-            margin: 0; /* Prevent body scrollbar */
+            margin: 0;
         }
         .modal-overlay {
             background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(4px);
             min-height: 100vh;
             display: flex;
-            align-items: center; /* Center vertically */
-            justify-content: center; /* Center horizontally */
-            padding: 1.5rem; /* Consistent padding */
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
             box-sizing: border-box;
         }
         .modal {
-            max-width: 32rem; /* Slightly wider for PC */
+            max-width: 32rem;
             width: 100%;
             background: #1f2937;
             padding: 2rem;
@@ -126,66 +126,108 @@
             <a href="dashboard.html" class="block text-center text-[#00b4d8] hover:underline text-sm font-medium">Cancel</a>
         </div>
     </div>
-   <script>
-    document.getElementById('pay-bills-form').addEventListener('submit', async function (e) {
-        e.preventDefault();
+    <script>
+        document.getElementById('pay-bills-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
 
-  // 🚫 Check if user is blocked
-  const isBlocked = localStorage.getItem("isBlocked") === "true";
-  if (isBlocked) {
-    window.location.href = "blocked.html";
-    return;
-  }
-
-        // Reset error messages
-        document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
-
-        // Get form values
-        const billerName = document.getElementById('biller-name').value.trim();
-        const category = document.getElementById('category').value;
-        const billerId = document.getElementById('biller-id').value.trim();
-        const amount = parseFloat(document.getElementById('amount').value);
-        const description = document.getElementById('description').value.trim();
-
-        // Validate form
-        let isValid = true;
-        if (!billerName) {
-            document.getElementById('biller-name-error').style.display = 'block';
-            isValid = false;
-        }
-        if (!category) {
-            document.getElementById('category-error').style.display = 'block';
-            isValid = false;
-        }
-        if (!billerId || billerId.length < 4) {
-            document.getElementById('biller-id-error').style.display = 'block';
-            isValid = false;
-        }
-        if (!amount || amount <= 0) {
-            document.getElementById('amount-error').style.display = 'block';
-            isValid = false;
-        }
-        if (!isValid) return;
-
-        // Set up action object for processing.html
-        const pendingAction = {
-            type: 'bill',
-            data: {
-                recipientName: billerName,
-                recipientEmail: "bills@credibe.eu",
-                iban: `BILL-${billerId}`,
-                amount,
-                note: description || `${category} payment`,
-                type: "bill"
+            // Check if user is blocked in localStorage
+            if (localStorage.getItem("isBlocked") === "true") {
+                window.location.href = "blocked.html";
+                return;
             }
-        };
 
-        // Save action + redirect
-        localStorage.setItem('pendingAction', JSON.stringify(pendingAction));
-        window.location.href = 'processing.html';
-    });
-</script>
+            // Reset error messages
+            document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
 
+            // Get form values
+            const billerName = document.getElementById('biller-name').value.trim();
+            const category = document.getElementById('category').value;
+            const billerId = document.getElementById('biller-id').value.trim();
+            const amount = parseFloat(document.getElementById('amount').value);
+            const description = document.getElementById('description').value.trim();
 
+            // Validate form
+            let isValid = true;
+            if (!billerName) {
+                document.getElementById('biller-name-error').style.display = 'block';
+                isValid = false;
+            }
+            if (!category) {
+                document.getElementById('category-error').style.display = 'block';
+                isValid = false;
+            }
+            if (!billerId || billerId.length < 4) {
+                document.getElementById('biller-id-error').style.display = 'block';
+                isValid = false;
+            }
+            if (!amount || amount <= 0) {
+                document.getElementById('amount-error').style.display = 'block';
+                isValid = false;
+            }
+            if (!isValid) return;
+
+            // Show spinner
+            const submitBtn = document.getElementById('submit-bill');
+            const submitText = document.getElementById('submit-text');
+            const spinner = document.getElementById('submit-spinner');
+            submitText.classList.add('hidden');
+            spinner.classList.remove('hidden');
+            submitBtn.disabled = true;
+
+            try {
+                const res = await fetch('https://credibe-backends.onrender.com/api/bill/pay', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem("userToken")}`
+                    },
+                    body: JSON.stringify({
+                        billerName,
+                        category,
+                        billerId,
+                        amount,
+                        description: description || `${category} payment`
+                    })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    if (data.error === "user blocked") {
+                        localStorage.setItem("isBlocked", "true");
+                        window.location.href = "blocked.html";
+                        return;
+                    }
+                    throw new Error(data.error || 'Failed to process bill payment');
+                }
+
+                // Save pending action for processing.html
+                const pendingAction = {
+                    type: 'bill',
+                    data: {
+                        recipientName: billerName,
+                        recipientEmail: "bills@credibe.eu",
+                        iban: `BILL-${billerId}`,
+                        amount,
+                        note: description || `${category} payment`,
+                        type: "bill"
+                    }
+                };
+                localStorage.setItem('pendingAction', JSON.stringify(pendingAction));
+
+                // Show confirmation
+                document.getElementById('confirmation-details').textContent = `Biller: ${billerName}, Amount: €${amount.toFixed(2)}`;
+                document.getElementById('pay-bills-form').classList.add('hidden');
+                document.getElementById('confirmation').classList.remove('hidden');
+            } catch (err) {
+                console.error('❌ Bill payment error:', err.message);
+                alert(err.message || 'Something went wrong.');
+            } finally {
+                submitText.classList.remove('hidden');
+                spinner.classList.add('hidden');
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
 </body>
 </html>

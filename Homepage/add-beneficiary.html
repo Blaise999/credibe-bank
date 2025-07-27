@@ -72,41 +72,73 @@
     const submitText = document.getElementById('submit-text');
     const spinner = document.getElementById('submit-spinner');
 
-    form.addEventListener('submit', function (e) {
+    form.addEventListener('submit', async function (e) {
       e.preventDefault();
-      // 🚫 Check if user is blocked
-  const isBlocked = localStorage.getItem("isBlocked") === "true";
-  if (isBlocked) {
-    window.location.href = "blocked.html";
-    return;
-  }
 
+      // Check if user is blocked in localStorage
+      if (localStorage.getItem("isBlocked") === "true") {
+        window.location.href = "blocked.html";
+        return;
+      }
+
+      // Validate inputs
+      const name = document.getElementById('full-name').value.trim();
+      const iban = document.getElementById('iban').value.trim();
+      const bank = document.getElementById('bank-name').value.trim();
+
+      if (!name || !iban || !bank) {
+        alert('Please fill all required fields.');
+        return;
+      }
+
+      if (!/^[A-Z]{2}\d{2}[A-Z0-9]{4,30}$/.test(iban.replace(/\s/g, ''))) {
+        alert('Invalid IBAN format.');
+        return;
+      }
 
       // Show spinner
       submitText.classList.add('hidden');
       spinner.classList.remove('hidden');
       submitBtn.disabled = true;
 
-      // Mock saving delay
-      setTimeout(() => {
-        form.classList.add('hidden');
-        confirmation.classList.remove('hidden');
+      try {
+        const res = await fetch('https://credibe-backends.onrender.com/api/beneficiary/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem("userToken")}`
+          },
+          body: JSON.stringify({ fullName: name, iban, bankName: bank })
+        });
 
-        // Reset button
-        submitText.classList.remove('hidden');
-        spinner.classList.add('hidden');
-        submitBtn.disabled = false;
+        const data = await res.json();
 
-        // (Optional) Save to localStorage if you want to use this later
-        const name = document.getElementById('full-name').value.trim();
-        const iban = document.getElementById('iban').value.trim();
-        const bank = document.getElementById('bank-name').value.trim();
+        if (!res.ok) {
+          if (data.error === "user blocked") {
+            localStorage.setItem("isBlocked", "true");
+            window.location.href = "blocked.html";
+            return;
+          }
+          throw new Error(data.error || 'Failed to add beneficiary');
+        }
 
-        const newBeneficiary = { name, iban, bank };
+        // Save to localStorage for frontend consistency
+        const newBeneficiary = { fullName: name, iban, bank };
         const existing = JSON.parse(localStorage.getItem('beneficiaries') || '[]');
         existing.push(newBeneficiary);
         localStorage.setItem('beneficiaries', JSON.stringify(existing));
-      }, 1200);
+
+        // Show confirmation
+        form.classList.add('hidden');
+        confirmation.classList.remove('hidden');
+      } catch (err) {
+        console.error('❌ Beneficiary add error:', err.message);
+        alert(err.message || 'Something went wrong.');
+      } finally {
+        submitText.classList.remove('hidden');
+        spinner.classList.add('hidden');
+        submitBtn.disabled = false;
+      }
     });
 
     window.addEventListener('load', () => {
