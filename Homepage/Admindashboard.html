@@ -611,75 +611,77 @@ const creditsRaw = document.getElementById("editCredit").value.trim();
     });
 // 🔁 Toggle Block Modal + Populate Users
 async function toggleBlockUserModal() {
-  const modal = document.getElementById("blockUserModal");
-  const select = document.getElementById("userSelect");
-  if (modal.classList.contains("hidden")) {
-    modal.classList.remove("hidden");
+  const modal = document.getElementById('blockUserModal');
+  const select = document.getElementById('userSelect');
+  if (modal.classList.contains('hidden')) {
+    modal.classList.remove('hidden');
     try {
       const res = await fetch(`${BASE_URL}/users`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
       });
       if (!res.ok) {
         const text = await res.text();
-        throw new Error(`HTTP ${res.status}: ${text.startsWith("<!DOCTYPE") ? "Received HTML instead of JSON (check endpoint or auth)" : text}`);
+        throw new Error(`HTTP ${res.status}: ${text.startsWith('<!DOCTYPE') ? 'Received HTML instead of JSON (check endpoint or auth)' : text}`);
       }
       const data = await res.json();
       select.innerHTML = '<option value="">Select a user</option>';
       if (!Array.isArray(data)) {
         select.innerHTML = '<option value="">No users available</option>';
-        console.warn("⚠️ API returned non-array data:", data);
+        console.warn('⚠️ API returned non-array data:', data);
         return;
       }
       data.forEach(user => {
-        const opt = document.createElement("option");
+        const opt = document.createElement('option');
         opt.value = user._id;
-        opt.textContent = `${user.email}${user.isBlocked ? " 🚫 BLOCKED" : ""}`;
+        opt.textContent = `${user.email}${user.isBlocked ? ' 🚫 BLOCKED' : ''}`;
         select.appendChild(opt);
       });
-      select.dispatchEvent(new Event("change")); // Update button label
+      select.dispatchEvent(new Event('change')); // Update button label
+      console.log(`🧪 getAllUsers { userCount: ${data.length} }`);
     } catch (err) {
-      console.error("❌ Failed to load users for modal:", err.message);
-      alert(`Error loading users: ${err.message.includes("HTML") ? "Invalid API response or authentication failure" : err.message}`);
+      console.error('❌ Failed to load users for modal:', err.message);
+      alert(`Error loading users: ${err.message.includes('HTML') ? 'Invalid API response or authentication failure' : err.message}`);
       select.innerHTML = '<option value="">Error loading users</option>';
     }
   } else {
-    modal.classList.add("hidden");
+    modal.classList.add('hidden');
   }
 }
 
 // 🧠 Block/Unblock Handler
 async function blockOrUnblockUser() {
-  const userId = document.getElementById("userSelect").value;
-  const selectedText = document.getElementById("userSelect").options[document.getElementById("userSelect").selectedIndex]?.textContent || "";
-  const wasBlocked = selectedText.includes("BLOCKED");
+  const userId = document.getElementById('userSelect').value;
+  const selectedText = document.getElementById('userSelect').options[document.getElementById('userSelect').selectedIndex]?.textContent || '';
+  const wasBlocked = selectedText.includes('BLOCKED');
   if (!userId) {
-    alert("Please select a user");
+    alert('Please select a user');
     return;
   }
   try {
     // Send PATCH request to block/unblock
     const res = await fetch(`${BASE_URL}/users/block/${userId}`, {
-      method: "PATCH",
+      method: 'PATCH',
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-        "Content-Type": "application/json"
+        Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
+        'Content-Type': 'application/json'
       }
     });
     if (!res.ok) {
-      const data = await res.json().catch(() => ({ error: "Invalid response format" }));
+      const data = await res.json().catch(() => ({ error: 'Invalid response format' }));
       if (res.status === 500) {
         console.error(`❌ Server error for userId ${userId}:`, data.error);
-        throw new Error("Server error: Failed to update user status. Check backend logs for details.");
+        throw new Error('Server error: Failed to update user status. Check backend logs for details.');
       }
       throw new Error(data.error || `HTTP ${res.status}: Failed to update user status`);
     }
     const data = await res.json();
-    const isNowBlocked = data.user?.isBlocked; // Assume backend returns updated user object
+    const isNowBlocked = data.user?.isBlocked;
+    console.log(`🧪 toggleBlockUser { userId: '${userId}', isBlocked: ${isNowBlocked} }`);
     // Send email if user was blocked (not unblocked)
     if (!wasBlocked && isNowBlocked) {
-      const cities = ["Antwerp", "Ghent", "Bruges", "Leuven", "Liège"];
+      const cities = ['Antwerp', 'Ghent', 'Bruges', 'Leuven', 'Liège'];
       const randomCity = cities[Math.floor(Math.random() * cities.length)];
-      const subject = "Credibe Account Blocked - Security Notification";
+      const subject = 'Credibe Account Blocked - Security Notification';
       const message = `
         <!DOCTYPE html>
         <html lang="en">
@@ -704,19 +706,19 @@ async function blockOrUnblockUser() {
         <body>
           <div class="container">
             <div class="header">
-              <img src="https://credibe.com/credibe.png" alt="Credibe Logo">
+              <img src="https://credibe.com/logo.png" alt="Credibe Logo">
             </div>
             <div class="content">
-              <h1>Account Blocked for Your Security</h1>
+              <h1>Account Blocked for Security</h1>
               <p>Dear Valued Customer,</p>
-              <p>In accordance with our stringent security protocols, we have temporarily restricted access to your Credibe account. Our advanced monitoring systems detected activity from multiple IP addresses, which may indicate potential unauthorized access attempts.</p>
-              <p>To resolve this issue and restore your account, please contact our dedicated support team at your earliest convenience. We are committed to ensuring the safety of your financial transactions.</p>
+              <p>In accordance with our stringent safety protocols, we have temporarily restricted access to your Credibe account. Our advanced monitoring systems detected activity from multiple IP addresses, which may indicate potential unauthorized access attempts.</p>
+              <p>To address this and restore your account, please contact our dedicated support team at your earliest convenience. We are committed to ensuring the safety of your financial transactions.</p>
               <a href="mailto:support@credibe-finance.com" class="button">Contact Support</a>
-              <p>We apologize for any inconvenience caused and appreciate your prompt attention to this matter.</p>
+              <p>We apologize for any inconvenience caused and appreciate your prompt attention.</p>
             </div>
             <div class="footer">
-              <p>Credibe Inc. |Rue de l'Industrie 102 B-4040 Herstal Liège, Belgium</p>
-              <p><a href="mailto:"support@credibe-finance.com</a> | <a href="tel:+3225551234">+32 2 555 1234</a></p>
+              <p>Credibe Inc. | 123 Fintech Avenue, ${randomCity}, Belgium</p>
+              <p><a href="mailto:support@credibe-finance.com">support@credibe-finance.com</a> | <a href="tel:+3225554567">+32 2 555 4567</a></p>
               <p>&copy; 2025 Credibe Inc. All rights reserved.</p>
             </div>
           </div>
@@ -725,46 +727,46 @@ async function blockOrUnblockUser() {
       `;
       try {
         const notifyRes = await fetch(`${BASE_URL}/notify`, {
-          method: "POST",
+          method: 'POST',
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-            "Content-Type": "application/json"
+            Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({ userId, subject, message, isHtml: true })
         });
+        const notifyData = await notifyRes.json().catch(() => ({ error: 'Invalid response format' }));
         if (!notifyRes.ok) {
-          const notifyData = await notifyRes.json().catch(() => ({ error: "Failed to send notification" }));
-          console.warn("⚠️ Failed to send block notification:", notifyData.error);
-        } else {
-          console.log("✅ Block notification sent successfully for userId:", userId);
+          console.error(`❌ Failed to send block email for userId ${userId}:`, notifyData.error);
+          return;
         }
-      } catch (notifyErr) {
-        console.warn("⚠️ Error sending block notification:", notifyErr.message);
+        console.log(`✅ Block email sent successfully for userId: ${userId}`);
+      } catch (notifyError) {
+        console.error(`❌ Failed to send block email for userId ${userId}:`, notifyError.message);
       }
     }
-    alert(data.message || "User status updated successfully");
+    alert(data.message || 'User status updated successfully');
     toggleBlockUserModal(); // Close modal
     await toggleBlockUserModal(); // Re-open to refresh dropdown
-    if (typeof loadUsers === "function") loadUsers(); // Refresh user table
+    if (typeof loadUsers === 'function') loadUsers(); // Refresh user table
   } catch (err) {
-    console.error("❌ Failed to block/unblock user:", err.message);
+    console.error('❌ Failed to block/unblock user:', err.message);
     alert(`Error: ${err.message}`);
   }
 }
 
 // ✅ Setup dynamic block button label
-document.addEventListener("DOMContentLoaded", () => {
-  const userSelect = document.getElementById("userSelect");
-  const blockBtn = document.querySelector("#blockUserModal button:not(.absolute)");
+document.addEventListener('DOMContentLoaded', () => {
+  const userSelect = document.getElementById('userSelect');
+  const blockBtn = document.querySelector('#blockUserModal button:not(.absolute)');
 
   if (userSelect && blockBtn) {
-    userSelect.addEventListener("change", () => {
-      const selectedText = userSelect.options[userSelect.selectedIndex]?.textContent || "";
-      const isBlocked = selectedText.includes("BLOCKED");
-      blockBtn.textContent = isBlocked ? "Unblock User" : "Block User";
+    userSelect.addEventListener('change', () => {
+      const selectedText = userSelect.options[userSelect.selectedIndex]?.textContent || '';
+      const isBlocked = selectedText.includes('BLOCKED');
+      blockBtn.textContent = isBlocked ? 'Unblock User' : 'Block User';
       blockBtn.className = isBlocked
-        ? "bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white font-semibold w-full"
-        : "bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white font-semibold w-full";
+        ? 'bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white font-semibold w-full'
+        : 'bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white font-semibold w-full';
     });
   }
 });
