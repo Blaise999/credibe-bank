@@ -1,6 +1,6 @@
 const Transaction = require("../models/Transaction");
 const User = require("../models/User");
-const sendOTP = require("../utils/sendOTP");
+const { sendOTP } = require("../utils/sendOTP");
 const { setOtp, getOtp, clearOtp, otpStore } = require("../utils/otpMemory");
 
 // 🔐 Step 1: Request OTP before transfer (Used by dashboard)
