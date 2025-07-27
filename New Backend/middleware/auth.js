@@ -18,15 +18,15 @@ const verifyToken = async (req, res, next) => {
       return res.status(401).json({ error: "Invalid token payload: missing user ID" });
     }
 
-   const user = await User.findById(decoded.id).select("email phone name role isBlocked");
+    const user = await User.findById(decoded.id).select("email phone name role isBlocked");
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
-if (!user) {
-  return res.status(404).json({ error: "User not found" });
-}
-
-if (user.isBlocked) {
-  return res.status(403).json({ error: "User is blocked" });
-}
+    // ✅ Only block if user is blocked AND trying to modify data
+    if (user.isBlocked && req.method !== 'GET') {
+      return res.status(403).json({ error: "User is blocked" });
+    }
 
     req.user = {
       id: user._id,
@@ -64,7 +64,7 @@ const verifyAdminToken = async (req, res, next) => {
 };
 
 module.exports = {
-  verifyToken,         // ✅ keep for generic use
-  verifyUserToken,     // ✅ unchanged
-  isAdmin: verifyAdminToken  // ✅ updated to use full DB lookup
+  verifyToken,
+  verifyUserToken,
+  isAdmin: verifyAdminToken
 };

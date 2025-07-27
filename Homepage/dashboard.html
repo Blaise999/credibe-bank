@@ -152,13 +152,11 @@
 <body class="bg-[#1a1a1a] text-[#e0e0e0] min-h-screen flex flex-col overflow-x-hidden">
 <!-- Header with Credibe Logo Right, Menu Left -->
 <header class="bg-[#2d2d2d] p-3 sm:p-6 flex items-center justify-between sticky top-0 z-50 w-full shadow-md">
-  <!-- 🍔 Hamburger + Greeting -->
-  <div class="flex items-center space-x-2">
-    <button id="menu-toggle" class="text-white text-2xl md:hidden focus:outline-none" aria-label="Toggle mobile menu">
-      ☰
-    </button>
-    <span id="mobile-greeting" class="text-white text-base md:hidden"></span>
-  </div>
+
+  <!-- 🍔 Hamburger Left -->
+  <button id="menu-toggle" class="text-white text-2xl md:hidden focus:outline-none">
+    ☰
+  </button>
 
   <!-- 🏦 Logo + Text Right -->
   <div class="flex items-center space-x-4 ml-auto">
@@ -166,12 +164,14 @@
       <img src="credibe.png" class="h-8 w-8 rounded-full object-contain bg-white p-[2px]">
       <span class="text-2xl sm:text-3xl font-bold text-[#00b4d8]">Credibe</span>
     </a>
+
     <div class="hidden sm:flex items-center space-x-2">
       <span class="text-white text-base sm:text-lg font-medium bg-[#1e1f2a] px-3 py-1 rounded-full">
         👋 Welcome back
       </span>
     </div>
   </div>
+
 </header>
 
     <!-- Main Layout -->
@@ -189,16 +189,16 @@
             </nav>
         </aside>
 
-       <!-- Mobile Menu -->
-<nav id="mobile-menu" class="mobile-menu fixed top-[4rem] left-0 w-64 bg-[#2d2d2d] h-[calc(100vh-4rem)] p-2 space-y-2 transform transition-transform duration-300 ease-in-out md:hidden closed z-40">
-  <a href="#" data-page="dashboard" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">🏠 Dashboard</a>
-  <a href="#" data-page="accounts" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">💳 Accounts</a>
-  <a href="#" data-page="transfers" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">💸 Transfers</a>
-  <a href="#" data-page="transactions" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">📄 Transactions</a>
-  <a href="#" data-page="analytics" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">📊 Analytics</a>
-  <a href="#" data-page="security" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">🔒 Security</a>
-  <a href="#" data-page="settings" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">⚙️ Settings</a>
-</nav>
+        <!-- Mobile Menu -->
+        <nav id="mobile-menu" class="fixed top-[4rem] left-0 w-64 bg-[#2d2d2d] h-full p-2 space-y-2 transform transition-transform duration-300 ease-in-out md:hidden z-40 mobile-menu closed">
+            <a href="#" data-page="dashboard" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">🏠 Dashboard</a>
+            <a href="#" data-page="accounts" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">💳 Accounts</a>
+            <a href="#" data-page="transfers" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">💸 Transfers</a>
+            <a href="#" data-page="transactions" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">📄 Transactions</a>
+            <a href="#" data-page="analytics" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">📊 Analytics</a>
+            <a href="#" data-page="security" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">🔒 Security</a>
+            <a href="#" data-page="settings" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">⚙️ Settings</a>
+        </nav>
 
         <!-- Main Content Area -->
         <main class="flex-1 p-2 sm:p-4 w-full md:ml-64">
@@ -219,14 +219,14 @@
             <div class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md hover:scale-105 transition duration-300 ease-in-out">
                 <a href="add-money.html" class="block flex flex-col" aria-label="View Total Balance">
                     <h3 class="text-[#e0e0e0] font-semibold mt-1 sm:mt-2 text-sm sm:text-base">TOTAL BALANCE</h3>
-                    <p id="totalBalance" class="text-[#00b4d8] text-base sm:text-xl">$0.00</p>
+                    <p id="totalBalance" class="text-[#00b4d8] text-base sm:text-xl">€0.00</p>
                 </a>
             </div>
 
             <!-- Savings -->
             <div class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md hover:scale-105 transition duration-300 ease-in-out">
                 <h3 class="text-[#e0e0e0] font-semibold mt-1 sm:mt-2 text-sm sm:text-base">SAVINGS</h3>
-                <p id="savingsAmount" class="text-[#00b4d8] text-base sm:text-xl">$0.00</p>
+                <p id="savingsAmount" class="text-[#00b4d8] text-base sm:text-xl">€0.00</p>
             </div>
 
             <!-- Credit -->
@@ -235,7 +235,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 11h16M4 15h16M4 19h16" />
                 </svg>
                 <h3 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">Credit</h3>
-                <p id="creditAmount" class="text-[#00b4d8] text-base sm:text-xl">$0.00</p>
+                <p id="creditAmount" class="text-[#00b4d8] text-base sm:text-xl">€0.00</p>
             </div>
         </div>
 
@@ -346,28 +346,12 @@
     </div>
 </div>
 
-<!-- Transfers Page -->
+<<!-- Transfers Page -->
 <div id="transfers-page" class="page hidden">
-
-  <!-- Section Title + Tabs -->
-  <div class="text-center mb-6">
-    <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2">Transfers</h1>
-    <div class="flex justify-center space-x-2">
-      <!-- Local Tab (active) -->
-      <a href="#" class="bg-[#00b4d8] text-white font-medium px-4 py-2 rounded-lg shadow-md">
-        Local Transfer
-      </a>
-      <!-- International Tab -->
-      <a href="intl.html" class="bg-[#1a1a1a] border border-[#00b4d8] hover:bg-[#00b4d8]/10 text-[#00b4d8] font-medium px-4 py-2 rounded-lg shadow-md transition-all">
-        International Transfer
-      </a>
-    </div>
-  </div>
-
-  <!-- Local Transfer Form -->
+  <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Local Transfers (Europe)</h1>
   <div class="flex justify-center w-full">
     <form id="transfer-form" class="bg-[#1f2937]/50 backdrop-blur-md p-4 sm:p-6 rounded-lg sm:rounded-2xl shadow-md space-y-4 w-full max-w-md">
-
+      
       <!-- Recipient Name -->
       <div>
         <label for="recipient-name" class="block text-sm text-[#e0e0e0]">Recipient Name</label>
@@ -382,7 +366,7 @@
 
       <!-- Amount -->
       <div>
-        <label for="amount" class="block text-sm text-[#e0e0e0]">Amount ($)</label>
+        <label for="amount" class="block text-sm text-[#e0e0e0]">Amount (€)</label>
         <input type="number" id="amount" required step="0.01" min="0.01" class="w-full bg-[#1a1a1a]/50 text-[#e0e0e0] border border-[#444] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="e.g. 2500">
       </div>
 
@@ -594,9 +578,9 @@
     <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Buy Crypto</h1>
     <form id="buy-crypto-form" action="down.html" method="get" class="bg-[#1f2937]/50 backdrop-blur-md p-2 sm:p-6 rounded-lg sm:rounded-2xl drop-shadow-md space-y-4 sm:space-y-6 w-full max-w-xs sm:max-w-md">
         <div class="relative">
-            <label for="crypto-amount" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Amount ($)</label>
+            <label for="crypto-amount" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Amount (€)</label>
             <input type="number" id="crypto-amount" name="amount" step="0.01" min="0.01" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter amount" required>
-            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">$</span>
+            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">€</span>
         </div>
         <div class="relative">
             <label for="crypto-currency" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Currency</label>
@@ -644,9 +628,9 @@
             <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300">📋</span>
         </div>
         <div class="relative">
-            <label for="bill-amount" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Amount ($)</label>
+            <label for="bill-amount" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Amount (€)</label>
             <input type="number" id="bill-amount" name="amount" step="0.01" min="0.01" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter amount" required>
-            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">$</span>
+            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">€</span>
         </div>
         <div class="relative">
             <label for="description" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Description (Optional)</label>
@@ -705,215 +689,170 @@
   
 <script>
 (async () => {
- // Utility function to format dollar amounts
-function formatDollar(amount) {
-  return `$${Number(amount).toLocaleString('en-US', {
+function formatEuro(amount) {
+  return `€${Number(amount).toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   })}`;
 }
 
-
-  // 🔐 Check for user token
-  const token = localStorage.getItem("userToken");
-  if (!token) {
+    // 🔐 Check for user token
+const token = localStorage.getItem("userToken");
+if (!token) {
     alert("You must be logged in to view this page.");
     window.location.href = "login.html";
-    return;
-  }
-
-  // 🚫 Blocked User Form Protection
-  document.querySelectorAll("form").forEach(form => {
-    form.addEventListener("submit", e => {
-      const isBlocked = localStorage.getItem("isBlocked") === "true";
-      if (isBlocked) {
-        e.preventDefault();
-        window.location.href = "blocked.html";
-      }
-    });
-  });
-/// Mobile menu toggle and tap-outside-to-close
-const mobileMenu = document.getElementById("mobile-menu");
-const menuToggle = document.getElementById("menu-toggle");
-
-if (menuToggle && mobileMenu) {
-  menuToggle.addEventListener("click", (e) => {
-    e.stopPropagation(); // Prevent click from bubbling to document
-    const isOpen = mobileMenu.classList.contains("open");
-
-    if (isOpen) {
-      mobileMenu.classList.remove("open");
-      mobileMenu.classList.add("closed");
-    } else {
-      mobileMenu.classList.remove("closed");
-      mobileMenu.classList.add("open");
-    }
-    console.log(`Mobile menu toggled: ${isOpen ? "closed" : "open"}`);
-  });
-
-  // Tap-outside-to-close
-  document.addEventListener("click", (e) => {
-    const isMenuOpen = mobileMenu.classList.contains("open");
-    const isClickInsideMenu = mobileMenu.contains(e.target);
-    const isClickOnToggle = menuToggle.contains(e.target);
-
-    if (isMenuOpen && !isClickInsideMenu && !isClickOnToggle) {
-      mobileMenu.classList.remove("open");
-      mobileMenu.classList.add("closed");
-      console.log("Mobile menu closed by tapping outside");
-    }
-  });
 }
 
-// Handle window resize to hide mobile menu on desktop
-window.addEventListener("resize", () => {
-  if (window.innerWidth >= 768 && mobileMenu && mobileMenu.classList.contains("open")) {
-    mobileMenu.classList.remove("open");
-    mobileMenu.classList.add("closed");
-    console.log("Mobile menu hidden on resize to desktop");
-  }
-});
-  // Page Switching with Skeleton Loader
-  const navLinks = document.querySelectorAll('.nav-link');
-  const pages = document.querySelectorAll('.page');
-
-  function showPage(pageId) {
-    pages.forEach(page => {
-      page.classList.add('hidden');
-      if (page.__x && page.__x.$data) {
-        page.__x.$data.loading = true;
-      }
+    // Handle window resize to hide mobile menu on desktop
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768 && mobileMenu && !mobileMenu.classList.contains('closed')) {
+            mobileMenu.classList.add('closed');
+            mobileMenu.classList.remove('open');
+            console.log('Mobile menu hidden on resize to desktop');
+        }
     });
 
-    const activePage = document.getElementById(`${pageId}-page`);
-    if (activePage) {
-      setTimeout(() => {
-        activePage.classList.remove('hidden');
-        if (activePage.__x && page.__x.$data) {
-          activePage.__x.$data.loading = false;
+    // Page Switching with Skeleton Loader
+    const navLinks = document.querySelectorAll('.nav-link');
+    const pages = document.querySelectorAll('.page');
+
+    function showPage(pageId) {
+        pages.forEach(page => {
+            page.classList.add('hidden');
+            if (page.__x && page.__x.$data) {
+                page.__x.$data.loading = true;
+            }
+        });
+
+        const activePage = document.getElementById(`${pageId}-page`);
+        if (activePage) {
+            setTimeout(() => {
+                activePage.classList.remove('hidden');
+                if (activePage.__x && activePage.__x.$data) {
+                    activePage.__x.$data.loading = false;
+                }
+                if (pageId === 'transactions') {
+                    loadTransactions();
+                }
+            }, 500);
         }
-        if (pageId === 'transactions') {
-          loadTransactions();
+
+        navLinks.forEach(link => link.classList.remove('bg-[#3a3a3a]', 'text-[#00b4d8]'));
+        const activeLink = document.querySelector(`[data-page="${pageId}"]`);
+        if (activeLink) activeLink.classList.add('bg-[#3a3a3a]', 'text-[#00b4d8]');
+
+        if (window.innerWidth < 768 && mobileMenu) {
+            mobileMenu.classList.add('closed');
+            mobileMenu.classList.remove('open');
         }
-      }, 500);
+
+        console.log(`Switched to page: ${pageId}`);
     }
 
-    navLinks.forEach(link => link.classList.remove('bg-[#3a3a3a]', 'text-[#00b4d8]'));
-    const activeLink = document.querySelector(`[data-page="${pageId}"]`);
-    if (activeLink) activeLink.classList.add('bg-[#3a3a3a]', 'text-[#00b4d8]');
-
-    if (window.innerWidth < 768 && mobileMenu) {
-      mobileMenu.classList.add('closed');
-      mobileMenu.classList.remove('open');
-      document.getElementById("menu-toggle").textContent = '☰';
-    }
-
-    console.log(`Switched to page: ${pageId}`);
-  }
-
-  navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      const pageId = link.getAttribute('data-page');
-      showPage(pageId);
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const pageId = link.getAttribute('data-page');
+            showPage(pageId);
+        });
     });
-  });
 
-  // Charts
-  const spendingChartCtx = document.getElementById('spending-chart');
-  if (spendingChartCtx) {
-    try {
-      new Chart(spendingChartCtx.getContext('2d'), {
-        type: 'line',
-        data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-          datasets: [{
-            label: 'Spending',
-            data: [1200, 1900, 1500, 2200, 1800, 2500],
-            borderColor: '#00b4d8',
-            backgroundColor: 'rgba(0, 180, 216, 0.2)',
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#00b4d8',
-            pointBorderColor: '#e0e0e0'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: { beginAtZero: true, ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } },
-            x: { ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } }
-          },
-          plugins: { legend: { labels: { color: '#e0e0e0', font: { size: 12 } } } },
-          animation: { duration: 1000, easing: 'easeInOutQuad' }
+    // Charts
+    const spendingChartCtx = document.getElementById('spending-chart');
+    if (spendingChartCtx) {
+        try {
+            new Chart(spendingChartCtx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Spending',
+                        data: [1200, 1900, 1500, 2200, 1800, 2500],
+                        borderColor: '#00b4d8',
+                        backgroundColor: 'rgba(0, 180, 216, 0.2)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#00b4d8',
+                        pointBorderColor: '#e0e0e0'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } },
+                        x: { ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } }
+                    },
+                    plugins: { legend: { labels: { color: '#e0e0e0', font: { size: 12 } } } },
+                    animation: { duration: 1000, easing: 'easeInOutQuad' }
+                }
+            });
+            console.log('Spending chart initialized');
+        } catch (error) {
+            console.error('Error initializing spending chart:', error);
         }
-      });
-      console.log('Spending chart initialized');
-    } catch (error) {
-      console.error('Error initializing spending chart:', error);
     }
-  }
 
-  const monthlySpendingChartCtx = document.getElementById('monthly-spending-chart');
-  if (monthlySpendingChartCtx) {
-    try {
-      new Chart(monthlySpendingChartCtx.getContext('2d'), {
-        type: 'bar',
-        data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-          datasets: [{
-            label: 'Monthly Spending',
-            data: [1000, 1500, 1200, 1800, 1600, 2000],
-            backgroundColor: '#00b4d8',
-            borderColor: '#e0e0e0',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: { beginAtZero: true, ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } },
-            x: { ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } }
-          },
-          plugins: { legend: { labels: { color: '#e0e0e0', font: { size: 12 } } } },
-          animation: { duration: 1000, easing: 'easeInOutQuad' }
+    const monthlySpendingChartCtx = document.getElementById('monthly-spending-chart');
+    if (monthlySpendingChartCtx) {
+        try {
+            new Chart(monthlySpendingChartCtx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Monthly Spending',
+                        data: [1000, 1500, 1200, 1800, 1600, 2000],
+                        backgroundColor: '#00b4d8',
+                        borderColor: '#e0e0e0',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } },
+                        x: { ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } }
+                    },
+                    plugins: { legend: { labels: { color: '#e0e0e0', font: { size: 12 } } } },
+                    animation: { duration: 1000, easing: 'easeInOutQuad' }
+                }
+            });
+            console.log('Monthly spending chart initialized');
+        } catch (error) {
+            console.error('Error initializing monthly spending chart:', error);
         }
-      });
-      console.log('Monthly spending chart initialized');
-    } catch (error) {
-      console.error('Error initializing monthly spending chart:', error);
     }
-  }
 
-  const categorySpendingChartCtx = document.getElementById('category-spending-chart');
-  if (categorySpendingChartCtx) {
-    try {
-      new Chart(categorySpendingChartCtx.getContext('2d'), {
-        type: 'pie',
-        data: {
-          labels: ['Groceries', 'Bills', 'Entertainment', 'Travel', 'Other'],
-          datasets: [{
-            data: [30, 25, 20, 15, 10],
-            backgroundColor: ['#00b4d8', '#87ceeb', '#4682b4', '#1e90ff', '#add8e6'],
-            borderColor: '#e0e0e0',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { labels: { color: '#e0e0e0', font: { size: 12 } } } },
-          animation: { duration: 1000, easing: 'easeInOutQuad' }
+    const categorySpendingChartCtx = document.getElementById('category-spending-chart');
+    if (categorySpendingChartCtx) {
+        try {
+            new Chart(categorySpendingChartCtx.getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: ['Groceries', 'Bills', 'Entertainment', 'Travel', 'Other'],
+                    datasets: [{
+                        data: [30, 25, 20, 15, 10],
+                        backgroundColor: ['#00b4d8', '#87ceeb', '#4682b4', '#1e90ff', '#add8e6'],
+                        borderColor: '#e0e0e0',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#e0e0e0', font: { size: 12 } } } },
+                    animation: { duration: 1000, easing: 'easeInOutQuad' }
+                }
+            });
+            console.log('Category spending chart initialized');
+        } catch (error) {
+            console.error('Error initializing category spending chart:', error);
         }
-      });
-      console.log('Category spending chart initialized');
-    } catch (error) {
-      console.error('Error initializing category spending chart:', error);
     }
-  }
 
+// Transfer Form
 const transferForm = document.getElementById('transfer-form');
 const transferOtpSection = document.getElementById('transferOtpSection');
 const sendTransferOtpPhone = document.getElementById('send-transfer-otp-phone');
@@ -922,90 +861,72 @@ const submitTransfer = document.getElementById('submit-transfer');
 const submitText = document.getElementById('submitText');
 const submitSpinner = document.getElementById('submitSpinner');
 
+
 if (transferForm) {
-  const transferRecipientName = document.getElementById('recipient-name');
-  const transferRecipientEmail = document.getElementById('recipient-email');
-  const transferRecipientIban = document.getElementById('recipient-iban');
+    const transferRecipientName = document.getElementById('recipient-name');
+    const transferRecipientEmail = document.getElementById('recipient-email');
+    const transferRecipientIban = document.getElementById('recipient-iban');
 
-  // Load beneficiaries if available
-  if (transferRecipientName && transferRecipientEmail && transferRecipientIban) {
-    const beneficiaries = JSON.parse(localStorage.getItem('beneficiaries') || '[]');
-    if (beneficiaries.length > 0) {
-      const select = document.createElement('select');
-      select.id = 'beneficiary-select';
-      select.className = 'w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-3 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8] mb-2';
-      select.innerHTML = `<option value="">Select a beneficiary</option>` + 
-        beneficiaries.map(b => `<option value="${b.email}">${b.fullName} (${b.email}, ${b.iban})</option>`).join('');
-      transferRecipientName.parentElement.insertBefore(select, transferRecipientName);
-      select.addEventListener('change', () => {
-        const selected = beneficiaries.find(b => b.email === select.value);
-        transferRecipientName.value = selected ? selected.fullName : '';
-        transferRecipientEmail.value = selected ? selected.email : '';
-        transferRecipientIban.value = selected ? selected.iban : '';
-      });
-    }
-  }
-
-  // 🔹 Send Transfer OTP to Your Own Email
-  if (sendTransferOtpEmail) {
-    sendTransferOtpEmail.addEventListener('click', async () => {
-      // Check localStorage isBlocked first
-      if (localStorage.getItem("isBlocked") === "true") {
-        window.location.href = "blocked.html";
-        return;
-      }
-
-      const userEmailField = document.getElementById('user-email');
-      if (!userEmailField) return alert("Your email input is missing.");
-
-      const email = userEmailField.value.trim();
-      if (!email) return alert("Please enter your email to receive OTP.");
-
-      console.log('🧪 Sending OTP request:', { email, timestamp: new Date().toISOString() });
-
-      if (transferOtpSection) transferOtpSection.classList.remove('hidden');
-
-      try {
-        const res = await fetch('https://credibe-backends.onrender.com/api/transfer/send-direct-otp', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            email,
-            type: "transfer"
-          })
-        });
-
-        const data = await res.json();
-        console.log('🧪 OTP response:', { status: res.status, data });
-
-        if (!res.ok) {
-          if (data.error === "user blocked") {
-            localStorage.setItem("isBlocked", "true");
-            window.location.href = "blocked.html";
-            return;
-          }
-          throw new Error(data.error || "OTP error");
+    // Load beneficiaries if available
+    if (transferRecipientName && transferRecipientEmail && transferRecipientIban) {
+        const beneficiaries = JSON.parse(localStorage.getItem('beneficiaries') || '[]');
+        if (beneficiaries.length > 0) {
+            const select = document.createElement('select');
+            select.id = 'beneficiary-select';
+            select.className = 'w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-3 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8] mb-2';
+            select.innerHTML = `<option value="">Select a beneficiary</option>` + 
+                beneficiaries.map(b => `<option value="${b.email}">${b.fullName} (${b.email}, ${b.iban})</option>`).join('');
+            transferRecipientName.parentElement.insertBefore(select, transferRecipientName);
+            select.addEventListener('change', () => {
+                const selected = beneficiaries.find(b => b.email === select.value);
+                transferRecipientName.value = selected ? selected.fullName : '';
+                transferRecipientEmail.value = selected ? selected.email : '';
+                transferRecipientIban.value = selected ? selected.iban : '';
+            });
         }
+    }
 
-        alert("OTP sent to your email ✔️");
-      } catch (err) {
-        console.error("❌ OTP send error:", err.message, { email });
-        alert(err.message || "Something went wrong.");
-      }
-    });
-  }
+    // 🔹 Send Transfer OTP to Your Own Email
+    if (sendTransferOtpEmail) {
+        sendTransferOtpEmail.addEventListener('click', async () => {
+            const userEmailField = document.getElementById('user-email');
+            if (!userEmailField) return alert("Your email input is missing.");
 
-  // 🔹 Submit Transfer (CREDIBE IBAN-ONLY SYSTEM)
+            const email = userEmailField.value.trim();
+            if (!email) return alert("Please enter your email to receive OTP.");
+
+            console.log('🧪 Sending OTP request:', { email, timestamp: new Date().toISOString() });
+
+            if (transferOtpSection) transferOtpSection.classList.remove('hidden');
+
+            try {
+                const res = await fetch('https://credibe-backends.onrender.com/api/transfer/send-direct-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email,
+                        type: "transfer"
+                    })
+                });
+
+                const data = await res.json();
+                console.log('🧪 OTP response:', { status: res.status, data });
+                if (!res.ok) throw new Error(data.error || "OTP error");
+
+                alert("OTP sent to your email ✔️");
+            } catch (err) {
+                console.error("❌ OTP send error:", err.message, { email });
+                alert(err.message || "Something went wrong.");
+            }
+        });
+    }
+
+    // 🔹 Submit Transfer (CREDIBE IBAN-ONLY SYSTEM)
+  if (transferForm) {
   transferForm.addEventListener('submit', async function (e) {
     e.preventDefault();
-
-    // Check localStorage isBlocked first
-    if (localStorage.getItem("isBlocked") === "true") {
-      window.location.href = "blocked.html";
-      return;
-    }
 
     const recipientNameField = document.getElementById('recipient-name');
     const swiftField = document.getElementById('swift');
@@ -1053,28 +974,20 @@ if (transferForm) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem("userToken")}`
+            'Authorization': `Bearer ${localStorage.getItem('userToken')}`
           },
           body: JSON.stringify({ type: 'transfer' })
         });
 
         const data = await res.json();
-
-        if (!res.ok) {
-          if (data.error === "user blocked") {
-            localStorage.setItem("isBlocked", "true");
-            window.location.href = "blocked.html";
-            return;
-          }
-          throw new Error(data.error || 'OTP send failed');
-        }
+        if (!res.ok) throw new Error(data.error || 'OTP send failed');
 
         transferOtpSection.classList.remove('hidden');
         alert('OTP sent to your registered email. Please enter it to continue.');
       } catch (err) {
-        console.error("❌ OTP send error:", err.message);
         alert(err.message || 'Failed to send OTP.');
       }
+
       return;
     }
 
@@ -1103,7 +1016,7 @@ if (transferForm) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem("userToken")}`
+          'Authorization': `Bearer ${localStorage.getItem('userToken')}`
         },
         body: JSON.stringify(payload)
       });
@@ -1126,11 +1039,6 @@ if (transferForm) {
 
         window.location.href = 'transfer-pending.html';
       } else {
-        if (data.error === "user blocked") {
-          localStorage.setItem("isBlocked", "true");
-          window.location.href = "blocked.html";
-          return;
-        }
         alert(data.error || `Transfer failed. Status: ${res.status}`);
       }
     } catch (error) {
@@ -1143,509 +1051,364 @@ if (transferForm) {
     }
   });
 }
-  // 🎯 Transaction Filter Dropdown
-  const transactionFilter = document.getElementById('transaction-filter');
-  if (transactionFilter) {
-    transactionFilter.addEventListener('change', (e) => {
-      const days = e.target.value || 'all';
-      console.log('🧪 Filter selected:', days);
-      loadTransactions(days);
-      alert(`Filtered transactions for: ${days === 'all' ? 'All time' : `${days} days`}`);
-    });
-  }
-
-  // Generate static fake transactions
-  function generateStaticFakeTransactions() {
-    const cached = localStorage.getItem('fakeTransactions');
-    const freezeCap = new Date("2025-03-26T23:59:59");
-
-    // 🧠 Check if cache exists AND is valid
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        const isValid = parsed.every(txn => {
-          const d = new Date(txn.date);
-          return txn.recipient && typeof txn.recipient === 'string' && d <= freezeCap;
-        });
-
-        if (isValid) return parsed;
-
-        // 🧨 If invalid (e.g., future dates or unknowns) — delete it
-        console.warn("🚫 Old or invalid fake txns found — clearing...");
-        localStorage.removeItem('fakeTransactions');
-      } catch (err) {
-        console.warn("⚠️ Failed to parse fake txns — clearing...");
-        localStorage.removeItem('fakeTransactions');
-      }
-    }
-
-    // ✅ If no valid cache, generate new safe ones
-    const names = [
-      "ING Bank", "BNP Paribas", "Belfius", "KBC Group", "ABN AMRO",
-      "Delhaize", "Albert Heijn", "Carrefour", "Colruyt", "Lidl Belgium",
-      "Lucas Maes", "Emma Dupont", "Louis Vandamme", "Sophie Martin", "Julie Janssens",
-      "Coolblue", "Vanden Borre", "Bol.com", "MediaMarkt",
-      "Zalando", "H&M", "IKEA Belgium", "JBC", "Tommy Hilfiger",
-      "Esso", "TotalEnergies", "Q8 Belgium", "NMBS/SNCB", "De Lijn",
-      "Stib-Mivb", "Bpost", "Telenet", "Proximus", "Orange Belgium",
-      "Nestlé", "Unilever", "Coca-Cola EU", "Heineken", "Jupiler",
-      "Dries Mertens", "Koen Wauters", "Noa Vermeer", "Charlotte Peeters", "Sarah De Smet",
-      "Jens Van Damme", "Tom Vercauteren", "Kevin Leroy", "Lotte Nys", "Maxime Deneve"
-    ];
-
-    const txns = [];
-    const fixedDate = new Date("2025-03-26T00:00:00Z");
-
-    for (let i = 0; i < 100; i++) {
-      const nameIndex = i % names.length;
-      txns.push({
-        _id: `fake-${i}`,
-        date: fixedDate.toISOString(),
-        recipient: names[nameIndex],
-        amount: Math.floor(Math.random() * 900 + 100),
-        status: "approved"
-      });
-    }
-
-    localStorage.setItem('fakeTransactions', JSON.stringify(txns));
-    return txns;
-  }
-
-  // ⏳ Filter transactions strictly by date
-  function filterTxnsByDays(txns, days) {
-    const now = new Date();
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // midnight today
-    const freezeCap = new Date("2025-03-26T23:59:59"); // legacy cap
-
-    return txns.filter(t => {
-      const rawDate = new Date(t.date || t.createdAt);
-      if (isNaN(rawDate.getTime()) || rawDate > now) return false;
-
-      // ✅ Keep all transactions that existed before or on March 26
-      if (rawDate <= freezeCap) return true;
-
-      // ✅ Only allow new txns created today or after
-      if (rawDate >= today) {
-        const daysDiff = (now - rawDate) / (1000 * 60 * 60 * 24);
-        return days === 'all' || daysDiff <= parseInt(days);
-      }
-
-      // ❌ Reject any injected old-looking ones created after March 26 but before today
-      return false;
-    });
-  }
-
-  // 📦 Load and display all transactions
-  async function loadTransactions(days = 'all') {
-    const tableBody = document.getElementById('transactions-table');
-    if (!tableBody) return;
-
-    tableBody.innerHTML = '<tr><td colspan="4" class="p-2 text-center">Loading...</td></tr>';
-
-    try {
-      const userId = localStorage.getItem("userId") || "";
-      const url = `https://credibe-backends.onrender.com/api/user/transactions/${userId}${days !== 'all' ? `?days=${days}` : ''}`;
-
-      const res = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      const transactions = res.ok ? await res.json() : [];
-      console.log("🔥 Raw transactions:", transactions);
-
-      // 🧠 Apply filter by days
-      const filtered = filterTxnsByDays(transactions, days);
-
-      // 🧠 Sort newest → oldest
-      const sortedTxns = filtered.sort((a, b) => {
-        const aDate = new Date(a.date || a.createdAt);
-        const bDate = new Date(b.date || b.createdAt);
-        return bDate - aDate;
-      });
-
-      // 🧼 No results
-      if (sortedTxns.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-gray-500">No transactions found.</td></tr>';
-        return;
-      }
-
-      // 🧾 Render each row
-      tableBody.innerHTML = sortedTxns.map(t => {
-        const rawDate = t.date || t.createdAt;
-        const txnDate = new Date(rawDate);
-        const formattedDate = !isNaN(txnDate.getTime())
-          ? txnDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-          : 'Unknown';
-
-        const recipient = t.recipient || 'Unknown';
-        const amount = typeof t.amount === "number" ? `${t.amount} $` : 'Unknown';
-
-        const statusRaw = t.status || 'pending';
-        let statusLabel = '❓ Unknown';
-        let statusColor = 'text-gray-400';
-
-        if (statusRaw === 'pending') {
-          statusLabel = '🕓 Pending';
-          statusColor = 'text-yellow-500';
-        } else if (statusRaw === 'approved') {
-          statusLabel = '✅ Approved';
-          statusColor = 'text-green-500';
-        } else if (statusRaw === 'rejected') {
-          statusLabel = '❌ Rejected';
-          statusColor = 'text-red-500';
-        }
-
-        return `
-          <tr class="border-t border-[#444]">
-            <td class="p-1 sm:p-2 text-xs sm:text-sm">${formattedDate}</td>
-            <td class="p-1 sm:p-2 text-xs sm:text-sm">${recipient}</td>
-            <td class="p-1 sm:p-2 text-xs sm:text-sm">${amount}</td>
-            <td class="p-1 sm:p-2 text-xs sm:text-sm ${statusColor}">${statusLabel}</td>
-          </tr>`;
-      }).join('');
-    } catch (error) {
-      console.error("❌ Transaction load error:", error.message);
-      tableBody.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-red-500">Error loading transactions.</td></tr>';
-    }
-  }
-
-  // ✅ Reusable function to fetch user data
-  async function fetchUserData() {
-    try {
-      const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        console.error("❌ Failed to fetch user data:", data.error);
-        return null;
-      }
-
-      return data;
-    } catch (err) {
-      console.error("🔥 Error fetching user data:", err);
-      return null;
-    }
-  }
-
-  // ✅ Populate form + dashboard
-  (async () => {
-    const data = await fetchUserData();
-    if (!data) return;
-
-    // ⚙️ Prefill settings
-    if (document.getElementById("full-name")) {
-      document.getElementById("full-name").value = data.name || "";
-      document.getElementById("email").value = data.email || "";
-      document.getElementById("phone").value = data.phone || "";
-    }
-    // 👋 Show greeting using name from settings
-const greet = document.getElementById("mobile-greeting");
-const fullNameInput = document.getElementById("full-name");
-
-if (greet && fullNameInput) {
-  const fullName = fullNameInput.value.trim();
-  const firstName = fullName.split(" ")[0] || "there";
-  greet.textContent = `Hi, ${firstName}`;
+}
+// 🎯 Transaction Filter Dropdown
+const transactionFilter = document.getElementById('transaction-filter');
+if (transactionFilter) {
+  transactionFilter.addEventListener('change', (e) => {
+    const days = e.target.value || 'all';
+    console.log('🧪 Filter selected:', days);
+    loadTransactions(days);
+    alert(`Filtered transactions for: ${days === 'all' ? 'All time' : `${days} days`}`);
+  });
 }
 
-    // 👋 Dashboard welcome message
-    const welcomeTag = document.getElementById("welcome-user");
-    if (welcomeTag) {
-      welcomeTag.textContent = `Welcome, ${data.name || "User"}`;
-    }
+function generateStaticFakeTransactions() {
+  const cached = localStorage.getItem('fakeTransactions');
+  const freezeCap = new Date("2025-03-26T23:59:59");
 
-    // 💶 Dashboard balance
-    const balanceTag = document.getElementById("user-balance");
-    if (balanceTag) {
-      balanceTag.textContent = `$${data.balance ?? 0}`;
-    }
-
-    // 🔁 Update dashboard values
-    document.getElementById("totalBalance").textContent = `$${data.balance?.toLocaleString() || '0'}`;
-    document.getElementById("savingsAmount").textContent = `$${data.savings?.toLocaleString() || '0'}`;
-    document.getElementById("creditAmount").textContent = `$${data.credits?.toLocaleString() || '0'}`;
-  })();
-
-  // ✅ Populate account details
-  (async () => {
+  // 🧠 Check if cache exists AND is valid
+  if (cached) {
     try {
-      const res = await fetch("https://credibe-backends.onrender.com/api/user/profile", {
-        headers: { Authorization: `Bearer ${token}` }
+      const parsed = JSON.parse(cached);
+
+      const isValid = parsed.every(txn => {
+        const d = new Date(txn.date);
+        return txn.recipient && typeof txn.recipient === 'string' && d <= freezeCap;
       });
-      const data = await res.json();
-      const checking = data.accounts?.checking || {};
-      const savings = data.accounts?.savings || {};
-      document.getElementById("checking-iban").textContent = checking.iban || "—";
-      document.getElementById("checking-date").textContent = checking.createdAt ? new Date(checking.createdAt).toLocaleDateString() : "—";
-      document.getElementById("savings-iban").textContent = savings.iban || "—";
-      document.getElementById("savings-date").textContent = savings.createdAt ? new Date(savings.createdAt).toLocaleDateString() : "—";
-    } catch (e) {
-      console.error("IBAN Fetch Error:", e);
+
+      if (isValid) return parsed;
+
+      // 🧨 If invalid (e.g., future dates or unknowns) — delete it
+      console.warn("🚫 Old or invalid fake txns found — clearing...");
+      localStorage.removeItem('fakeTransactions');
+
+    } catch (err) {
+      console.warn("⚠️ Failed to parse fake txns — clearing...");
+      localStorage.removeItem('fakeTransactions');
     }
-  })();
+  }
 
-  // ✅ Submit settings form
-  const settingsForm = document.getElementById('settings-form');
-  if (settingsForm) {
-    settingsForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
+  // ✅ If no valid cache, generate new safe ones
+  const names = [
+    "ING Bank", "BNP Paribas", "Belfius", "KBC Group", "ABN AMRO",
+    "Delhaize", "Albert Heijn", "Carrefour", "Colruyt", "Lidl Belgium",
+    "Lucas Maes", "Emma Dupont", "Louis Vandamme", "Sophie Martin", "Julie Janssens",
+    "Coolblue", "Vanden Borre", "Bol.com", "MediaMarkt", "Decathlon",
+    "Zalando", "H&M", "IKEA Belgium", "JBC", "Tommy Hilfiger",
+    "Esso", "TotalEnergies", "Q8 Belgium", "NMBS/SNCB", "De Lijn",
+    "Stib-Mivb", "Bpost", "Telenet", "Proximus", "Orange Belgium",
+    "Nestlé", "Unilever", "Coca-Cola EU", "Heineken", "Jupiler",
+    "Dries Mertens", "Koen Wauters", "Noa Vermeer", "Charlotte Peeters", "Sarah De Smet",
+    "Jens Van Damme", "Tom Vercauteren", "Kevin Leroy", "Lotte Nys", "Maxime Deneve"
+  ];
 
-      const name = document.getElementById('full-name').value;
-      const email = document.getElementById('email').value;
-      const phone = document.getElementById('phone').value;
+  const txns = [];
+  const fixedDate = new Date("2025-03-26T00:00:00Z");
 
-      const submitButton = settingsForm.querySelector('button[type="submit"]');
-      submitButton.disabled = true;
-
-      try {
-        const res = await fetch('https://credibe-backends.onrender.com/api/settings/update', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ name, email, phone })
-        });
-
-        const response = await res.json();
-
-        if (res.ok) {
-          alert('✅ Settings updated successfully!');
-          console.log('Updated settings:', { name, email, phone });
-
-          // 🔄 Refresh values
-          const newData = await fetchUserData();
-          if (newData) {
-            document.getElementById("full-name").value = newData.name || "";
-            document.getElementById("email").value = newData.email || "";
-            document.getElementById("phone").value = newData.phone || "";
-          }
-        } else {
-          alert(response.error || '❌ Failed to update settings.');
-        }
-      } catch (err) {
-        console.error('⚠️ Settings update error:', err);
-        alert('Something went wrong. Try again.');
-      } finally {
-        submitButton.disabled = false;
-      }
+  for (let i = 0; i < 100; i++) {
+    const nameIndex = i % names.length;
+    txns.push({
+      _id: `fake-${i}`,
+      date: fixedDate.toISOString(),
+      recipient: names[nameIndex],
+      amount: Math.floor(Math.random() * 900 + 100),
+      status: "approved"
     });
   }
 
-  // Buy Crypto form
-  const buyCryptoForm = document.getElementById("buy-crypto-form");
-  if (buyCryptoForm) {
-    buyCryptoForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const amount = document.getElementById("crypto-amount").value;
-      const currency = document.getElementById("crypto-currency").value;
-      const wallet = document.getElementById("crypto-wallet").value;
+  localStorage.setItem('fakeTransactions', JSON.stringify(txns));
+  return txns;
+}
 
-      if (!amount || amount <= 0) {
-        alert('Please enter a valid amount.');
-        return;
-      }
-      if (!currency) {
-        alert('Please select a currency.');
-        return;
-      }
-      if (!wallet) {
-        alert('Please enter a wallet address.');
-        return;
-      }
 
-      try {
-        const res = await fetch("https://credibe-backends.onrender.com/api/transfer/crypto", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({ amount, currency, wallet })
-        });
+/// ⏳ Filter transactions strictly by date
+function filterTxnsByDays(txns, days) {
+  const now = new Date();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // midnight today
+  const freezeCap = new Date("2025-03-26T23:59:59"); // legacy cap
 
-        if (res.ok) {
-          alert("✅ Your crypto request has been processed. Await admin approval.");
-          buyCryptoForm.reset();
-        } else {
-          const error = await res.json();
-          alert("❌ Error: " + error.message);
-        }
-      } catch (err) {
-        alert("❌ Failed to send request.");
-      }
-    });
-  }
+  return txns.filter(t => {
+    const rawDate = new Date(t.date || t.createdAt);
+    if (isNaN(rawDate.getTime()) || rawDate > now) return false;
 
-  // Pay Bills form
-  const payBillsForm = document.getElementById("pay-bills-form");
-  if (payBillsForm) {
-    payBillsForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const biller = document.getElementById("biller-name").value;
-      const category = document.getElementById("category").value;
-      const amount = document.getElementById("bill-amount").value;
+    // ✅ Keep all transactions that existed before or on March 26
+    if (rawDate <= freezeCap) return true;
 
-      if (!biller) {
-        alert('Please enter a biller name.');
-        return;
-      }
-      if (!category) {
-        alert('Please select a category.');
-        return;
-      }
-      if (!amount || amount <= 0) {
-        alert('Please enter a valid amount.');
-        return;
-      }
-
-      try {
-        const res = await fetch("https://credibe-backends.onrender.com/api/transfer/bill", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({ biller, category, amount })
-        });
-
-        if (res.ok) {
-          alert("✅ Your bill request has been processed. Await admin approval.");
-          payBillsForm.reset();
-        } else {
-          const error = await res.json();
-          alert("❌ Error: " + error.message);
-        }
-      } catch (err) {
-        alert("❌ Failed to send request.");
-      }
-    });
-  }
-
-  // Add Beneficiary form
-  const addBeneficiaryForm = document.getElementById("addBeneficiaryForm");
-  if (addBeneficiaryForm) {
-    addBeneficiaryForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const fullName = document.getElementById("full-name").value;
-      const iban = document.getElementById("iban").value;
-      const bankName = document.getElementById("bank-name").value;
-
-      if (!fullName || !iban || !bankName) {
-        alert('Please fill all required fields.');
-        return;
-      }
-      if (!/^[A-Z]{2}\d{2}[A-Z0-9]{4,30}$/.test(iban.replace(/\s/g, ''))) {
-        alert('Invalid IBAN format.');
-        return;
-      }
-
-      try {
-        const res = await fetch("https://credibe-backends.onrender.com/api/beneficiary/add", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({ fullName, iban, bankName })
-        });
-
-        if (res.ok) {
-          alert("✅ Beneficiary added successfully. Await admin approval.");
-          addBeneficiaryForm.reset();
-        } else {
-          const error = await res.json();
-          alert("❌ Error: " + error.message);
-        }
-      } catch (err) {
-        alert("❌ Failed to send request.");
-      }
-    });
-  }
-
-  // Security Handlers
-  const changePassword = document.getElementById('change-password');
-  const verifyIdentity = document.getElementById('verify-identity');
-  if (changePassword) {
-    changePassword.addEventListener('click', () => {
-      console.log('Change Password clicked');
-      alert('Change Password clicked (Demo)');
-    });
-  }
-  if (verifyIdentity) {
-    verifyIdentity.addEventListener('click', () => {
-      console.log('Verify Identity clicked');
-      alert('Verify Identity clicked (Demo)');
-    });
-  }
-
-  // Logout Handler
-  const confirmLogout = document.getElementById('confirm-logout');
-  if (confirmLogout) {
-    confirmLogout.addEventListener('click', () => {
-      localStorage.removeItem('userToken');
-      window.location.href = 'login.html';
-      console.log('User logged out');
-    });
-  }
-
-  // Initialize Application
-  document.addEventListener("DOMContentLoaded", () => {
-    showPage('dashboard');
-    console.log("Application initialized");
-    // Fade in effect for pages
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(page => page.classList.add('fade-in', 'visible'));
-
-    // Initialize charts on page load if present
-    if (document.getElementById('spending-chart')) {
-      loadTransactions();
+    // ✅ Only allow new txns created today or after
+    if (rawDate >= today) {
+      const daysDiff = (now - rawDate) / (1000 * 60 * 60 * 24);
+      return days === 'all' || daysDiff <= parseInt(days);
     }
+
+    // ❌ Reject any injected old-looking ones created after March 26 but before today
+    return false;
   });
+}
 
-  // Load user dashboard
-  async function loadUserDashboard() {
-    if (!token) {
-      alert("You must be logged in to view this page.");
-      window.location.href = "login.html";
+// 📦 Load and display all transactions
+async function loadTransactions(days = 'all') {
+  const tableBody = document.getElementById('transactions-table');
+  if (!tableBody) return;
+
+  tableBody.innerHTML = '<tr><td colspan="4" class="p-2 text-center">Loading...</td></tr>';
+
+  try {
+    const userId = localStorage.getItem("userId") || "";
+    const url = `https://credibe-backends.onrender.com/api/user/transactions/${userId}${days !== 'all' ? `?days=${days}` : ''}`;
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("userToken")}`
+      }
+    });
+
+    const transactions = res.ok ? await res.json() : [];
+    console.log("🔥 Raw transactions:", transactions);
+
+    // 🧠 Apply filter by days
+    const filtered = filterTxnsByDays(transactions, days);
+
+    // 🧠 Sort newest → oldest
+    const sortedTxns = filtered.sort((a, b) => {
+      const aDate = new Date(a.date || a.createdAt);
+      const bDate = new Date(b.date || b.createdAt);
+      return bDate - aDate;
+    });
+
+    // 🧼 No results
+    if (sortedTxns.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-gray-500">No transactions found.</td></tr>';
       return;
     }
 
-    try {
-      const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+    // 🧾 Render each row
+    tableBody.innerHTML = sortedTxns.map(t => {
+      const rawDate = t.date || t.createdAt;
+      const txnDate = new Date(rawDate);
+      const formattedDate = !isNaN(txnDate.getTime())
+        ? txnDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+        : 'Unknown';
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.error("❌ Failed to load user data:", errorData);
-        throw new Error(errorData.error || "Unknown error");
+      const recipient = t.recipient || 'Unknown';
+      const amount = typeof t.amount === "number" ? `${t.amount} €` : 'Unknown';
+
+      const statusRaw = t.status || 'pending';
+      let statusLabel = '❓ Unknown';
+      let statusColor = 'text-gray-400';
+
+      if (statusRaw === 'pending') {
+        statusLabel = '🕓 Pending';
+        statusColor = 'text-yellow-500';
+      } else if (statusRaw === 'approved') {
+        statusLabel = '✅ Approved';
+        statusColor = 'text-green-500';
+      } else if (statusRaw === 'rejected') {
+        statusLabel = '❌ Rejected';
+        statusColor = 'text-red-500';
       }
 
-      const data = await res.json();
+      return `
+        <tr class="border-t border-[#444]">
+          <td class="p-1 sm:p-2 text-xs sm:text-sm">${formattedDate}</td>
+          <td class="p-1 sm:p-2 text-xs sm:text-sm">${recipient}</td>
+          <td class="p-1 sm:p-2 text-xs sm:text-sm">${amount}</td>
+          <td class="p-1 sm:p-2 text-xs sm:text-sm ${statusColor}">${statusLabel}</td>
+        </tr>`;
+    }).join('');
 
-      // 🔁 Update the user dashboard values
-      document.getElementById("totalBalance").textContent = `$${data.balance?.toLocaleString() || '0'}`;
-      document.getElementById("savingsAmount").textContent = `$${data.savings?.toLocaleString() || '0'}`;
-      document.getElementById("creditAmount").textContent = `$${data.credits?.toLocaleString() || '0'}`;
-    } catch (err) {
-      console.error("❌ Dashboard load error:", err.message);
+  } catch (error) {
+    console.error("❌ Transaction load error:", error.message);
+    tableBody.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-red-500">Error loading transactions.</td></tr>';
+  }
+}
+
+    // Security Handlers
+    const changePassword = document.getElementById('change-password');
+    const verifyIdentity = document.getElementById('verify-identity');
+    if (changePassword) {
+        changePassword.addEventListener('click', () => {
+            console.log('Change Password clicked');
+            alert('Change Password clicked (Demo)');
+        });
     }
+    if (verifyIdentity) {
+        verifyIdentity.addEventListener('click', () => {
+            console.log('Verify Identity clicked');
+            alert('Verify Identity clicked (Demo)');
+        });
+    }
+
+   // ✅ Ensure user is logged in
+if (!token) {
+    alert("You must be logged in to view this page.");
+    window.location.href = "login.html";
+}
+
+
+// ✅ Reusable function to fetch user data
+async function fetchUserData() {
+  try {
+    const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error("❌ Failed to fetch user data:", data.error);
+      return null;
+    }
+
+    return data;
+  } catch (err) {
+    console.error("🔥 Error fetching user data:", err);
+    return null;
+  }
+}
+
+// ✅ Populate form + dashboard
+(async () => {
+  const data = await fetchUserData();
+  if (!data) return;
+
+  // ⚙️ Prefill settings
+  if (document.getElementById("full-name")) {
+    document.getElementById("full-name").value = data.name || "";
+    document.getElementById("email").value = data.email || "";
+    document.getElementById("phone").value = data.phone || "";
   }
 
-  window.onload = loadUserDashboard;
+  // 👋 Dashboard welcome message
+  const welcomeTag = document.getElementById("welcome-user");
+  if (welcomeTag) {
+    welcomeTag.textContent = `Welcome, ${data.name || "User"}`;
+  }
+
+  // 💶 Dashboard balance
+  const balanceTag = document.getElementById("user-balance");
+  if (balanceTag) {
+    balanceTag.textContent = `€${data.balance ?? 0}`;
+  }
+})();
+
+// ✅ Submit settings form
+const settingsForm = document.getElementById('settings-form');
+if (settingsForm) {
+  settingsForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById('full-name').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+
+    const submitButton = settingsForm.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+
+    try {
+      const res = await fetch('https://credibe-backends.onrender.com/api/settings/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ name, email, phone })
+      });
+
+      const response = await res.json();
+
+      if (res.ok) {
+        alert('✅ Settings updated successfully!');
+        console.log('Updated settings:', { name, email, phone });
+
+        // 🔄 Refresh values
+        await (async () => {
+          const newData = await fetchUserData();
+          if (!newData) return;
+          document.getElementById("full-name").value = newData.name || "";
+          document.getElementById("email").value = newData.email || "";
+          document.getElementById("phone").value = newData.phone || "";
+        })();
+
+      } else {
+        alert(response.error || '❌ Failed to update settings.');
+      }
+
+    } catch (err) {
+      console.error('⚠️ Settings update error:', err);
+      alert('Something went wrong. Try again.');
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+}
+
+
+
+    // Logout Handler
+    const confirmLogout = document.getElementById('confirm-logout');
+    if (confirmLogout) {
+        confirmLogout.addEventListener('click', () => {
+            localStorage.removeItem('userToken');
+            window.location.href = 'login.html';
+            console.log('User logged out');
+        });
+    }
+
+    // Initialize Application
+    document.addEventListener("DOMContentLoaded", () => {
+        showPage('dashboard');
+        console.log("Application initialized");
+        // Fade in effect for pages
+        const pages = document.querySelectorAll('.page');
+        pages.forEach(page => page.classList.add('fade-in', 'visible'));
+
+        // Initialize charts on page load if present
+        if (document.getElementById('spending-chart')) {
+            loadTransactions(); // Load transactions for dashboard
+        }
+    });
+
+    // Ensure script execution completes
+   
+  async function loadUserDashboard() {
+  const token = localStorage.getItem("userToken");
+  if (!token) {
+    alert("You must be logged in to view this page.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  try {
+    const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      console.error("❌ Failed to load user data:", errorData);
+      throw new Error(errorData.error || "Unknown error");
+    }
+
+    const data = await res.json();
+
+    // 🔁 Update the user dashboard values
+ document.getElementById("totalBalance").textContent = `€${data.balance.toLocaleString()}`;
+document.getElementById("savingsAmount").textContent = `€${data.savings.toLocaleString()}`;
+document.getElementById("creditAmount").textContent = `€${data.credits.toLocaleString()}`;
+  } catch (err) {
+    console.error("❌ Dashboard load error:", err.message);
+  }
+}
+
+window.onload = loadUserDashboard;
 })();
 </script>
 
@@ -1757,7 +1520,15 @@ document.getElementById("pay-bills-form")?.addEventListener("submit", async (e) 
       window.location.href = 'down.html';
     });
   }
- 
+ const menuToggle = document.getElementById("menu-toggle");
+const mobileMenu = document.getElementById("mobile-menu");
+
+if (menuToggle && mobileMenu) {
+    menuToggle.addEventListener("click", () => {
+        mobileMenu.classList.toggle("closed");
+        mobileMenu.classList.toggle("open");
+    });
+}
 </script>
 
 
