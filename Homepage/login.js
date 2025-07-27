@@ -41,6 +41,16 @@ document.getElementById("login-form").addEventListener("submit", async function 
       localStorage.setItem("userId", data.user._id);
       localStorage.setItem("lastLogin", new Date().toLocaleString());
 
+      // 🔁 Auto logout after 5 minutes
+      const logoutAt = Date.now() + (5 * 60 * 1000); // 5 mins
+      localStorage.setItem("logoutAt", logoutAt.toString());
+
+      setTimeout(() => {
+        alert("Session expired. Please log in again.");
+        localStorage.clear();
+        window.location.href = "login.html";
+      }, 5 * 60 * 1000);
+
       // 🔄 Remove static login date once logged in
       const staticLoginInfo = document.getElementById("static-login-info");
       if (staticLoginInfo) staticLoginInfo.remove();
