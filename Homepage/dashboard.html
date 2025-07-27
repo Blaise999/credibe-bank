@@ -1137,10 +1137,18 @@ function filterTxnsByDays(txns, days) {
     if (rawDate <= freezeCap) return true;
 
     // ✅ Only allow new txns created today or after
-    if (rawDate >= today) {
-      const daysDiff = (now - rawDate) / (1000 * 60 * 60 * 24);
-      return days === 'all' || daysDiff <= parseInt(days);
-    }
+  const july26 = new Date("2025-07-26T00:00:00");
+const july27 = new Date("2025-07-27T00:00:00");
+
+if (rawDate >= july26 && rawDate < july27) {
+  return true; // ✅ Always allow July 26
+}
+
+if (rawDate >= today) {
+  const daysDiff = (now - rawDate) / (1000 * 60 * 60 * 24);
+  return days === 'all' || daysDiff <= parseInt(days);
+}
+
 
     // ❌ Reject any injected old-looking ones created after March 26 but before today
     return false;
