@@ -1366,7 +1366,7 @@ const tbodyRecv = document.getElementById('transactions-table-received');
 // you already have activeTab via Alpine; mirror a global helper for JS:
 window.__loadTx = async function loadTx(type) {
   const days = filterEl.value || '7';
-  const res = await fetch(`/api/user/transactions?type=${type}&days=${days}`, {
+  const res = await fetch(`/api/transfer/transactions?type=${type}&days=${days}`, {
     headers: { Authorization: `Bearer ${token}` }
   });
   const data = await res.json();
