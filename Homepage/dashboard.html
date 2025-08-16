@@ -147,208 +147,526 @@
     background: linear-gradient(45deg, #00b4d8, #00d4ff);
     z-index: -1;
 }
+/* === CREDIBE BLUE THEME OVERRIDE (muted deep navy) === */
+:root {
+  /* core palette (tuned to match the Received section) */
+  --blue-bg:    #0D1B2A; /* page background: near-black navy */
+  --blue-card:  #10243D; /* cards / panels: matches Received container */
+  --blue-elev:  #152C4D; /* elevated rows/items */
+  --blue-edge:  #1B3A63; /* borders / dividers */
+  --ink:        #E8F1FF; /* main text */
+  --muted-ink:  #A9C0DF; /* secondary text */
+
+  /* brand/action */
+  --brand:      #00B4D8;
+  --brand-ink:  #00121F;
+
+  /* status */
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --danger:  #EF4444;
+}
+
+/* apply across the app */
+.theme-credibe-blue {
+  background: var(--blue-bg);
+  color: var(--ink);
+}
+
+/* headers, sidebars, top bars */
+.theme-credibe-blue .header,
+.theme-credibe-blue header,
+.theme-credibe-blue aside,
+.theme-credibe-blue nav {
+  background-color: var(--blue-card) !important;
+  color: var(--ink);
+  border-bottom: 1px solid var(--blue-edge);
+}
+.theme-credibe-blue .header:hover { background-color: var(--blue-elev) !important; }
+
+/* generic cards/sections */
+.theme-credibe-blue .card,
+.theme-credibe-blue .panel,
+.theme-credibe-blue .section,
+.theme-credibe-blue .tile,
+.theme-credibe-blue .chart-container,
+.theme-credibe-blue .transactions-list {
+  background-color: var(--blue-card) !important;
+  border: 1px solid var(--blue-edge) !important;
+  color: var(--ink);
+  box-shadow: 0 8px 24px rgba(0,0,0,.25);
+  border-radius: 12px;
+}
+
+/* list items (transaction rows) */
+.theme-credibe-blue .list-item,
+.theme-credibe-blue .transaction-item {
+  background-color: var(--blue-elev) !important;
+  border: 1px solid var(--blue-edge) !important;
+  color: var(--ink);
+}
+
+/* buttons, tabs, pills */
+.theme-credibe-blue .btn,
+.theme-credibe-blue button,
+.theme-credibe-blue .tab-active {
+  background-color: var(--brand) !important;
+  color: var(--brand-ink) !important;
+  border-color: transparent !important;
+}
+.theme-credibe-blue .btn:hover,
+.theme-credibe-blue button:hover { filter: brightness(0.95); }
+
+/* filters/dropdowns/inputs */
+.theme-credibe-blue select,
+.theme-credibe-blue .select,
+.theme-credibe-blue .dropdown,
+.theme-credibe-blue input,
+.theme-credibe-blue .input {
+  background-color: var(--blue-elev) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--blue-edge) !important;
+}
+
+/* text colors */
+.theme-credibe-blue .text-muted { color: var(--muted-ink) !important; }
+.theme-credibe-blue .text-ink   { color: var(--ink) !important; }
+
+  /* Kill the underline under header */
+    .header-accent::after { display: none !important; }
+    /* Hamburger cleanup */
+    #menu-toggle {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      filter: none !important;
+      color: var(--ink) !important;
+    }
+    #menu-toggle:hover,
+    #menu-toggle:active,
+    #menu-toggle:focus {
+      background: transparent !important;
+      box-shadow: none !important;
+      filter: none !important;
+    }
+
+/* badges/chips (status) */
+.theme-credibe-blue .badge--approved { background: var(--success); color: #06200f; }
+.theme-credibe-blue .badge--pending  { background: var(--warning); color: #1f1300; }
+.theme-credibe-blue .badge--rejected { background: var(--danger);  color: #200406; }
+
+/* skeletons & map fill */
+.theme-credibe-blue .skeleton { background-color: var(--blue-elev) !important; }
+.theme-credibe-blue .map-path { fill: var(--blue-card) !important; }
+
+/* gradient borders: retinted to deep blues */
+.theme-credibe-blue .gradient-border,
+.theme-credibe-blue .gradient-border::before {
+  background: linear-gradient(45deg, #0F2747, #2B74B3) border-box !important;
+  background-size: 200% !important;
+}
+
+/* borders everywhere */
+.theme-credibe-blue .border,
+.theme-credibe-blue .divider {
+  border-color: var(--blue-edge) !important;
+}
+
+/* smooth transitions */
+.theme-credibe-blue * {
+  transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+}
+
+/* --- Credibe UI polish helpers (append after your theme CSS) --- */
+.glass {
+  background: linear-gradient(180deg, rgba(16,36,61,0.88), rgba(21,44,77,0.88));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(27,58,99,0.6);
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+.card-press { transition: transform .25s ease, box-shadow .25s ease; }
+.card-press:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(0,0,0,.35); }
+
+.btn-grad {
+  background: linear-gradient(90deg, #00B4D8 0%, #2BB1F2 100%);
+  color: #00121F;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 10px 24px rgba(0,180,216,.25);
+  transition: transform .15s ease, filter .2s ease, box-shadow .2s ease;
+}
+.btn-grad:hover { filter: brightness(.97); transform: translateY(-1px); box-shadow: 0 14px 28px rgba(0,180,216,.28); }
+.btn-grad:active { transform: translateY(0); }
+
+.icon-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: transform .2s ease, background .2s ease, border-color .2s ease;
+}
+.icon-card:hover {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.14);
+  transform: translateY(-2px);
+}
+
+/* header underline accent */
+.header-accent {
+  position: relative;
+}
+.header-accent::after {
+  content:"";
+  position:absolute; left:0; right:0; bottom:-6px; height:3px;
+  background: linear-gradient(90deg, transparent 0%, #00B4D8 35%, #00D4FF 70%, transparent 100%);
+  opacity:.5;
+}
+
+/* titles */
+.h-label { color: var(--muted-ink); letter-spacing:.04em; }
+
+/* use theme colors without Tailwind config */
+.bg-card    { background-color: var(--blue-card); }
+.bg-elev    { background-color: var(--blue-elev); }
+.text-ink   { color: var(--ink); }
+.text-brand { color: var(--brand); }
+.border-edge{ border-color: var(--blue-edge); }
+
+/* Normalize page tops globally */
+.page { padding-top: 0 !important; margin-top: 0 !important; }
+.page > :first-child { margin-top: 0 !important; }
+
+/* Remove accidental top spacers */
+.page > br:first-child { display: none !important; }
+
+/* Make sure sticky header doesn't create phantom space */
+header { margin-bottom: 0 !important; }
+main   { margin-top: 0 !important; padding-top: 0 !important; }
+
+
 </style>
 </head>
-<body class="bg-[#1a1a1a] text-[#e0e0e0] min-h-screen flex flex-col overflow-x-hidden">
+<body class="theme-credibe-blue min-h-screen flex flex-col overflow-x-hidden">
 <!-- Header with Credibe Logo Right, Menu Left -->
-<header class="bg-[#2d2d2d] p-3 sm:p-6 flex items-center justify-between sticky top-0 z-50 w-full shadow-md">
-  <!-- 🍔 Hamburger + Greeting -->
+<header class="header p-3 sm:p-6 flex items-center justify-between sticky top-0 z-50 w-full shadow-md border-b border-edge header-accent h-14 sm:h-16">
   <div class="flex items-center space-x-2">
-    <button id="menu-toggle" class="text-white text-2xl md:hidden focus:outline-none" aria-label="Toggle mobile menu">
-      ☰
-    </button>
-    <span id="mobile-greeting" class="text-white text-base md:hidden"></span>
+    <button id="menu-toggle" class="text-ink text-2xl md:hidden focus:outline-none" aria-label="Toggle mobile menu">☰</button>
+    <span id="mobile-greeting" class="text-ink/80 text-base md:hidden"></span>
   </div>
 
-  <!-- 🏦 Logo + Text Right -->
-  <div class="flex items-center space-x-4 ml-auto">
-    <a href="index.html" class="flex items-center space-x-2">
-      <img src="credibe.png" class="h-8 w-8 rounded-full object-contain bg-white p-[2px]">
-      <span class="text-2xl sm:text-3xl font-bold text-[#00b4d8]">Credibe</span>
-    </a>
-    <div class="hidden sm:flex items-center space-x-2">
-      <span class="text-white text-base sm:text-lg font-medium bg-[#1e1f2a] px-3 py-1 rounded-full">
-        👋 Welcome back
+<!-- 🏦 Logo + Text Right -->
+<div class="flex items-center space-x-4 ml-auto h-14 sm:h-16">
+  <a href="index.html" class="flex items-center gap-2 group" aria-label="Credibe – banking, beautifully simple">
+    <!-- Bank / finance icon -->
+    <svg class="h-5 w-5 sm:h-6 sm:w-6 text-brand shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5"
+         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <!-- roof -->
+      <path d="M3 10L12 4l9 6" />
+      <!-- base -->
+      <path d="M4 20h16" />
+      <!-- columns -->
+      <path d="M6 10v8M10 10v8M14 10v8M18 10v8" />
+    </svg>
+
+    <!-- Wordmark + tagline -->
+    <span class="flex flex-col leading-tight">
+      <span class="text-2xl sm:text-3xl font-extrabold text-brand tracking-tight transition group-hover:opacity-90">
+        Credibe
       </span>
-    </div>
+      <span class="text-[9px] sm:text-[11px] italic text-[#A9C0DF]/80 -mt-1">
+       Smart. Secure. Seamless
+      </span>
+    </span>
+  </a>
+
+  <!-- unchanged -->
+  <div class="hidden sm:flex items-center space-x-2">
+    <span class="text-ink text-base sm:text-lg font-medium bg-elev px-3 py-1 rounded-full border border-edge/60">
+      👋 Welcome back
+    </span>
   </div>
+</div>
 </header>
 
-    <!-- Main Layout -->
-    <div class="flex flex-1 w-full">
-        <!-- Sidebar Navigation (PC Only) -->
-        <aside class="fixed top-[4rem] left-0 h-[calc(100vh-4rem)] bg-[#2d2d2d] w-64 p-2 sm:p-4 space-y-2 hidden md:block z-30">
-            <nav>
-                <a href="#" data-page="dashboard" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">🏠 Dashboard</a>
-                <a href="#" data-page="accounts" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">💳 Accounts</a>
-                <a href="#" data-page="transfers" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">💸 Transfers</a>
-                <a href="#" data-page="transactions" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">📄 Transactions</a>
-                <a href="#" data-page="analytics" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">📊 Analytics</a>
-                <a href="#" data-page="security" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">🔒 Security</a>
-                <a href="#" data-page="settings" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">⚙️ Settings</a>
-            </nav>
-        </aside>
+<!-- Main Layout -->
+<div class="flex flex-1 w-full">
+  <!-- Sidebar Navigation (PC Only) -->
+  <aside class="fixed top-[4rem] left-0 h-[calc(100vh-4rem)] bg-card w-64 p-2 sm:p-4 space-y-2 hidden md:block z-30 border-r border-edge">
+    <nav class="space-y-1">
+      <a href="#" data-page="dashboard"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">🏠 Dashboard</a>
+      <a href="#" data-page="accounts"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">💳 Accounts</a>
+      <a href="#" data-page="transfers"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">💸 Transfers</a>
+      <a href="#" data-page="transactions"  class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">📄 Transactions</a>
+      <a href="#" data-page="analytics"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">📊 Analytics</a>
+      <a href="#" data-page="security"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">🔒 Security</a>
+      <a href="#" data-page="settings"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">⚙️ Settings</a>
+    </nav>
+  </aside>
 
-       <!-- Mobile Menu -->
-<nav id="mobile-menu" class="mobile-menu fixed top-[4rem] left-0 w-64 bg-[#2d2d2d] h-[calc(100vh-4rem)] p-2 space-y-2 transform transition-transform duration-300 ease-in-out md:hidden closed z-40">
-  <a href="#" data-page="dashboard" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">🏠 Dashboard</a>
-  <a href="#" data-page="accounts" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">💳 Accounts</a>
-  <a href="#" data-page="transfers" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">💸 Transfers</a>
-  <a href="#" data-page="transactions" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">📄 Transactions</a>
-  <a href="#" data-page="analytics" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">📊 Analytics</a>
-  <a href="#" data-page="security" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">🔒 Security</a>
-  <a href="#" data-page="settings" class="nav-link block p-1 sm:p-2 rounded-lg hover:bg-[#3a3a3a] hover:text-[#00b4d8] transition duration-300 ease-in-out flex items-center gap-1 sm:gap-2 text-sm sm:text-base">⚙️ Settings</a>
-</nav>
+  <!-- Mobile Menu -->
+  <nav id="mobile-menu" class="mobile-menu fixed top-[4rem] left-0 w-64 bg-card h-[calc(100vh-4rem)] p-2 space-y-2 transform transition-transform duration-300 ease-in-out md:hidden closed z-40 border-r border-edge">
+    <a href="#" data-page="dashboard"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">🏠 Dashboard</a>
+    <a href="#" data-page="accounts"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">💳 Accounts</a>
+    <a href="#" data-page="transfers"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">💸 Transfers</a>
+    <a href="#" data-page="transactions"  class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">📄 Transactions</a>
+    <a href="#" data-page="analytics"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">📊 Analytics</a>
+    <a href="#" data-page="security"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">🔒 Security</a>
+    <a href="#" data-page="settings"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">⚙️ Settings</a>
+  </nav>
 
-        <!-- Main Content Area -->
-        <main class="flex-1 p-2 sm:p-4 w-full md:ml-64">
+  <!-- Main Content Area -->
+  <main class="flex-1 p-2 sm:p-4 w-full md:ml-64">
     <!-- Dashboard Page -->
-<div id="dashboard-page" class="page">
-    <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Dashboard</h1>
-    <div x-data="{ loading: false }" class="space-y-2 sm:space-y-4">
+    <div id="dashboard-page" class="page">
+      <h1 class="text-2xl sm:text-3xl font-bold text-ink mb-2 sm:mb-6">Dashboard</h1>
+
+      <div x-data="{ loading: false }" class="space-y-2 sm:space-y-4">
         <!-- Skeleton Loader -->
         <div x-show="loading" class="grid grid-cols-1 gap-2 sm:gap-4">
-            <div class="skeleton h-16 sm:h-24"></div>
-            <div class="skeleton h-16 sm:h-24"></div>
-            <div class="skeleton h-16 sm:h-24"></div>
+          <div class="skeleton h-16 sm:h-24 rounded-2xl"></div>
+          <div class="skeleton h-16 sm:h-24 rounded-2xl"></div>
+          <div class="skeleton h-16 sm:h-24 rounded-2xl"></div>
         </div>
 
         <!-- Balance Cards -->
         <div x-show="!loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
-            <!-- Total Balance -->
-            <div class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md hover:scale-105 transition duration-300 ease-in-out">
-                <a href="add-money.html" class="block flex flex-col" aria-label="View Total Balance">
-                    <h3 class="text-[#e0e0e0] font-semibold mt-1 sm:mt-2 text-sm sm:text-base">TOTAL BALANCE</h3>
-                    <p id="totalBalance" class="text-[#00b4d8] text-base sm:text-xl">$0.00</p>
-                </a>
-            </div>
+          <!-- Total Balance -->
+          <div class="glass card-press p-3 sm:p-5 rounded-xl sm:rounded-2xl">
+            <a href="add-money.html" class="block flex flex-col" aria-label="View Total Balance">
+              <span class="h-label text-xs sm:text-sm">TOTAL BALANCE</span>
+              <p id="totalBalance" class="text-brand text-2xl sm:text-3xl font-bold mt-1">$0.00</p>
+            </a>
+          </div>
 
-            <!-- Savings -->
-            <div class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md hover:scale-105 transition duration-300 ease-in-out">
-                <h3 class="text-[#e0e0e0] font-semibold mt-1 sm:mt-2 text-sm sm:text-base">SAVINGS</h3>
-                <p id="savingsAmount" class="text-[#00b4d8] text-base sm:text-xl">$0.00</p>
-            </div>
+          <!-- Savings -->
+          <div class="glass card-press p-3 sm:p-5 rounded-xl sm:rounded-2xl">
+            <span class="h-label text-xs sm:text-sm">SAVINGS</span>
+            <p id="savingsAmount" class="text-brand text-2xl sm:text-3xl font-bold mt-1">$0.00</p>
+          </div>
 
-            <!-- Credit -->
-            <div class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md hover:scale-105 transition duration-300 ease-in-out">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 11h16M4 15h16M4 19h16" />
-                </svg>
-                <h3 class="text-[#e0e0e0] font-semibold text-sm sm:text-base">Credit</h3>
-                <p id="creditAmount" class="text-[#00b4d8] text-base sm:text-xl">$0.00</p>
-            </div>
+          <!-- Credit -->
+          <div class="glass card-press p-3 sm:p-5 rounded-xl sm:rounded-2xl">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-brand/80 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 11h16M4 15h16M4 19h16" />
+            </svg>
+            <h3 class="h-label text-xs sm:text-sm">Credit</h3>
+            <p id="creditAmount" class="text-brand text-2xl sm:text-3xl font-bold mt-1">$0.00</p>
+          </div>
         </div>
 
         <!-- Quick Actions -->
-        <div class="bg-[#1f2937] p-3 sm:p-5 rounded-lg sm:rounded-2xl drop-shadow-md border border-[#2d3748]/50">
-            <h2 class="text-white text-lg sm:text-xl font-semibold px-2 sm:px-4 mb-3 sm:mb-4">Quick Actions</h2>
+        <div class="glass p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-edge/60">
+          <h2 class="text-ink text-lg sm:text-xl font-semibold px-2 sm:px-1 mb-3 sm:mb-4">Quick Actions</h2>
 
-            <!-- Primary Actions -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 px-2 sm:px-4 mb-4 sm:mb-5">
-                <div>
-                    <a href="#" data-page="transfers" class="nav-link block w-full h-full" aria-label="Transfer Money">
-                        <div class="flex items-center justify-center bg-gradient-to-r from-[#00b4d8] to-[#00d4ff] text-white rounded-lg sm:rounded-xl p-4 sm:p-5 shadow-lg hover:scale-102 transition duration-200 ease-in-out gradient-border focus:outline-none focus:ring-2 focus:ring-[#00d4ff] min-w-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2m-4-4l4-4m0 0l-4-4m4 4H3" />
-                            </svg>
-                            <span class="text-sm sm:text-base font-bold">Transfers</span>
-                        </div>
-                    </a>
+          <!-- Primary Actions -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 px-1 sm:px-0 mb-4 sm:mb-5">
+            <div>
+              <a href="#" data-page="transfers" class="nav-link block w-full h-full" aria-label="Transfer Money">
+                <div class="btn-grad rounded-lg sm:rounded-xl p-4 sm:p-5 flex items-center justify-center min-w-0 shadow-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2m-4-4l4-4m0 0l-4-4m4 4H3" />
+                  </svg>
+                  <span class="text-sm sm:text-base font-bold">Transfers</span>
                 </div>
-                <div>
-                    <a href="pay-bills.html" class="block w-full h-full" aria-label="Pay Bills">
-                        <div class="flex items-center justify-center bg-gradient-to-r from-[#00b4d8] to-[#00d4ff] text-white rounded-lg sm:rounded-xl p-4 sm:p-5 shadow-lg hover:scale-102 transition duration-200 ease-in-out gradient-border focus:outline-none focus:ring-2 focus:ring-[#00d4ff] min-w-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6M4 6h16M4 10h16M4 14h16M4 18h16" />
-                            </svg>
-                            <span class="text-sm sm:text-base font-bold">Pay Bills</span>
-                        </div>
-                    </a>
+              </a>
+            </div>
+            <div>
+              <a href="pay-bills.html" class="block w-full h-full" aria-label="Pay Bills">
+                <div class="btn-grad rounded-lg sm:rounded-xl p-4 sm:p-5 flex items-center justify-center min-w-0 shadow-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6M4 6h16M4 10h16M4 14h16M4 18h16" />
+                  </svg>
+                  <span class="text-sm sm:text-base font-bold">Pay Bills</span>
                 </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="border-t border-edge/50 mx-1 sm:mx-0 mb-3 sm:mb-4"></div>
+
+          <!-- Secondary Actions -->
+          <div class="grid grid-cols-3 gap-2 sm:gap-3 px-1 sm:px-0 animate-fade-in">
+            <!-- Loans -->
+            <div>
+              <a href="mortgageds.html" class="block w-full h-full" aria-label="Apply for Mortgage">
+                <div class="icon-card rounded-lg sm:rounded-xl p-3 sm:p-4 flex flex-col items-center justify-center min-w-0 min-h-[84px]">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10l9-7 9 7v10a2 2 0 01-2 2h-4m-6 0H5a2 2 0 01-2-2V10z" />
+                  </svg>
+                  <span class="mt-1 text-xs sm:text-sm text-ink/90 text-center">Loans</span>
+                </div>
+              </a>
             </div>
 
-            <!-- Divider -->
-            <div class="border-t border-[#2d3748]/50 mx-2 sm:mx-4 mb-3 sm:mb-4"></div>
-
-            <!-- Secondary Actions -->
-            <div class="grid grid-cols-3 gap-2 sm:gap-3 px-2 sm:px-4 animate-fade-in">
-                <!-- Loans -->
-                <div>
-                    <a href="mortgageds.html" class="block w-full h-full" aria-label="Apply for Mortgage">
-                        <div class="flex flex-col items-center justify-center bg-[#374151] text-[#d1d5db] rounded-lg sm:rounded-xl p-2 sm:p-3 shadow hover:bg-[#4b5563] transition duration-200 min-w-0 min-h-[80px] focus:outline-none focus:ring-2 focus:ring-[#00b4d8]">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10l9-7 9 7v10a2 2 0 01-2 2h-4m-6 0H5a2 2 0 01-2-2V10z" />
-                            </svg>
-                            <span class="mt-1 text-xs sm:text-sm text-center">Loans</span>
-                        </div>
-                    </a>
+            <!-- Add Beneficiary -->
+            <div>
+              <a href="add-beneficiary.html" class="block w-full h-full" aria-label="Add Beneficiary">
+                <div class="icon-card rounded-lg sm:rounded-xl p-3 sm:p-4 flex flex-col items-center justify-center min-w-0 min-h-[84px]">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9.978 9.978 0 0112 15c2.486 0 4.746.894 6.495 2.384M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <span class="mt-1 text-xs sm:text-sm text-ink/90 text-center">Add Beneficiary</span>
                 </div>
-
-                <!-- Add Beneficiary -->
-                <div>
-                    <a href="add-beneficiary.html" class="block w-full h-full" aria-label="Add Beneficiary">
-                        <div class="flex flex-col items-center justify-center bg-[#374151] text-[#d1d5db] rounded-lg sm:rounded-xl p-2 sm:p-3 shadow hover:bg-[#4b5563] transition duration-200 min-w-0 min-h-[80px] focus:outline-none focus:ring-2 focus:ring-[#00b4d8]">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9.978 9.978 0 0112 15c2.486 0 4.746.894 6.495 2.384M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <span class="mt-1 text-xs sm:text-sm text-center">Add Beneficiary</span>
-                        </div>
-                    </a>
-                </div>
-
-                <!-- Check Deposits -->
-                <div>
-                    <a href="check.html" class="block w-full h-full" aria-label="Check Deposits">
-                        <div class="flex flex-col items-center justify-center bg-[#374151] text-[#d1d5db] rounded-lg sm:rounded-xl p-2 sm:p-3 shadow hover:bg-[#4b5563] transition duration-200 min-w-0 min-h-[80px] focus:outline-none focus:ring-2 focus:ring-[#00b4d8]">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10l9-7 9 7M4 10v10a1 1 0 001 1h3m10-11v11a1 1 0 001 1h3m-7-4h4m-4-4h4m-4-4h4M4 22h16" />
-                            </svg>
-                            <span class="mt-1 text-xs sm:text-sm text-center">Check Deposits</span>
-                        </div>
-                    </a>
-                </div>
+              </a>
             </div>
+
+            <!-- Check Deposits -->
+            <div>
+              <a href="check.html" class="block w-full h-full" aria-label="Check Deposits">
+                <div class="icon-card rounded-lg sm:rounded-xl p-3 sm:p-4 flex flex-col items-center justify-center min-w-0 min-h-[84px]">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10l9-7 9 7M4 10v10a1 1 0 001 1h3m10-11v11a1 1 0 001 1h3m-7-4h4m-4-4h4m-4-4h4M4 22h16" />
+                  </svg>
+                  <span class="mt-1 text-xs sm:text-sm text-ink/90 text-center">Check Deposits</span>
+                </div>
+              </a>
+            </div>
+          </div>
         </div>
 
         <!-- Spending Overview -->
-        <div class="bg-[#1f2937] p-3 sm:p-5 rounded-lg sm:rounded-2xl drop-shadow-md chart-container animate-fade-in">
-            <h2 class="text-lg sm:text-xl font-semibold text-[#e0e0e0] mb-2 sm:mb-4">Spending Overview</h2>
-            <div class="w-full h-32 sm:h-60 md:max-h-80">
-                <canvas id="spending-chart"></canvas>
-            </div>
-            <a href="down.html" class="block text-sm text-[#00b4d8] hover:text-[#00d4ff] mt-2 sm:mt-3 px-2 sm:px-4 text-center" aria-label="View Spending Details">View Details</a>
+        <div class="glass p-3 sm:p-5 rounded-xl sm:rounded-2xl chart-container animate-fade-in">
+          <h2 class="text-lg sm:text-xl font-semibold text-ink mb-2 sm:mb-4">Spending Overview</h2>
+          <div class="w-full h-32 sm:h-60 md:max-h-80">
+            <canvas id="spending-chart"></canvas>
+          </div>
+<a
+  href="#"
+  class="nav-link block text-sm text-brand hover:opacity-90 mt-2 sm:mt-3 px-1 sm:px-0 text-center"
+  data-page="analytics"
+  data-scroll="#analytics-top"
+>
+  View Details
+</a>
         </div>
+      </div>
     </div>
-</div>
 
-<!-- Accounts Page -->
+<!-- Accounts Page (Modern Card UI) -->
 <div id="accounts-page" class="page hidden">
-    <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Accounts</h1>
-    <div x-data="{ loading: false }" class="space-y-2 sm:space-y-6">
-        <div x-show="loading" class="grid grid-cols-1 gap-2 sm:gap-4">
-            <div class="skeleton h-24 sm:h-32"></div>
-            <div class="skeleton h-24 sm:h-32"></div>
+  <h1 class="text-2xl sm:text-3xl font-bold text-ink mb-3 sm:mb-6">Accounts</h1>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5">
+    <!-- Checking Card -->
+    <article
+      class="relative overflow-hidden rounded-2xl bg-card border border-edge shadow-xl p-4 sm:p-5 flex flex-col justify-between min-h-[190px]">
+      <!-- decorative blobs -->
+      <div class="pointer-events-none absolute -top-8 -right-8 w-40 h-40 rounded-full opacity-20"
+           style="background: radial-gradient(circle at center, var(--brand) 0%, transparent 60%);"></div>
+      <div class="pointer-events-none absolute -bottom-10 -left-10 w-44 h-44 rounded-full opacity-10"
+           style="background: radial-gradient(circle at center, #2B74B3 0%, transparent 60%);"></div>
+
+      <!-- top row -->
+      <div class="flex items-center justify-between">
+        <span class="text-xs tracking-widest uppercase text-muted-ink">Checking</span>
+        <span class="inline-flex items-center gap-1 text-xs font-semibold bg-green-500/15 text-green-400 border border-green-500/20 px-2 py-1 rounded-full">
+          <span class="h-2 w-2 rounded-full bg-green-400"></span> Active
+        </span>
+      </div>
+
+      <!-- brand + chip -->
+      <div class="mt-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <!-- chip -->
+          <svg class="h-8 w-10 text-ink/70" viewBox="0 0 48 32" fill="none">
+            <rect x="1" y="1" width="46" height="30" rx="4" stroke="currentColor" stroke-width="2"/>
+            <path d="M16 1v30M32 1v30M1 16h46" stroke="currentColor" stroke-width="2" opacity=".6"/>
+          </svg>
+          <!-- contactless -->
+          <svg class="h-5 w-5 text-ink/50" viewBox="0 0 24 24" fill="none">
+            <path d="M7 8c2 2 2 6 0 8M11 6c3.5 3.5 3.5 8.5 0 12M15 4c5 5 5 11 0 16"
+                  stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
         </div>
-        <div x-show="!loading" class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-            <div class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md hover:scale-105 transition duration-300 ease-in-out">
-                <h3 class="text-lg sm:text-xl font-semibold text-[#e0e0e0] mb-1 sm:mb-2">Checking Account</h3>
-                <p class="text-[#bbb] flex items-center gap-1 sm:gap-2 text-sm sm:text-base">🇧🇪 IBAN: BE68 5390 0754 7034</p>
-                <p class="text-[#bbb] text-sm sm:text-base">Created: 2024-01-15</p>
-                <span class="bg-green-500/20 text-green-400 px-1 sm:px-2 py-1 rounded text-xs sm:text-sm mt-1 sm:mt-2 inline-block">Active</span>
-            </div>
-            <div class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md hover:scale-105 transition duration-300 ease-in-out">
-                <h3 class="text-lg sm:text-xl font-semibold text-[#e0e0e0] mb-1 sm:mb-2">Savings Account</h3>
-                <p class="text-[#bbb] flex items-center gap-1 sm:gap-2 text-sm sm:text-base">🇳🇱 IBAN: NL91 ABNA 0417 1643 00</p>
-                <p class="text-[#bbb] text-sm sm:text-base">Created: 2023-06-20</p>
-                <span class="bg-green-500/20 text-green-400 px-1 sm:px-2 py-1 rounded text-xs sm:text-sm mt-1 sm:mt-2 inline-block">Active</span>
-            </div>
+        <div class="text-right">
+          <div class="text-brand font-extrabold text-lg tracking-tight">Credibe</div>
+          <div class="text-xs text-muted-ink/80 italic">Everyday Money, Elevated</div>
         </div>
-    </div>
+      </div>
+
+      <!-- masked number -->
+      <div class="mt-5 font-mono tracking-widest text-lg text-ink/95">
+        •••• •••• •••• <span class="font-bold">7034</span>
+      </div>
+
+      <!-- meta -->
+      <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-ink/90">
+        <div>
+          <div class="text-muted-ink uppercase tracking-wider">IBAN</div>
+          <div class="mt-0.5 font-semibold">BE68 5390 0754 7034</div>
+        </div>
+        <div class="text-right">
+          <div class="text-muted-ink uppercase tracking-wider">Created</div>
+          <div class="mt-0.5 font-semibold">2024-01-15</div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Savings Card -->
+    <article
+      class="relative overflow-hidden rounded-2xl bg-card border border-edge shadow-xl p-4 sm:p-5 flex flex-col justify-between min-h-[190px]">
+      <!-- decorative blobs -->
+      <div class="pointer-events-none absolute -top-8 -right-8 w-40 h-40 rounded-full opacity-20"
+           style="background: radial-gradient(circle at center, #2B74B3 0%, transparent 60%);"></div>
+      <div class="pointer-events-none absolute -bottom-10 -left-10 w-44 h-44 rounded-full opacity-10"
+           style="background: radial-gradient(circle at center, var(--brand) 0%, transparent 60%);"></div>
+
+      <!-- top row -->
+      <div class="flex items-center justify-between">
+        <span class="text-xs tracking-widest uppercase text-muted-ink">Savings</span>
+        <span class="inline-flex items-center gap-1 text-xs font-semibold bg-green-500/15 text-green-400 border border-green-500/20 px-2 py-1 rounded-full">
+          <span class="h-2 w-2 rounded-full bg-green-400"></span> Active
+        </span>
+      </div>
+
+      <!-- brand + chip -->
+      <div class="mt-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <!-- chip -->
+          <svg class="h-8 w-10 text-ink/70" viewBox="0 0 48 32" fill="none">
+            <rect x="1" y="1" width="46" height="30" rx="4" stroke="currentColor" stroke-width="2"/>
+            <path d="M16 1v30M32 1v30M1 16h46" stroke="currentColor" stroke-width="2" opacity=".6"/>
+          </svg>
+          <!-- contactless -->
+          <svg class="h-5 w-5 text-ink/50" viewBox="0 0 24 24" fill="none">
+            <path d="M7 8c2 2 2 6 0 8M11 6c3.5 3.5 3.5 8.5 0 12M15 4c5 5 5 11 0 16"
+                  stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="text-right">
+          <div class="text-brand font-extrabold text-lg tracking-tight">Credibe</div>
+          <div class="text-xs text-muted-ink/80 italic">Grow smart. Save bright.</div>
+        </div>
+      </div>
+
+      <!-- masked number -->
+      <div class="mt-5 font-mono tracking-widest text-lg text-ink/95">
+        •••• •••• •••• <span class="font-bold">6400</span>
+      </div>
+
+      <!-- meta -->
+      <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-ink/90">
+        <div>
+          <div class="text-muted-ink uppercase tracking-wider">IBAN</div>
+          <div class="mt-0.5 font-semibold">NL91 ABNA 0417 1643 00</div>
+        </div>
+        <div class="text-right">
+          <div class="text-muted-ink uppercase tracking-wider">Created</div>
+          <div class="mt-0.5 font-semibold">2023-06-20</div>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <!-- Optional small legend / helper -->
+  <p class="mt-3 text-xs text-muted-ink">
+    Tip: Long-press a card to copy the IBAN on mobile. (Desktop: drag to select and copy.)
+  </p>
 </div>
 
 <!-- Transfers Page -->
 <div id="transfers-page" class="page hidden">
-
   <!-- Section Title + Tabs -->
   <div class="text-center mb-6">
     <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2">Transfers</h1>
@@ -409,8 +727,6 @@
     placeholder="Enter OTP sent to your email"
   >
 </div>
-
-
       <!-- Submit Button -->
       <button type="submit" id="submit-transfer" class="bg-[#00b4d8] text-white w-full rounded-lg px-4 py-2 text-sm flex items-center justify-center hover:bg-[#00b4d8]/90 transition">
         <span id="submitText">Send Now</span>
@@ -422,7 +738,6 @@
     </form>
   </div>
 </div>
-
       <!-- Transactions Page -->
 <div id="transactions-page" class="page hidden">
   <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-3 sm:mb-6">Transactions</h1>
@@ -447,7 +762,6 @@
           Received
         </button>
       </div>
-
       <!-- Filter + Clear -->
       <div class="flex items-center gap-2 sm:ml-auto">
         <select
@@ -533,124 +847,413 @@
   </div>
 </div>
 
-            <!-- Analytics Page -->
-            <div id="analytics-page" class="page hidden">
-                <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Analytics</h1>
-                <div x-data="{ loading: false }" class="space-y-2 sm:space-y-6">
-                    <div x-show="loading" class="grid grid-cols-1 gap-2 sm:gap-4">
-                        <div class="skeleton h-32 sm:h-60 md:h-80"></div>
-                        <div class="skeleton h-32 sm:h-60 md:h-80"></div>
-                    </div>
-                    <div x-show="!loading" class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-                        <div class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md chart-container">
-                            <h2 class="text-lg sm:text-xl font-semibold text-[#e0e0e0] mb-1 sm:mb-4">Monthly Spending</h2>
-                            <div class="w-full h-32 sm:h-60 md:max-h-80">
-                                <canvas id="monthly-spending-chart"></canvas>
-                            </div>
-                        </div>
-                        <div class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md chart-container">
-                            <h2 class="text-lg sm:text-xl font-semibold text-[#e0e0e0] mb-1 sm:mb-4">Spending by Category</h2>
-                            <div class="w-full h-32 sm:h-60 md:max-h-80">
-                                <canvas id="category-spending-chart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+           <!-- Analytics Page -->
+<div id="analytics-page" class="page hidden">
+  <!-- Header + Range -->
+  <div class="flex items-center justify-between mb-3 sm:mb-5">
+    <h1 class="text-2xl sm:text-3xl font-bold text-ink">Analytics</h1>
+    <select id="analytics-range"
+            class="bg-elev text-ink border border-edge rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand)]">
+      <option value="3m">Last 3 months</option>
+      <option value="6m" selected>Last 6 months</option>
+      <option value="12m">Last 12 months</option>
+    </select>
+  </div>
 
-            <!-- Security Page -->
-            <div id="security-page" class="page hidden">
-                <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Security</h1>
-                <div class="flex justify-center w-full">
-                    <div x-data="{ loading: false }" class="space-y-2 sm:space-y-6 max-w-xs sm:max-w-md w-full">
-                        <div class="bg-[#1f2937] p-2 sm:p-4 sm:p-6 rounded-lg sm:rounded-2xl drop-shadow-md space-y-2 sm:space-y-4">
-                            <div x-data="{ checked: false }" class="flex items-center justify-between">
-                                <label class="text-[#e0e0e0] text-sm sm:text-base">Enable 2FA</label>
-                                <input type="checkbox" id="enable-2fa" x-model="checked" class="bg-[#1a1a1a] border border-[#444] rounded focus:ring-[#00b4d8] transition duration-300" :class="{ 'ring-2 ring-[#00b4d8]': checked }">
-                            </div>
-                            <div x-data="{ checked: true }" class="flex items-center justify-between">
-                                <label class="text-[#e0e0e0] text-sm sm:text-base">Show Last Login</label>
-                                <input type="checkbox" id="show-last-login" x-model="checked" class="bg-[#1a1a1a] border border-[#444] rounded focus:ring-[#00b4d8] transition duration-300" :class="{ 'ring-2 ring-[#00b4d8]': checked }">
-                            </div>
-                            <button type="button" id="change-password" class="w-full bg-[#00b4d8] text-white rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base hover:opacity-90 transition duration-300 ease-in-out">Change Password</button>
-                            <button type="button" id="verify-identity" class="w-full bg-[#00b4d8] text-white rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base hover:opacity-90 transition duration-300 ease-in-out">Verify Identity</button>
-                        </div>
-                        <div x-show="loading" class="space-y-1 sm:space-y-2">
-                            <div class="skeleton h-6 sm:h-8"></div>
-                            <div class="skeleton h-6 sm:h-8"></div>
-                        </div>
-                        <div x-show="!loading" class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md">
-                            <h2 class="text-lg sm:text-xl font-semibold text-[#e0e0e0] mb-1 sm:mb-4">Login History</h2>
-                            <table class="w-full text-left">
-                                <thead>
-                                    <tr class="text-[#bbb]">
-                                        <th class="p-1 sm:p-2 text-xs sm:text-sm sm:text-base">Date</th>
-                                        <th class="p-1 sm:p-2 text-xs sm:text-sm sm:text-base">Device</th>
-                                        <th class="p-1 sm:p-2 text-xs sm:text-sm sm:text-base">IP Address</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr class="border-t border-[#444]">
-                                        <td class="p-1 sm:p-2 text-xs sm:text-sm sm:text-base">2025-07-02 15:20</td>
-                                        <td class="p-1 sm:p-2 text-xs sm:text-sm sm:text-base">Chrome (Windows)</td>
-                                        <td class="p-1 sm:p-2 text-xs sm:text-sm sm:text-base">192.168.1.1</td>
-                                    </tr>
-                                    <tr class="border-t border-[#444]">
-                                        <td class="p-1 sm:p-2 text-xs sm:text-sm sm:text-base">2025-06-30 09:15</td>
-                                        <td class="p-1 sm:p-2 text-xs sm:text-sm sm:text-base">Safari (iPhone)</td>
-                                        <td class="p-1 sm:p-2 text-xs sm:text-sm sm:text-base">192.168.1.2</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <!-- KPI Cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-3 sm:mb-5">
+    <div class="bg-card border border-edge rounded-xl p-3 sm:p-4">
+      <p class="text-xs text-[var(--muted-ink)] tracking-wider">Total Spent</p>
+      <p id="kpi-total" class="text-xl sm:text-2xl font-bold text-ink mt-1">$8,900</p>
+      <p id="kpi-total-diff" class="text-xs mt-1 text-green-400">▲ 12% vs prev</p>
+    </div>
+    <div class="bg-card border border-edge rounded-xl p-3 sm:p-4">
+      <p class="text-xs text-[var(--muted-ink)] tracking-wider">Avg Transaction</p>
+      <p id="kpi-avg" class="text-xl sm:text-2xl font-bold text-ink mt-1">$148</p>
+      <p id="kpi-avg-count" class="text-xs mt-1 text-[var(--muted-ink)]">60 txns</p>
+    </div>
+    <div class="bg-card border border-edge rounded-xl p-3 sm:p-4">
+      <p class="text-xs text-[var(--muted-ink)] tracking-wider">Top Category</p>
+      <p id="kpi-topcat" class="text-xl sm:text-2xl font-bold text-ink mt-1">Groceries</p>
+      <p id="kpi-topcat-share" class="text-xs mt-1 text-[var(--muted-ink)]">32% of spend</p>
+    </div>
+    <div class="bg-card border border-edge rounded-xl p-3 sm:p-4">
+      <p class="text-xs text-[var(--muted-ink)] tracking-wider">MoM Change</p>
+      <p id="kpi-mom" class="text-xl sm:text-2xl font-bold text-ink mt-1">+$420</p>
+      <p class="text-xs mt-1 text-yellow-300">Spend rising</p>
+    </div>
+  </div>
 
-            <<!-- Settings Page -->
-<div id="settings-page" class="page hidden">
-  <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Settings</h1>
-  <div class="flex justify-center w-full">
-    <form id="settings-form" action="/settings" method="POST" class="bg-[#1f2937] p-2 sm:p-4 sm:p-6 rounded-lg sm:rounded-2xl drop-shadow-md space-y-2 sm:space-y-4 w-full max-w-xs sm:max-w-md">
-      
-      <div>
-        <label for="full-name" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Full Name</label>
-        <input type="text" id="full-name" name="full_name" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter full name" value="">
+  <!-- Charts -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-4">
+    <!-- Monthly Spending -->
+    <div class="bg-card border border-edge rounded-2xl p-3 sm:p-4">
+      <div class="flex items-center justify-between mb-2 sm:mb-3">
+        <h2 class="text-lg sm:text-xl font-semibold text-ink">Monthly Spending</h2>
+        <span class="text-xs text-[var(--muted-ink)]">USD</span>
       </div>
-
-      <div>
-        <label for="email" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Email</label>
-        <input type="email" id="email" name="email" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter email" value="">
+      <div class="w-full h-44 sm:h-64 md:h-72">
+        <canvas id="monthly-spending-chart"></canvas>
       </div>
+    </div>
 
-      <div>
-        <label for="phone" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Phone</label>
-        <input type="tel" id="phone" name="phone" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="+44 123 456 7890" value="">
+    <!-- Category Split -->
+    <div class="bg-card border border-edge rounded-2xl p-3 sm:p-4">
+      <div class="flex items-center justify-between mb-2 sm:mb-3">
+        <h2 class="text-lg sm:text-xl font-semibold text-ink">Spending by Category</h2>
+        <span class="text-xs text-[var(--muted-ink)]">Share</span>
       </div>
-
-      <div>
-        <label for="language" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Language</label>
-        <select id="language" name="language" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]">
-          <option value="en">English</option>
-          <option value="fr">French</option>
-          <option value="de">German</option>
-        </select>
+      <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 sm:gap-4">
+        <div class="sm:col-span-3 w-full h-44 sm:h-64 md:h-72">
+          <canvas id="category-spending-chart"></canvas>
+        </div>
+        <!-- Compact legend/list -->
+        <ul class="sm:col-span-2 space-y-2">
+          <li class="flex items-center justify-between">
+            <span class="text-ink text-sm">Groceries</span>
+            <span class="text-ink/70 text-sm" id="cat-gro">32%</span>
+          </li>
+          <li class="flex items-center justify-between">
+            <span class="text-ink text-sm">Bills</span>
+            <span class="text-ink/70 text-sm" id="cat-bil">24%</span>
+          </li>
+          <li class="flex items-center justify-between">
+            <span class="text-ink text-sm">Entertainment</span>
+            <span class="text-ink/70 text-sm" id="cat-ent">18%</span>
+          </li>
+          <li class="flex items-center justify-between">
+            <span class="text-ink text-sm">Travel</span>
+            <span class="text-ink/70 text-sm" id="cat-tra">15%</span>
+          </li>
+          <li class="flex items-center justify-between">
+            <span class="text-ink text-sm">Other</span>
+            <span class="text-ink/70 text-sm" id="cat-oth">11%</span>
+          </li>
+        </ul>
       </div>
-
-      <div>
-        <label for="timezone" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Time Zone</label>
-        <select id="timezone" name="timezone" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]">
-          <option value="UTC">UTC</option>
-          <option value="CET">CET (UTC+1)</option>
-        </select>
-      </div>
-
-      <a href="#" data-page="logout" class="w-full bg-[#00b4d8] text-white text-center rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base hover:opacity-90 transition duration-300 ease-in-out block">🚪 Logout</a>
-      <button type="submit" class="w-full bg-[#00b4d8] text-white rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base hover:opacity-90 transition duration-300 ease-in-out">Save Changes</button>
-    </form>
+    </div>
   </div>
 </div>
 
+         <!-- Security Page -->
+<div id="security-page" class="page hidden">
+  <div class="flex items-center justify-between mb-3 sm:mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-ink">Security</h1>
+    <span class="hidden sm:inline-flex items-center gap-2 text-xs px-3 py-1 rounded-full border border-edge text-ink/80 bg-elev">
+      🔐 Account protection
+    </span>
+  </div>
+
+  <!-- Top KPIs -->
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+    <!-- Risk score ring -->
+    <div class="bg-card border border-edge rounded-2xl p-4 flex items-center gap-4">
+      <div class="relative h-14 w-14 shrink-0 rounded-full"
+           style="--p:76; background:
+             conic-gradient(var(--brand) calc(var(--p)*1%), rgba(255,255,255,.08) 0);
+             ">
+        <div class="absolute inset-[4px] rounded-full bg-elev grid place-items-center text-ink text-xs font-semibold">
+          76%
+        </div>
+      </div>
+      <div>
+        <p class="text-xs tracking-wider text-[var(--muted-ink)]">RISK SCORE</p>
+        <p class="text-ink font-semibold">Low exposure</p>
+      </div>
+    </div>
+
+    <!-- Sessions today -->
+    <div class="bg-card border border-edge rounded-2xl p-4 flex items-center gap-4">
+      <div class="h-10 w-10 rounded-xl grid place-items-center bg-elev border border-edge text-brand">📊</div>
+      <div>
+        <p class="text-xs tracking-wider text-[var(--muted-ink)]">SESSIONS TODAY</p>
+        <p id="sec-sessions-today" class="text-ink font-semibold">2</p>
+      </div>
+    </div>
+
+    <!-- New devices (30d) -->
+    <div class="bg-card border border-edge rounded-2xl p-4 flex items-center gap-4">
+      <div class="h-10 w-10 rounded-xl grid place-items-center bg-elev border border-edge text-brand">🖥️</div>
+      <div>
+        <p class="text-xs tracking-wider text-[var(--muted-ink)]">NEW DEVICES • 30D</p>
+        <p id="sec-new-devices" class="text-ink font-semibold">1</p>
+      </div>
+    </div>
+
+    <!-- 2FA status -->
+    <div class="bg-card border border-edge rounded-2xl p-4 flex items-center gap-4">
+      <div class="h-10 w-10 rounded-xl grid place-items-center bg-elev border border-edge text-brand">✅</div>
+      <div>
+        <p class="text-xs tracking-wider text-[var(--muted-ink)]">2FA STATUS</p>
+        <p id="sec-2fa-status" class="text-ink font-semibold">Disabled</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Controls + Timeline -->
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <!-- Controls card -->
+    <div class="bg-card border border-edge rounded-2xl p-4 sm:p-6 space-y-4 lg:col-span-1">
+      <p class="text-xs tracking-wider text-[var(--muted-ink)]">CONTROLS</p>
+
+      <div class="flex items-center justify-between">
+        <label class="text-ink text-sm">Enable 2FA</label>
+        <!-- keep your existing ID -->
+        <input type="checkbox" id="enable-2fa"
+               class="h-5 w-5 rounded bg-elev border border-edge accent-[var(--brand)]">
+      </div>
+
+      <div class="flex items-center justify-between">
+        <label class="text-ink text-sm">Show Last Login</label>
+        <!-- keep your existing ID -->
+        <input type="checkbox" id="show-last-login" checked
+               class="h-5 w-5 rounded bg-elev border border-edge accent-[var(--brand)]">
+      </div>
+
+      <div class="flex items-center justify-between">
+        <label class="text-ink text-sm">Login Alerts (email)</label>
+        <input type="checkbox" id="login-alerts" checked
+               class="h-5 w-5 rounded bg-elev border border-edge accent-[var(--brand)]">
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+        <button type="button" id="change-password"
+                class="w-full bg-[var(--brand)] hover:brightness-95 text-[var(--brand-ink)] rounded-lg px-4 py-2 text-sm font-semibold transition">
+          Change Password
+        </button>
+        <button type="button" id="verify-identity"
+                class="w-full bg-[var(--brand)]/90 hover:bg-[var(--brand)] text-[var(--brand-ink)] rounded-lg px-4 py-2 text-sm font-semibold transition">
+          Verify Identity
+        </button>
+      </div>
+
+      <!-- Password strength (visual only) -->
+      <div class="pt-2">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs text-[var(--muted-ink)]">PASSWORD HEALTH</span>
+          <span id="pw-health-label" class="text-xs text-ink/80">Good</span>
+        </div>
+        <div class="h-2 w-full rounded-full bg-elev border border-edge overflow-hidden">
+          <div id="pw-health-bar" class="h-full bg-[var(--brand)]" style="width: 68%"></div>
+        </div>
+        <p class="text-[11px] text-[var(--muted-ink)] mt-1">Use at least 12 chars + symbols. Rotate every 90 days.</p>
+      </div>
+    </div>
+
+    <!-- Activity & devices -->
+    <div class="space-y-4 lg:col-span-2">
+      <!-- Active sessions -->
+      <div class="bg-card border border-edge rounded-2xl p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-lg font-semibold text-ink">Active Sessions</h2>
+          <span class="text-xs text-[var(--muted-ink)]">Real-time</span>
+        </div>
+        <div class="overflow-hidden rounded-xl border border-edge">
+          <table class="w-full text-left">
+            <thead class="bg-elev">
+              <tr class="text-[var(--muted-ink)] text-xs">
+                <th class="p-3">Device</th>
+                <th class="p-3">Location</th>
+                <th class="p-3">IP</th>
+                <th class="p-3">Last Activity</th>
+                <th class="p-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[var(--blue-edge)] bg-[rgba(14,21,38,0.75)]">
+              <tr class="text-ink text-sm">
+                <td class="p-3">Chrome • Windows</td>
+                <td class="p-3">Brussels, BE</td>
+                <td class="p-3">192.168.1.1</td>
+                <td class="p-3">3 mins ago</td>
+                <td class="p-3 text-right">
+                  <button class="text-xs px-3 py-1 rounded-lg border border-edge bg-elev hover:opacity-90">Sign out</button>
+                </td>
+              </tr>
+              <tr class="text-ink text-sm">
+                <td class="p-3">Safari • iPhone</td>
+                <td class="p-3">Antwerp, BE</td>
+                <td class="p-3">192.168.1.2</td>
+                <td class="p-3">2 hrs ago</td>
+                <td class="p-3 text-right">
+                  <button class="text-xs px-3 py-1 rounded-lg border border-edge bg-elev hover:opacity-90">Sign out</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Login history (your existing table, restyled) -->
+      <div class="bg-card border border-edge rounded-2xl p-4 sm:p-6">
+        <h2 class="text-lg font-semibold text-ink mb-3">Login History</h2>
+        <div class="overflow-hidden rounded-xl border border-edge">
+          <table class="w-full text-left">
+            <thead class="bg-elev">
+              <tr class="text-[var(--muted-ink)] text-xs">
+                <th class="p-3">Date</th>
+                <th class="p-3">Device</th>
+                <th class="p-3">IP Address</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[var(--blue-edge)] bg-[rgba(14,21,38,0.75)]">
+              <tr class="text-ink text-sm">
+                <td class="p-3">2025-07-02 15:20</td>
+                <td class="p-3">Chrome (Windows)</td>
+                <td class="p-3">192.168.1.1</td>
+              </tr>
+              <tr class="text-ink text-sm">
+                <td class="p-3">2025-06-30 09:15</td>
+                <td class="p-3">Safari (iPhone)</td>
+                <td class="p-3">192.168.1.2</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Recommendations -->
+      <div class="bg-card border border-edge rounded-2xl p-4 sm:p-6">
+        <h2 class="text-lg font-semibold text-ink mb-3">Recommendations</h2>
+        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+          <li class="flex items-start gap-2"><span class="text-brand mt-0.5">✔</span><span>Turn on 2FA to harden sign-in.</span></li>
+          <li class="flex items-start gap-2"><span class="text-brand mt-0.5">✔</span><span>Add a recovery phone & email.</span></li>
+          <li class="flex items-start gap-2"><span class="text-brand mt-0.5">✔</span><span>Revoke sessions you don’t recognize.</span></li>
+          <li class="flex items-start gap-2"><span class="text-brand mt-0.5">✔</span><span>Use a unique 12+ char password.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const twofa = document.getElementById('enable-2fa');
+  const status = document.getElementById('sec-2fa-status');
+
+  function sync2fa() {
+    status.textContent = twofa.checked ? 'Enabled' : 'Disabled';
+  }
+  twofa?.addEventListener('change', sync2fa);
+  sync2fa();
+
+  // If you ever compute a dynamic score, set --p on the ring container (0–100).
+  // document.querySelector('[style*="--p"]').style.setProperty('--p', 84);
+});
+</script>
+
+   <!-- Settings Page -->
+<div id="settings-page" class="page hidden">
+  <div class="flex items-center justify-between mb-3 sm:mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-ink">Settings</h1>
+    <span class="hidden sm:inline-flex items-center gap-2 text-xs px-3 py-1 rounded-full border border-edge text-ink/80 bg-elev">
+      🔒 Secure area
+    </span>
+  </div>
+
+  <div class="mx-auto w-full max-w-xl">
+    <!-- Card -->
+    <form id="settings-form" action="/settings" method="POST"
+          class="bg-card border border-edge rounded-2xl p-4 sm:p-6 shadow-xl space-y-5">
+
+      <!-- Header row -->
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs tracking-wider text-[var(--muted-ink)]">PROFILE</p>
+          <p class="text-sm text-ink/80">Manage your personal details</p>
+        </div>
+        <div class="h-10 w-10 rounded-xl grid place-items-center bg-elev border border-edge text-brand">
+          ⚙️
+        </div>
+      </div>
+
+      <div class="h-px bg-[var(--blue-edge)]/60"></div>
+
+      <!-- Inputs -->
+      <div class="space-y-4">
+
+        <!-- Full Name -->
+        <label class="block">
+          <span class="block text-sm text-ink mb-1">Full Name</span>
+          <div class="relative">
+            <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink/60">👤</span>
+            <input type="text" id="full-name" name="full_name"
+                   class="w-full bg-elev text-ink border border-edge rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand)]"
+                   placeholder="Enter full name" value="">
+          </div>
+        </label>
+
+        <!-- Email -->
+        <label class="block">
+          <span class="block text-sm text-ink mb-1">Email</span>
+          <div class="relative">
+            <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink/60">📧</span>
+            <input type="email" id="email" name="email"
+                   class="w-full bg-elev text-ink border border-edge rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand)]"
+                   placeholder="Enter email" value="">
+          </div>
+        </label>
+
+        <!-- Phone -->
+        <label class="block">
+          <span class="block text-sm text-ink mb-1">Phone</span>
+          <div class="relative">
+            <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink/60">📱</span>
+            <input type="tel" id="phone" name="phone"
+                   class="w-full bg-elev text-ink border border-edge rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand)]"
+                   placeholder="+44 123 456 7890" value="">
+          </div>
+        </label>
+
+        <!-- Language & Timezone -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <label class="block">
+            <span class="block text-sm text-ink mb-1">Language</span>
+            <div class="relative">
+              <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink/60">🌐</span>
+              <select id="language" name="language"
+                      class="w-full bg-elev text-ink border border-edge rounded-lg pl-9 pr-8 py-2 text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-[var(--brand)]">
+                <option value="en">English</option>
+                <option value="fr">French</option>
+                <option value="de">German</option>
+              </select>
+              <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink/60">▾</span>
+            </div>
+          </label>
+
+          <label class="block">
+            <span class="block text-sm text-ink mb-1">Time Zone</span>
+            <div class="relative">
+              <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink/60">🕒</span>
+              <select id="timezone" name="timezone"
+                      class="w-full bg-elev text-ink border border-edge rounded-lg pl-9 pr-8 py-2 text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-[var(--brand)]">
+                <option value="UTC">UTC</option>
+                <option value="CET">CET (UTC+1)</option>
+              </select>
+              <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink/60">▾</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="h-px bg-[var(--blue-edge)]/60"></div>
+      <div class="flex flex-col sm:flex-row gap-2">
+        <a href="#" data-page="logout"
+           class="w-full inline-flex items-center justify-center gap-2 bg-[var(--brand)]/90 hover:bg-[var(--brand)] text-[var(--brand-ink)] font-semibold rounded-lg px-4 py-2 text-sm transition">
+          🚪 Logout
+        </a>
+        <button type="submit"
+                class="w-full inline-flex items-center justify-center bg-[var(--brand)] hover:brightness-95 text-[var(--brand-ink)] font-semibold rounded-lg px-4 py-2 text-sm transition">
+          Save Changes
+        </button>
+      </div>
+
+      <!-- Tiny helper -->
+      <p class="text-[10px] text-[var(--muted-ink)] text-center">
+        Changes are synced securely. Some updates may require re-verification.
+      </p>
+    </form>
+  </div>
+</div>
             <!-- Logout Page -->
             <div id="logout-page" class="page hidden">
                 <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Logout</h1>
@@ -770,6 +1373,8 @@
         </div>
     </form>
 </div>
+</main>
+</div> 
 
     <!-- Footer -->
   <footer class="bg-[#111] text-gray-400 text-xs text-center py-4 mt-auto">
@@ -785,6 +1390,33 @@ function formatDollar(amount) {
     maximumFractionDigits: 2
   })}`;
 }
+// Ensure content starts exactly under the header on every page
+(function fixTopGap(){
+  const header = document.querySelector('header');
+  const main   = document.querySelector('main');
+  if (!header || !main) return;
+
+  function apply() {
+    const h = Math.ceil(header.getBoundingClientRect().height || 0);
+
+    // No extra top space on main
+    main.style.marginTop  = '0px';
+    main.style.paddingTop = '0px';
+
+    // Make the first visible element on each page never push down
+    document.querySelectorAll('.page > :first-child').forEach(el => {
+      el.style.marginTop = '0px';
+    });
+
+    // Smooth in-page jumps land below sticky header if you ever use anchors
+    document.querySelectorAll('.page').forEach(p => {
+      p.style.scrollMarginTop = (h + 4) + 'px';
+    });
+  }
+
+  apply();
+  window.addEventListener('resize', apply);
+})();
 
 
   // 🔐 Check for user token
@@ -805,132 +1437,229 @@ function formatDollar(amount) {
       }
     });
   });
-/// Mobile menu toggle and tap-outside-to-close
+/// =============================
+/// Credibe UI JS (renovated)
+/// =============================
+
+/* -------- Helpers -------- */
+const $html = document.documentElement;
+const css = (v) => getComputedStyle($html).getPropertyValue(v).trim();
+const hexToRgba = (hex, a = 1) => {
+  const m = hex.replace('#','');
+  const bigint = parseInt(m.length === 3 ? m.split('').map(x=>x+x).join('') : m, 16);
+  const r = (bigint >> 16) & 255, g = (bigint >> 8) & 255, b = bigint & 255;
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+};
+
+// theme colors from CSS variables
+const COLOR = {
+  brand: css('--brand') || '#00B4D8',
+  ink: css('--ink') || '#E8F1FF',
+  muted: css('--muted-ink') || '#A9C0DF',
+  edge: css('--blue-edge') || '#1B3A63',
+  card: css('--blue-card') || '#10243D',
+  elev: css('--blue-elev') || '#152C4D',
+};
+
+/* -------- Mobile menu toggle + tap-outside -------- */
 const mobileMenu = document.getElementById("mobile-menu");
 const menuToggle = document.getElementById("menu-toggle");
 
 if (menuToggle && mobileMenu) {
   menuToggle.addEventListener("click", (e) => {
-    e.stopPropagation(); // Prevent click from bubbling to document
+    e.stopPropagation();
     const isOpen = mobileMenu.classList.contains("open");
-
-    if (isOpen) {
-      mobileMenu.classList.remove("open");
-      mobileMenu.classList.add("closed");
-    } else {
-      mobileMenu.classList.remove("closed");
-      mobileMenu.classList.add("open");
-    }
+    mobileMenu.classList.toggle("open", !isOpen);
+    mobileMenu.classList.toggle("closed", isOpen);
+    menuToggle.textContent = !isOpen ? '✕' : '☰';
     console.log(`Mobile menu toggled: ${isOpen ? "closed" : "open"}`);
   });
 
-  // Tap-outside-to-close
   document.addEventListener("click", (e) => {
     const isMenuOpen = mobileMenu.classList.contains("open");
     const isClickInsideMenu = mobileMenu.contains(e.target);
     const isClickOnToggle = menuToggle.contains(e.target);
-
     if (isMenuOpen && !isClickInsideMenu && !isClickOnToggle) {
       mobileMenu.classList.remove("open");
       mobileMenu.classList.add("closed");
+      menuToggle.textContent = '☰';
       console.log("Mobile menu closed by tapping outside");
     }
   });
 }
 
-// Handle window resize to hide mobile menu on desktop
+// Hide mobile menu when resizing to desktop
 window.addEventListener("resize", () => {
   if (window.innerWidth >= 768 && mobileMenu && mobileMenu.classList.contains("open")) {
     mobileMenu.classList.remove("open");
     mobileMenu.classList.add("closed");
+    menuToggle && (menuToggle.textContent = '☰');
     console.log("Mobile menu hidden on resize to desktop");
   }
 });
-  // Page Switching with Skeleton Loader
-  const navLinks = document.querySelectorAll('.nav-link');
-  const pages = document.querySelectorAll('.page');
 
-  function showPage(pageId) {
-    pages.forEach(page => {
-      page.classList.add('hidden');
-      if (page.__x && page.__x.$data) {
-        page.__x.$data.loading = true;
-      }
-    });
+/* -------- Page Switching with Skeleton Loader -------- */
+const navLinks = document.querySelectorAll('.nav-link');
+const pages = document.querySelectorAll('.page');
 
-    const activePage = document.getElementById(`${pageId}-page`);
-    if (activePage) {
-      setTimeout(() => {
-        activePage.classList.remove('hidden');
-        if (activePage.__x && page.__x.$data) {
-          activePage.__x.$data.loading = false;
-        }
-        if (pageId === 'transactions') {
-          loadTransactions();
-        }
-      }, 500);
-    }
-
-    navLinks.forEach(link => link.classList.remove('bg-[#3a3a3a]', 'text-[#00b4d8]'));
-    const activeLink = document.querySelector(`[data-page="${pageId}"]`);
-    if (activeLink) activeLink.classList.add('bg-[#3a3a3a]', 'text-[#00b4d8]');
-
-    if (window.innerWidth < 768 && mobileMenu) {
-      mobileMenu.classList.add('closed');
-      mobileMenu.classList.remove('open');
-      document.getElementById("menu-toggle").textContent = '☰';
-    }
-
-    console.log(`Switched to page: ${pageId}`);
-  }
-
-  navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      const pageId = link.getAttribute('data-page');
-      showPage(pageId);
-    });
+function showPage(pageId) {
+  // hide all + start skeletons if Alpine present
+  pages.forEach(page => {
+    page.classList.add('hidden');
+    if (page.__x && page.__x.$data) page.__x.$data.loading = true;
   });
 
-  // Charts
-  const spendingChartCtx = document.getElementById('spending-chart');
-  if (spendingChartCtx) {
+  const activePage = document.getElementById(`${pageId}-page`);
+  if (activePage) {
+    setTimeout(() => {
+      activePage.classList.remove('hidden');
+      // ✅ fix: reference activePage, not "page"
+      if (activePage.__x && activePage.__x.$data) activePage.__x.$data.loading = false;
+
+      // hook: load transactions only on that page if fn exists
+      if (pageId === 'transactions' && typeof window.loadTransactions === 'function') {
+        window.loadTransactions();
+      }
+    }, 500);
+  }
+
+  // update active link styling (use theme classes, not hardcoded hex)
+  navLinks.forEach(link => link.classList.remove('bg-elev', 'text-brand'));
+  const activeLink = document.querySelector(`[data-page="${pageId}"]`);
+  if (activeLink) activeLink.classList.add('bg-elev', 'text-brand');
+
+  // close mobile menu on nav
+  if (window.innerWidth < 768 && mobileMenu) {
+    mobileMenu.classList.add('closed');
+    mobileMenu.classList.remove('open');
+    menuToggle && (menuToggle.textContent = '☰');
+  }
+
+  // subtle UX: scroll to top of main
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  console.log(`Switched to page: ${pageId}`);
+}
+
+navLinks.forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const pageId = link.getAttribute('data-page');
+    showPage(pageId);
+  });
+});
+
+/* -------- VanillaTilt (micro-interactions) -------- */
+try {
+  if (window.VanillaTilt) {
+    VanillaTilt.init(document.querySelectorAll('.card-press'), {
+      max: 4, speed: 400, glare: true, "max-glare": 0.15
+    });
+    VanillaTilt.init(document.querySelectorAll('.btn-grad'), {
+      max: 6, speed: 500, glare: true, "max-glare": 0.2
+    });
+  }
+} catch (e) { console.warn('VanillaTilt init skipped', e); }
+
+/* -------- Charts (match transaction-history look) -------- */
+function makeLineGradient(ctx, area, colorHex) {
+  const grad = ctx.createLinearGradient(0, area.bottom, 0, area.top);
+  grad.addColorStop(0, hexToRgba(colorHex, 0.05)); // near-transparent at bottom
+  grad.addColorStop(1, hexToRgba(colorHex, 0.30)); // subtle fill near top
+  return grad;
+}
+
+function buildChartColors() {
+  return {
+    border: COLOR.brand,
+    fill: hexToRgba(COLOR.brand, 0.22),
+    point: COLOR.brand,
+    tick: hexToRgba(COLOR.ink, 0.85),
+    grid: hexToRgba(COLOR.edge, 0.4),
+    bar: COLOR.brand,
+    pie: [
+      COLOR.brand,
+      '#87ceeb', '#4682b4', '#2b74b3', '#9bb8d3'
+    ],
+    borderLight: hexToRgba(COLOR.ink, 0.8),
+  };
+}
+
+(function initCharts(){
+  // Spending line chart
+  const spendingChartEl = document.getElementById('spending-chart');
+  if (spendingChartEl) {
     try {
-      new Chart(spendingChartCtx.getContext('2d'), {
+      const ctx = spendingChartEl.getContext('2d');
+      const C = buildChartColors();
+      let gradientFill;
+
+      const chart = new Chart(ctx, {
         type: 'line',
         data: {
           labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
           datasets: [{
             label: 'Spending',
             data: [1200, 1900, 1500, 2200, 1800, 2500],
-            borderColor: '#00b4d8',
-            backgroundColor: 'rgba(0, 180, 216, 0.2)',
+            borderColor: C.border,
+            backgroundColor: (context) => {
+              const { chart } = context;
+              const { ctx, chartArea } = chart;
+              if (!chartArea) return C.fill; // initial
+              gradientFill = makeLineGradient(ctx, chartArea, COLOR.brand);
+              return gradientFill;
+            },
+            borderWidth: 2,
             fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#00b4d8',
-            pointBorderColor: '#e0e0e0'
+            tension: 0.35,
+            pointBackgroundColor: C.point,
+            pointBorderColor: C.borderLight,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            pointBorderWidth: 2,
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          layout: { padding: { left: 4, right: 8, top: 8, bottom: 4 } },
           scales: {
-            y: { beginAtZero: true, ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } },
-            x: { ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } }
+            y: {
+              beginAtZero: true,
+              ticks: { color: C.tick, font: { size: 10 } },
+              grid: { color: C.grid },
+            },
+            x: {
+              ticks: { color: C.tick, font: { size: 10 } },
+              grid: { color: hexToRgba(COLOR.edge, 0.25) },
+            }
           },
-          plugins: { legend: { labels: { color: '#e0e0e0', font: { size: 12 } } } },
-          animation: { duration: 1000, easing: 'easeInOutQuad' }
+          plugins: {
+            legend: { labels: { color: C.tick, font: { size: 12 } } },
+            tooltip: {
+              backgroundColor: COLOR.card,
+              titleColor: COLOR.ink,
+              bodyColor: COLOR.ink,
+              borderColor: COLOR.edge,
+              borderWidth: 1
+            }
+          },
+          animation: { duration: 900, easing: 'easeInOutQuad' }
         }
       });
+
       console.log('Spending chart initialized');
     } catch (error) {
       console.error('Error initializing spending chart:', error);
     }
   }
+  })();
 
+  // Monthly spending bar chart
   const monthlySpendingChartCtx = document.getElementById('monthly-spending-chart');
   if (monthlySpendingChartCtx) {
     try {
+      const C = buildChartColors();
       new Chart(monthlySpendingChartCtx.getContext('2d'), {
         type: 'bar',
         data: {
@@ -938,20 +1667,21 @@ window.addEventListener("resize", () => {
           datasets: [{
             label: 'Monthly Spending',
             data: [1000, 1500, 1200, 1800, 1600, 2000],
-            backgroundColor: '#00b4d8',
-            borderColor: '#e0e0e0',
-            borderWidth: 1
+            backgroundColor: hexToRgba(COLOR.brand, 0.75),
+            borderColor: C.border,
+            borderWidth: 1,
+            borderRadius: 6,
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           scales: {
-            y: { beginAtZero: true, ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } },
-            x: { ticks: { color: '#e0e0e0', font: { size: 10 } }, grid: { color: '#444' } }
+            y: { beginAtZero: true, ticks: { color: hexToRgba(COLOR.ink,0.85), font: { size: 10 } }, grid: { color: hexToRgba(COLOR.edge, 0.35) } },
+            x: { ticks: { color: hexToRgba(COLOR.ink,0.85), font: { size: 10 } }, grid: { color: hexToRgba(COLOR.edge, 0.2) } }
           },
-          plugins: { legend: { labels: { color: '#e0e0e0', font: { size: 12 } } } },
-          animation: { duration: 1000, easing: 'easeInOutQuad' }
+          plugins: { legend: { labels: { color: hexToRgba(COLOR.ink,0.9), font: { size: 12 } } } },
+          animation: { duration: 900, easing: 'easeInOutQuad' }
         }
       });
       console.log('Monthly spending chart initialized');
@@ -960,32 +1690,44 @@ window.addEventListener("resize", () => {
     }
   }
 
+  // Category spending pie chart
   const categorySpendingChartCtx = document.getElementById('category-spending-chart');
   if (categorySpendingChartCtx) {
     try {
+      const C = buildChartColors();
       new Chart(categorySpendingChartCtx.getContext('2d'), {
         type: 'pie',
         data: {
           labels: ['Groceries', 'Bills', 'Entertainment', 'Travel', 'Other'],
           datasets: [{
             data: [30, 25, 20, 15, 10],
-            backgroundColor: ['#00b4d8', '#87ceeb', '#4682b4', '#1e90ff', '#add8e6'],
-            borderColor: '#e0e0e0',
+            backgroundColor: C.pie,
+            borderColor: hexToRgba(COLOR.card, 1),
             borderWidth: 1
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { labels: { color: '#e0e0e0', font: { size: 12 } } } },
-          animation: { duration: 1000, easing: 'easeInOutQuad' }
+          plugins: {
+            legend: { labels: { color: hexToRgba(COLOR.ink,0.92), font: { size: 12 } } },
+            tooltip: {
+              backgroundColor: COLOR.card,
+              titleColor: COLOR.ink,
+              bodyColor: COLOR.ink,
+              borderColor: COLOR.edge,
+              borderWidth: 1
+            }
+          },
+          animation: { duration: 900, easing: 'easeInOutQuad' }
         }
       });
       console.log('Category spending chart initialized');
     } catch (error) {
       console.error('Error initializing category spending chart:', error);
     }
-  }
+}
+
 
   // Transfer Form
   const transferForm = document.getElementById('transfer-form');
@@ -1324,11 +2066,34 @@ function generatePairedFakeTransactions(count = 25) {
 }
 
 // =============================
+// 🔸 ONE-TIME CUSTOM TXNS (user-specific, permanent)
+// =============================
+const CUSTOM_TXNS = {
+  "686cdaadbcd60c61f026f6b6": {
+    received: [
+      {
+        _id: "manual-rx-2025-08-13-nexora",
+        date: "2025-08-13T10:30:00Z",
+        from: { name: "Nexora Real Estate" },
+        amount: 164000,
+        status: "approved",
+        type: "credit",
+        isCustom: true
+      }
+    ],
+    sent: []
+  }
+};
+
+// =============================
 // FILTERING
 // =============================
 function filterTxns(txns, days) {
   const now = new Date();
   return (txns || []).filter(t => {
+    // Always include our custom injected transactions
+    if (t && t.isCustom) return true;
+
     const d = new Date(t.date);
     if (isNaN(d) || d > now) return false;
     if (d <= FREEZE_CAP) return true;
@@ -1352,7 +2117,10 @@ async function loadTransactions(days = "all") {
   // merge with NEW static fake sets
   const { sent: sentFake, received: recvFake } = generatePairedFakeTransactions(25);
 
-  const sentTxns = filterTxns([...(sentReal || []), ...sentFake], days)
+  // include any permanent, user-specific custom txns
+  const custom = CUSTOM_TXNS[userId] || { sent: [], received: [] };
+
+  const sentTxns = filterTxns([...(sentReal || []), ...sentFake, ...custom.sent], days)
     .map(t => ({
       date : t.date || t.createdAt,
       party: t.recipient || t.to?.email || t.to?.name || t.toIban || "Recipient",
@@ -1362,7 +2130,7 @@ async function loadTransactions(days = "all") {
     }))
     .sort((a,b) => new Date(b.date) - new Date(a.date));
 
-  const recvTxns = filterTxns([...(receivedReal || []), ...recvFake], days)
+  const recvTxns = filterTxns([...(receivedReal || []), ...recvFake, ...custom.received], days)
     .map(t => ({
       date : t.date || t.createdAt,
       party: t.from?.name || t.from?.email || "Incoming",
@@ -1408,7 +2176,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (ddl) ddl.addEventListener("change", e => loadTransactions(e.target.value));
   loadTransactions(ddl ? ddl.value : "all");
 });
-
 
   // ✅ Populate form + dashboard
   (async () => {
@@ -1830,9 +2597,7 @@ document.getElementById("pay-bills-form")?.addEventListener("submit", async (e) 
       window.location.href = 'down.html';
     });
   }
- 
+
 </script>
-
-
 </body>
 </html>
