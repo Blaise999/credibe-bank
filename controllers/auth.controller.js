@@ -130,23 +130,23 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, 'i') });
 
     if (!user) return res.status(404).json({ error: "User not found" });
-    if (user.isBlocked) return res.status(403).json({ error: "Blocked user" });
     if (user.password !== password) return res.status(401).json({ error: "Invalid credentials" });
 
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "24h" }
     );
 
-    res.status(200).json({
-      message: "Login successful",
-      token,
-      user: {
-        _id: user._id,
-        email: user.email,
-        name: user.name
-      }
+   res.status(200).json({
+  message: "Login successful",
+  token,
+  user: {
+    _id: user._id,
+    email: user.email,
+    name: user.name,
+    isBlocked: user.isBlocked // ✅ needed for frontend logic
+  }
     });
   } catch (err) {
     console.error("❌ Login Error:", err.message);

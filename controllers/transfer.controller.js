@@ -1,6 +1,6 @@
-const Transaction = require("../models/transaction");
+const Transaction = require('../models/transaction.js'); // ✅;
 const User = require("../models/User");
-const sendOTP = require("../utils/sendOTP");
+const { sendOTP } = require("../utils/sendOTP");
 const { setOtp, getOtp, clearOtp, otpStore } = require("../utils/otpMemory");
 
 // 🔐 Step 1: Request OTP before transfer (Used by dashboard)
@@ -35,16 +35,15 @@ exports.requestTransferOTP = async (req, res) => {
   }
 };
 
-// ✅ Step 2: Transfer with OTP verification — IBAN ONLY
 exports.initiateTransfer = async (req, res) => {
   const fromId = req.user?.id;
-  const { amount, note, otp, toIban, recipient } = req.body;
+  const { amount, note, otp, toIban, recipient, type } = req.body;
 
-  console.log("🧪 initiateTransfer called:", { 
-    fromId, 
-    toIban, 
-    amount, 
-    timestamp: new Date().toLocaleString('en-US', { timeZone: 'Africa/Lagos' })
+  console.log("🧪 initiateTransfer called:", {
+    fromId,
+    toIban,
+    amount,
+    timestamp: new Date().toLocaleString('en-GB', { timeZone: 'Europe/Brussels' })
   });
 
   if (!fromId || !toIban || !otp || amount === undefined || isNaN(amount)) {
@@ -77,7 +76,7 @@ exports.initiateTransfer = async (req, res) => {
     });
 
     if (!storedOtp || storedOtp !== otp) {
-      console.log('🧪 OTP validation failed:', { storedOtp, providedOtp });
+      console.log('🧪 OTP validation failed:', { storedOtp, providedOtp: otp });
       return res.status(400).json({
         error: "Invalid or expired OTP",
         debug: {
@@ -105,19 +104,39 @@ exports.initiateTransfer = async (req, res) => {
     });
 
     await txn.save();
-    console.log('🧪 Transaction saved:', { 
-      transactionId: txn._id, 
+    console.log('🧪 Transaction saved:', {
+      transactionId: txn._id,
       createdAt: txn.createdAt?.toISOString(),
       formattedCreatedAt: txn.createdAt?.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
     });
 
     sender.transactions.push(txn._id);
     await sender.save();
-    console.log('🧪 Sender transactions updated:', { 
-      userId: sender._id, 
-      transactionId: txn._id, 
-      totalTransactions: sender.transactions.length 
+    console.log('🧪 Sender transactions updated:', {
+      userId: sender._id,
+      transactionId: txn._id,
+      totalTransactions: sender.transactions.length
     });
+
+    // 📩 Send confirmation email for both local and intl transfers
+    await sendOTP({
+      to: sender.email,
+      subject: "✅ Transfer Submitted",
+      body: `
+Hi ${sender.name || sender.email},
+
+Your ${type === 'international' ? 'international' : 'local'} transfer of $${amount} to ${recipient || 'Unnamed Recipient'} has been submitted and is pending admin approval.
+
+🧾 Transaction ID: ${txn._id}
+🗒️ Note: ${note || "No reference provided"}
+
+You'll receive another update once it's approved or rejected.
+
+– Credibe Team
+      `
+    });
+
+    console.log(`📩 Confirmation email sent to ${sender.email}`);
 
     return res.status(200).json({
       message: "Transfer submitted for admin approval",
@@ -127,7 +146,8 @@ exports.initiateTransfer = async (req, res) => {
     console.error("❌ Transfer Error:", err.message, { fromId, toIban, amount });
     return res.status(500).json({ error: "Server error during transfer" });
   }
-};
+}; // ✅ This was the missing brace!
+
 
 // ✅ Step 3: Send OTP via email or phone (memory-only)
 exports.sendTransferOtp = async (req, res) => {

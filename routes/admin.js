@@ -26,7 +26,7 @@ router.get("/stats", getDashboardStats);
 // User management
 router.get("/users", getAllUsers);
 router.patch("/users/block/:userId", toggleBlockUser);
-router.patch("/users/edit/:id", editUserBalance);
+router.patch("/users/edit/:userId", editUserBalance);
 
 // Transfers
 router.get("/transfers/pending", getPendingTransfers);

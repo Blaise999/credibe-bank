@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('../models/User');
-const Transaction = require('../models/transaction');
-
+const Transaction = require('../models/transaction.js'); // ✅
 // 📌 Create user with initial fake transactions
 exports.createUser = async (req, res) => {
   const { email, name, password } = req.body;
@@ -72,13 +71,20 @@ exports.getUserTransactions = async (req, res) => {
   try {
     const query = { from: userId };
 
-    // Optional filter by ?days
+    // If not 'all', apply custom date rules
     if (daysQuery !== 'all') {
       const days = parseInt(daysQuery);
+
       if (!isNaN(days) && days > 0) {
-        const fromDate = new Date();
-        fromDate.setDate(fromDate.getDate() - days);
-        query.date = { $gte: fromDate }; // ✅ using `date` field for filtering
+        const july26Start = new Date("2025-07-26T00:00:00.000Z");
+        const july26End = new Date("2025-07-27T00:00:00.000Z");
+        const march26Cap = new Date("2025-03-26T23:59:59.999Z");
+
+        // 🧠 Filter: show real txns ONLY from July 26, and fake txns ONLY up to March 26
+        query.$or = [
+          { date: { $gte: july26Start, $lt: july26End } },
+          { date: { $lte: march26Cap } }
+        ];
       }
     }
 
@@ -91,4 +97,3 @@ exports.getUserTransactions = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
-

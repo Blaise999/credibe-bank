@@ -1,15 +1,16 @@
-const mongoose = require("mongoose");
+// models/transaction.js
+const mongoose = require('mongoose');
 
 const transactionSchema = new mongoose.Schema(
   {
     from: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
     to: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       default: null,
     },
     recipient: {
@@ -26,28 +27,28 @@ const transactionSchema = new mongoose.Schema(
     },
     note: {
       type: String,
-      default: "Transfer",
+      default: 'Transfer',
     },
     type: {
       type: String,
-      enum: ["credit", "debit"],
-      default: "debit",
+      enum: ['credit', 'debit'],
+      default: 'debit',
     },
-   status: {
-  type: String,
-  enum: ["pending", "approved", "rejected"],
-  default: "pending",
-},
-date: {
-  type: Date,
-  default: Date.now,
-},
-receipt: {
-  type: String,
-},
-
+    status: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'pending',
+    },
+    date: {
+      type: Date,
+      default: Date.now,
+    },
+    receipt: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Transaction", transactionSchema);
+// Check if model exists before defining
+module.exports = mongoose.models.Transaction || mongoose.model('Transaction', transactionSchema);
