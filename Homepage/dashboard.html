@@ -423,99 +423,115 @@
   </div>
 </div>
 
-           <!-- Transactions Page -->
+      <!-- Transactions Page -->
 <div id="transactions-page" class="page hidden">
-  <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">
-    Transactions
-  </h1>
+  <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-3 sm:mb-6">Transactions</h1>
 
-  <div x-data="{ loading: false, activeTab: 'sent' }" class="space-y-4 sm:space-y-6">
-    <!-- Top Controls -->
-    <div class="flex flex-col sm:flex-row justify-between items-center gap-3">
-      <div class="flex space-x-2">
-        <button 
-          @click="activeTab = 'sent'" 
-          :class="activeTab === 'sent' ? 'bg-[#00b4d8] text-white' : 'bg-[#3a3a3a] text-[#e0e0e0]'"
-          class="px-4 py-2 rounded-lg font-medium text-sm sm:text-base transition-all"
+  <div x-data="{ loading:false, activeTab:'sent' }" class="space-y-4 sm:space-y-6">
+    <!-- Controls -->
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+      <!-- Tabs -->
+      <div class="w-full sm:w-auto bg-[#111827] rounded-xl p-1 flex gap-1">
+        <button
+          @click="activeTab='sent'"
+          :class="activeTab==='sent' ? 'bg-[#00b4d8] text-white shadow' : 'text-[#cfd3d7]'"
+          class="w-1/2 sm:w-auto px-4 py-2 rounded-lg text-sm font-semibold transition"
         >
           Sent
         </button>
-        <button 
-          @click="activeTab = 'received'" 
-          :class="activeTab === 'received' ? 'bg-[#00b4d8] text-white' : 'bg-[#3a3a3a] text-[#e0e0e0]'"
-          class="px-4 py-2 rounded-lg font-medium text-sm sm:text-base transition-all"
+        <button
+          @click="activeTab='received'"
+          :class="activeTab==='received' ? 'bg-[#00b4d8] text-white shadow' : 'text-[#cfd3d7]'"
+          class="w-1/2 sm:w-auto px-4 py-2 rounded-lg text-sm font-semibold transition"
         >
           Received
         </button>
       </div>
 
-      <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
-        <select 
-          id="transaction-filter" 
-          class="bg-[#3a3a3a] text-[#e0e0e0] border border-[#00b4d8] rounded-lg px-2 sm:px-3 py-1 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8] w-full sm:w-auto"
+      <!-- Filter + Clear -->
+      <div class="flex items-center gap-2 sm:ml-auto">
+        <select
+          id="transaction-filter"
+          class="bg-[#111827] text-[#e5e7eb] border border-[#00b4d8]/60 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00b4d8]"
         >
-          <option value="7">Last 7 Days</option>
-          <option value="30">Last 30 Days</option>
-          <option value="90">Last 90 Days</option>
+          <option value="7">Last 7 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="90">Last 90 days</option>
           <option value="all">All</option>
         </select>
-        <button class="bg-red-600 hover:bg-red-700 text-white text-sm sm:text-base px-3 py-1 rounded-lg">
+        <button id="clear-transactions"
+          class="hidden sm:inline-flex bg-red-600 hover:bg-red-700 text-white text-sm px-3 py-2 rounded-lg">
           Clear All
         </button>
       </div>
     </div>
 
     <!-- Loading skeleton -->
-    <div x-show="loading" class="space-y-2">
-      <div class="skeleton h-6 sm:h-8"></div>
-      <div class="skeleton h-6 sm:h-8"></div>
-      <div class="skeleton h-6 sm:h-8"></div>
+    <div x-show="loading" class="grid grid-cols-1 gap-3">
+      <div class="h-16 rounded-xl bg-[#1f2937] animate-pulse"></div>
+      <div class="h-16 rounded-xl bg-[#1f2937] animate-pulse"></div>
+      <div class="h-16 rounded-xl bg-[#1f2937] animate-pulse"></div>
     </div>
 
-    <!-- Sent Transactions -->
-    <div 
-      x-show="!loading && activeTab === 'sent'" 
-      class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md"
-    >
-      <h2 class="text-lg sm:text-xl font-semibold text-[#e0e0e0] mb-2">Sent Transactions</h2>
-      <table class="w-full text-left">
-        <thead>
-          <tr class="text-[#bbb]">
-            <th class="p-1 sm:p-2 text-xs sm:text-sm">Date</th>
-            <th class="p-1 sm:p-2 text-xs sm:text-sm">Recipient</th>
-            <th class="p-1 sm:p-2 text-xs sm:text-sm">Amount</th>
-            <th class="p-1 sm:p-2 text-xs sm:text-sm">Status</th>
-          </tr>
-        </thead>
-        <tbody id="transactions-table-sent">
-          <!-- Populated dynamically -->
-        </tbody>
-      </table>
+    <!-- ===== SENT ===== -->
+    <div x-show="!loading && activeTab==='sent'" class="bg-[#111827] p-3 sm:p-5 rounded-2xl shadow-sm">
+      <h2 class="text-lg sm:text-xl font-semibold text-white mb-3">Sent</h2>
+
+      <!-- Mobile cards -->
+      <div id="transactions-cards-sent" class="sm:hidden space-y-2">
+        <div class="hidden empty-state-sent rounded-xl border border-white/5 bg-[#0b1220] p-4 text-center">
+          <p class="text-[#9ca3af] text-sm">No sent transactions yet.</p>
+        </div>
+      </div>
+
+      <!-- Desktop table -->
+      <div class="hidden sm:block overflow-hidden rounded-xl border border-white/5">
+        <table class="w-full text-left">
+          <thead class="bg-[#0b1220]">
+            <tr class="text-[#9ca3af] text-sm">
+              <th class="p-3">Date</th>
+              <th class="p-3">Recipient</th>
+              <th class="p-3">Amount</th>
+              <th class="p-3">Status</th>
+            </tr>
+          </thead>
+          <tbody id="transactions-table-sent" class="divide-y divide-white/5 bg-[#0e1526]">
+            <!-- rows via JS -->
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <!-- Received Transactions -->
-    <div 
-      x-show="!loading && activeTab === 'received'" 
-      class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md"
-    >
-      <h2 class="text-lg sm:text-xl font-semibold text-[#e0e0e0] mb-2">Received Transactions</h2>
-      <table class="w-full text-left">
-        <thead>
-          <tr class="text-[#bbb]">
-            <th class="p-1 sm:p-2 text-xs sm:text-sm">Date</th>
-            <th class="p-1 sm:p-2 text-xs sm:text-sm">Sender</th>
-            <th class="p-1 sm:p-2 text-xs sm:text-sm">Amount</th>
-            <th class="p-1 sm:p-2 text-xs sm:text-sm">Status</th>
-          </tr>
-        </thead>
-        <tbody id="transactions-table-received">
-          <!-- Populated dynamically -->
-        </tbody>
-      </table>
+    <!-- ===== RECEIVED ===== -->
+    <div x-show="!loading && activeTab==='received'" class="bg-[#111827] p-3 sm:p-5 rounded-2xl shadow-sm">
+      <h2 class="text-lg sm:text-xl font-semibold text-white mb-3">Received</h2>
+
+      <!-- Mobile cards -->
+      <div id="transactions-cards-received" class="sm:hidden space-y-2">
+        <div class="hidden empty-state-received rounded-xl border border-white/5 bg-[#0b1220] p-4 text-center">
+          <p class="text-[#9ca3af] text-sm">No incoming transactions yet.</p>
+        </div>
+      </div>
+
+      <!-- Desktop table -->
+      <div class="hidden sm:block overflow-hidden rounded-xl border border-white/5">
+        <table class="w-full text-left">
+          <thead class="bg-[#0b1220]">
+            <tr class="text-[#9ca3af] text-sm">
+              <th class="p-3">Date</th>
+              <th class="p-3">Sender</th>
+              <th class="p-3">Amount</th>
+              <th class="p-3">Status</th>
+            </tr>
+          </thead>
+          <tbody id="transactions-table-received" class="divide-y divide-white/5 bg-[#0e1526]">
+            <!-- rows via JS -->
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
-
 
             <!-- Analytics Page -->
             <div id="analytics-page" class="page hidden">
@@ -1168,206 +1184,187 @@ window.addEventListener("resize", () => {
     });
   }
 
-  // 🎯 Transaction Filter Dropdown
-  const transactionFilter = document.getElementById('transaction-filter');
-  if (transactionFilter) {
-    transactionFilter.addEventListener('change', (e) => {
-      const days = e.target.value || 'all';
-      console.log('🧪 Filter selected:', days);
-      loadTransactions(days);
-      alert(`Filtered transactions for: ${days === 'all' ? 'All time' : `${days} days`}`);
-    });
+// =============================
+// CONFIG
+// =============================
+const API_BASE = "https://credibe-backends.onrender.com";
+const userToken  = localStorage.getItem("userToken") || "";
+const userId   = localStorage.getItem("userId") || "";
+const AUTH_HDR = token ? { Authorization: `Bearer ${token}` } : {};
+const FREEZE_CAP = new Date("2025-03-26T23:59:59");
+
+// =============================
+// UTILS
+// =============================
+async function safeFetchJSON(url) {
+  try {
+    const res = await fetch(url, { headers: { ...AUTH_HDR } });
+    const text = await res.text();
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${text}`);
+    return JSON.parse(text);
+  } catch (err) {
+    console.error("❌ safeFetchJSON:", err.message);
+    return [];
   }
-
-  // Generate static fake transactions
-  function generateStaticFakeTransactions() {
-    const cached = localStorage.getItem('fakeTransactions');
-    const freezeCap = new Date("2025-03-26T23:59:59");
-
-    // 🧠 Check if cache exists AND is valid
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        const isValid = parsed.every(txn => {
-          const d = new Date(txn.date);
-          return txn.recipient && typeof txn.recipient === 'string' && d <= freezeCap;
-        });
-
-        if (isValid) return parsed;
-
-        // 🧨 If invalid (e.g., future dates or unknowns) — delete it
-        console.warn("🚫 Old or invalid fake txns found — clearing...");
-        localStorage.removeItem('fakeTransactions');
-      } catch (err) {
-        console.warn("⚠️ Failed to parse fake txns — clearing...");
-        localStorage.removeItem('fakeTransactions');
-      }
-    }
-
-    // ✅ If no valid cache, generate new safe ones
-    const names = [
-      "ING Bank", "BNP Paribas", "Belfius", "KBC Group", "ABN AMRO",
-      "Delhaize", "Albert Heijn", "Carrefour", "Colruyt", "Lidl Belgium",
-      "Lucas Maes", "Emma Dupont", "Louis Vandamme", "Sophie Martin", "Julie Janssens",
-      "Coolblue", "Vanden Borre", "Bol.com", "MediaMarkt",
-      "Zalando", "H&M", "IKEA Belgium", "JBC", "Tommy Hilfiger",
-      "Esso", "TotalEnergies", "Q8 Belgium", "NMBS/SNCB", "De Lijn",
-      "Stib-Mivb", "Bpost", "Telenet", "Proximus", "Orange Belgium",
-      "Nestlé", "Unilever", "Coca-Cola EU", "Heineken", "Jupiler",
-      "Dries Mertens", "Koen Wauters", "Noa Vermeer", "Charlotte Peeters", "Sarah De Smet",
-      "Jens Van Damme", "Tom Vercauteren", "Kevin Leroy", "Lotte Nys", "Maxime Deneve"
-    ];
-
-    const txns = [];
-    const fixedDate = new Date("2025-03-26T00:00:00Z");
-
-    for (let i = 0; i < 100; i++) {
-      const nameIndex = i % names.length;
-      txns.push({
-        _id: `fake-${i}`,
-        date: fixedDate.toISOString(),
-        recipient: names[nameIndex],
-        amount: Math.floor(Math.random() * 900 + 100),
-        status: "approved"
-      });
-    }
-
-    localStorage.setItem('fakeTransactions', JSON.stringify(txns));
-    return txns;
-  }
-
-  // ⏳ Filter transactions strictly by date
-  function filterTxnsByDays(txns, days) {
-    const now = new Date();
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // midnight today
-    const freezeCap = new Date("2025-03-26T23:59:59"); // legacy cap
-
-    return txns.filter(t => {
-      const rawDate = new Date(t.date || t.createdAt);
-      if (isNaN(rawDate.getTime()) || rawDate > now) return false;
-
-      // ✅ Keep all transactions that existed before or on March 26
-      if (rawDate <= freezeCap) return true;
-
-      // ✅ Only allow new txns created today or after
-    const july26 = new Date("2025-07-26T00:00:00");
-const july27 = new Date("2025-07-27T00:00:00");
-
-if (rawDate >= july26 && rawDate < july27) {
-  return true; // ✅ Always allow July 26
 }
 
-if (rawDate >= today) {
-  const daysDiff = (now - rawDate) / (1000 * 60 * 60 * 24);
-  return days === 'all' || daysDiff <= parseInt(days);
+function fmtDate(d) {
+  const dt = new Date(d);
+  return isNaN(dt) ? "Unknown" : dt.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-      // ❌ Reject any injected old-looking ones created after March 26 but before today
-      return false;
-    });
-  }
+function fmtAmount(n, sign) {
+  const num = Number(n);
+  if (!isFinite(num)) return "€0";
+  const f = new Intl.NumberFormat("en-GB").format(num);
+  if (sign === "-") return `-€${f}`;
+  if (sign === "+") return `+€${f}`;
+  return `€${f}`;
+}
 
-  // 📦 Load and display all transactions
-  async function loadTransactions(days = 'all') {
-    const tableBody = document.getElementById('transactions-table');
-    if (!tableBody) return;
+function txnStatusBadge(status) {
+  const base = "px-2 py-1 rounded-full text-xs font-semibold";
+  const map = {
+    approved: "bg-green-500/15 text-green-400 border border-green-500/20",
+    pending: "bg-yellow-500/15 text-yellow-300 border border-yellow-500/20",
+    rejected: "bg-red-500/15 text-red-400 border border-red-500/20",
+  };
+  return `<span class="${base} ${map[status] || "text-gray-400"}">${status}</span>`;
+}
 
-    tableBody.innerHTML = '<tr><td colspan="4" class="p-2 text-center">Loading...</td></tr>';
+// =============================
+// RENDER HELPERS
+// =============================
+function renderTxnRow(tx, view) {
+  return `
+    <tr class="text-[#e5e7eb]">
+      <td class="p-3 text-sm">${fmtDate(tx.date)}</td>
+      <td class="p-3 text-sm">${tx.party}</td>
+      <td class="p-3 text-sm font-semibold">${fmtAmount(tx.amount)}</td>
+      <td class="p-3 text-sm">${txnStatusBadge(tx.status)}</td>
+    </tr>`;
+}
 
+function renderTxnCard(tx, view) {
+  return `
+    <article class="rounded-xl border border-white/5 bg-[#0e1526] p-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-lg bg-[#0b1220] grid place-items-center text-sm">
+          ${view === "sent" ? "↗" : "↙"}
+        </div>
+        <div>
+          <div class="text-white text-sm font-semibold">${tx.party}</div>
+          <div class="text-xs text-[#9ca3af]">${fmtDate(tx.date)}</div>
+        </div>
+      </div>
+      <div class="text-right">
+        <div class="text-sm font-bold ${view === "sent" ? "text-red-400" : "text-green-400"}">
+          ${fmtAmount(tx.amount, view === "sent" ? "-" : "+")}
+        </div>
+        <div class="mt-1">${txnStatusBadge(tx.status)}</div>
+      </div>
+    </article>`;
+}
+
+// =============================
+// FAKE TXNS (STATIC HISTORY)
+// =============================
+function getFakeTransactions() {
+  const cached = localStorage.getItem("fakeTransactions");
+  if (cached) {
     try {
-      const userId = localStorage.getItem("userId") || "";
-      const url = `https://credibe-backends.onrender.com/api/user/transactions/${userId}${days !== 'all' ? `?days=${days}` : ''}`;
-
-      const res = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      const transactions = res.ok ? await res.json() : [];
-      console.log("🔥 Raw transactions:", transactions);
-
-      // 🧠 Apply filter by days
-      const filtered = filterTxnsByDays(transactions, days);
-
-      // 🧠 Sort newest → oldest
-      const sortedTxns = filtered.sort((a, b) => {
-        const aDate = new Date(a.date || a.createdAt);
-        const bDate = new Date(b.date || b.createdAt);
-        return bDate - aDate;
-      });
-
-      // 🧼 No results
-      if (sortedTxns.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-gray-500">No transactions found.</td></tr>';
-        return;
-      }
-
-      // 🧾 Render each row
-      tableBody.innerHTML = sortedTxns.map(t => {
-        const rawDate = t.date || t.createdAt;
-        const txnDate = new Date(rawDate);
-        const formattedDate = !isNaN(txnDate.getTime())
-          ? txnDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-          : 'Unknown';
-
-        const recipient = t.recipient || 'Unknown';
-        const amount = typeof t.amount === "number" ? `${t.amount} $` : 'Unknown';
-
-        const statusRaw = t.status || 'pending';
-        let statusLabel = '❓ Unknown';
-        let statusColor = 'text-gray-400';
-
-        if (statusRaw === 'pending') {
-          statusLabel = '🕓 Pending';
-          statusColor = 'text-yellow-500';
-        } else if (statusRaw === 'approved') {
-          statusLabel = '✅ Approved';
-          statusColor = 'text-green-500';
-        } else if (statusRaw === 'rejected') {
-          statusLabel = '❌ Rejected';
-          statusColor = 'text-red-500';
-        }
-
-        return `
-          <tr class="border-t border-[#444]">
-            <td class="p-1 sm:p-2 text-xs sm:text-sm">${formattedDate}</td>
-            <td class="p-1 sm:p-2 text-xs sm:text-sm">${recipient}</td>
-            <td class="p-1 sm:p-2 text-xs sm:text-sm">${amount}</td>
-            <td class="p-1 sm:p-2 text-xs sm:text-sm ${statusColor}">${statusLabel}</td>
-          </tr>`;
-      }).join('');
-    } catch (error) {
-      console.error("❌ Transaction load error:", error.message);
-      tableBody.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-red-500">Error loading transactions.</td></tr>';
-    }
+      const arr = JSON.parse(cached);
+      if (arr.every(t => new Date(t.date) <= FREEZE_CAP)) return arr;
+    } catch {}
+    localStorage.removeItem("fakeTransactions");
   }
 
-  // ✅ Reusable function to fetch user data
-  async function fetchUserData() {
-    try {
-      const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
-      });
+  const names = ["ING Bank","BNP Paribas","Belfius","KBC","ABN AMRO","Lucas Maes","Emma Dupont","Julie Janssens","Coolblue","Zalando"];
+  const fixedDate = new Date("2025-03-26T00:00:00Z");
+  const fake = Array.from({ length: 50 }, (_, i) => ({
+    _id: `fake-${i}`,
+    date: fixedDate.toISOString(),
+    recipient: names[i % names.length],
+    amount: Math.floor(Math.random() * 900 + 100),
+    status: "approved",
+    type: "debit",
+  }));
+  localStorage.setItem("fakeTransactions", JSON.stringify(fake));
+  return fake;
+}
 
-      const data = await res.json();
+// =============================
+// FILTERING
+// =============================
+function filterTxns(txns, days) {
+  const now = new Date();
+  const today0 = new Date(); today0.setHours(0,0,0,0);
+  return txns.filter(t => {
+    const d = new Date(t.date);
+    if (isNaN(d) || d > now) return false;
+    if (d <= FREEZE_CAP) return true; // always keep old frozen
+    if (days === "all") return true;
+    return (now - d) / 86400000 <= parseInt(days, 10);
+  });
+}
 
-      if (!res.ok) {
-        console.error("❌ Failed to fetch user data:", data.error);
-        return null;
-      }
+// =============================
+// LOAD + RENDER
+// =============================
+async function loadTransactions(days = "all") {
+  const base = `${API_BASE}/api/user/transactions/${userId}`;
+  const [sent, received] = await Promise.all([
+    safeFetchJSON(`${base}?type=sent${days !== "all" ? `&days=${days}` : ""}`),
+    safeFetchJSON(`${base}?type=received${days !== "all" ? `&days=${days}` : ""}`)
+  ]);
 
-      return data;
-    } catch (err) {
-      console.error("🔥 Error fetching user data:", err);
-      return null;
-    }
+  const fake = getFakeTransactions();
+
+  const sentTxns = filterTxns([...(sent || []), ...fake], days)
+    .map(t => ({ date: t.date || t.createdAt, party: t.recipient || "Recipient", amount: t.amount, status: t.status, view: "sent" }))
+    .sort((a,b) => new Date(b.date) - new Date(a.date));
+
+  const recvTxns = filterTxns(received || [], days)
+    .map(t => ({ date: t.date || t.createdAt, party: t.from?.email || "Sender", amount: t.amount, status: t.status, view: "received" }))
+    .sort((a,b) => new Date(b.date) - new Date(a.date));
+
+  renderTransactions(sentTxns, "sent");
+  renderTransactions(recvTxns, "received");
+}
+
+function renderTransactions(list, view) {
+  const tableId = view === "sent" ? "transactions-table-sent" : "transactions-table-received";
+  const cardsId = view === "sent" ? "transactions-cards-sent" : "transactions-cards-received";
+  const emptySel = view === "sent" ? ".empty-state-sent" : ".empty-state-received";
+
+  const table = document.getElementById(tableId);
+  const cards = document.getElementById(cardsId);
+  const empty = document.querySelector(emptySel);
+
+  table.innerHTML = "";
+  cards.innerHTML = "";
+
+  if (!list.length) {
+    if (empty) empty.classList.remove("hidden");
+    return;
   }
+  if (empty) empty.classList.add("hidden");
+
+  table.innerHTML = list.map(tx => renderTxnRow(tx, view)).join("");
+  cards.innerHTML = list.map(tx => renderTxnCard(tx, view)).join("");
+}
+
+// =============================
+// INIT
+// =============================
+document.addEventListener("DOMContentLoaded", () => {
+  const ddl = document.getElementById("transaction-filter");
+  if (ddl) {
+    ddl.addEventListener("change", e => loadTransactions(e.target.value));
+  }
+  loadTransactions(ddl ? ddl.value : "all");
+});
+
 
   // ✅ Populate form + dashboard
   (async () => {
