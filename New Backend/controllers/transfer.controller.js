@@ -1,4 +1,4 @@
-const Transaction = require("../models/Transaction");
+const Transaction = require('../models/transaction.js'); // ✅;
 const User = require("../models/User");
 const { sendOTP } = require("../utils/sendOTP");
 const { setOtp, getOtp, clearOtp, otpStore } = require("../utils/otpMemory");
