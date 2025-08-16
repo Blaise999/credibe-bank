@@ -423,42 +423,99 @@
   </div>
 </div>
 
-            <!-- Transactions Page -->
-            <div id="transactions-page" class="page hidden">
-                <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Transactions</h1>
-                <div x-data="{ loading: false }" class="space-y-2 sm:space-y-6">
-                    <div class="flex flex-col sm:flex-row justify-between items-center mb-1 sm:mb-4 gap-2">
-                        <h2 class="text-lg sm:text-xl font-semibold text-[#e0e0e0]">Past Transactions</h2>
-                        <select id="transaction-filter" class="bg-[#3a3a3a] text-[#e0e0e0] border border-[#00b4d8] rounded-lg px-1 sm:px-3 py-1 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8] w-full sm:w-auto">
-                            <option value="7">Last 7 Days</option>
-                            <option value="30">Last 30 Days</option>
-                            <option value="90">Last 90 Days</option>
-                            <option value="all">All</option>
-                        </select>
-                        <button class="bg-red-600 hover:bg-red-700 text-white text-sm sm:text-base px-3 py-1 rounded-lg">Clear All</button>
-                    </div>
-                    <div x-show="loading" class="space-y-1 sm:space-y-2">
-                        <div class="skeleton h-6 sm:h-8"></div>
-                        <div class="skeleton h-6 sm:h-8"></div>
-                        <div class="skeleton h-6 sm:h-8"></div>
-                    </div>
-                    <div x-show="!loading" class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md">
-                        <table class="w-full text-left">
-                            <thead>
-                                <tr class="text-[#bbb]">
-                                    <th class="p-1 sm:p-2 text-xs sm:text-sm sm:text-base">Date</th>
-                                    <th class="p-1 sm:p-2 text-xs sm:text-sm sm:text-base">Recipient</th>
-                                    <th class="p-1 sm:p-2 text-xs sm:text-sm sm:text-base">Amount</th>
-                                    <th class="p-1 sm:p-2 text-xs sm:text-sm sm:text-base">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="transactions-table">
-                                <!-- Populated dynamically -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+           <!-- Transactions Page -->
+<div id="transactions-page" class="page hidden">
+  <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">
+    Transactions
+  </h1>
+
+  <div x-data="{ loading: false, activeTab: 'sent' }" class="space-y-4 sm:space-y-6">
+    <!-- Top Controls -->
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-3">
+      <div class="flex space-x-2">
+        <button 
+          @click="activeTab = 'sent'" 
+          :class="activeTab === 'sent' ? 'bg-[#00b4d8] text-white' : 'bg-[#3a3a3a] text-[#e0e0e0]'"
+          class="px-4 py-2 rounded-lg font-medium text-sm sm:text-base transition-all"
+        >
+          Sent
+        </button>
+        <button 
+          @click="activeTab = 'received'" 
+          :class="activeTab === 'received' ? 'bg-[#00b4d8] text-white' : 'bg-[#3a3a3a] text-[#e0e0e0]'"
+          class="px-4 py-2 rounded-lg font-medium text-sm sm:text-base transition-all"
+        >
+          Received
+        </button>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
+        <select 
+          id="transaction-filter" 
+          class="bg-[#3a3a3a] text-[#e0e0e0] border border-[#00b4d8] rounded-lg px-2 sm:px-3 py-1 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8] w-full sm:w-auto"
+        >
+          <option value="7">Last 7 Days</option>
+          <option value="30">Last 30 Days</option>
+          <option value="90">Last 90 Days</option>
+          <option value="all">All</option>
+        </select>
+        <button class="bg-red-600 hover:bg-red-700 text-white text-sm sm:text-base px-3 py-1 rounded-lg">
+          Clear All
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading skeleton -->
+    <div x-show="loading" class="space-y-2">
+      <div class="skeleton h-6 sm:h-8"></div>
+      <div class="skeleton h-6 sm:h-8"></div>
+      <div class="skeleton h-6 sm:h-8"></div>
+    </div>
+
+    <!-- Sent Transactions -->
+    <div 
+      x-show="!loading && activeTab === 'sent'" 
+      class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md"
+    >
+      <h2 class="text-lg sm:text-xl font-semibold text-[#e0e0e0] mb-2">Sent Transactions</h2>
+      <table class="w-full text-left">
+        <thead>
+          <tr class="text-[#bbb]">
+            <th class="p-1 sm:p-2 text-xs sm:text-sm">Date</th>
+            <th class="p-1 sm:p-2 text-xs sm:text-sm">Recipient</th>
+            <th class="p-1 sm:p-2 text-xs sm:text-sm">Amount</th>
+            <th class="p-1 sm:p-2 text-xs sm:text-sm">Status</th>
+          </tr>
+        </thead>
+        <tbody id="transactions-table-sent">
+          <!-- Populated dynamically -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Received Transactions -->
+    <div 
+      x-show="!loading && activeTab === 'received'" 
+      class="bg-[#1f2937] p-2 sm:p-4 rounded-lg sm:rounded-2xl drop-shadow-md"
+    >
+      <h2 class="text-lg sm:text-xl font-semibold text-[#e0e0e0] mb-2">Received Transactions</h2>
+      <table class="w-full text-left">
+        <thead>
+          <tr class="text-[#bbb]">
+            <th class="p-1 sm:p-2 text-xs sm:text-sm">Date</th>
+            <th class="p-1 sm:p-2 text-xs sm:text-sm">Sender</th>
+            <th class="p-1 sm:p-2 text-xs sm:text-sm">Amount</th>
+            <th class="p-1 sm:p-2 text-xs sm:text-sm">Status</th>
+          </tr>
+        </thead>
+        <tbody id="transactions-table-received">
+          <!-- Populated dynamically -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 
             <!-- Analytics Page -->
             <div id="analytics-page" class="page hidden">
@@ -1228,6 +1285,20 @@ if (rawDate >= today) {
         }
       });
 
+      const tbodyRecv = document.getElementById("transactions-table-received");
+
+function renderReceivedTable(data) {
+  tbodyRecv.innerHTML = data.map(t => `
+    <tr>
+      <td>${new Date(t.date).toLocaleDateString()}</td>
+      <td>${t.note}</td>   <!-- this shows "Nexora Real Estate" -->
+      <td>€${t.amount.toLocaleString()}</td>
+      <td>${t.status}</td>
+    </tr>
+  `).join('');
+}
+
+
       const transactions = res.ok ? await res.json() : [];
       console.log("🔥 Raw transactions:", transactions);
 
@@ -1286,6 +1357,73 @@ if (rawDate >= today) {
       tableBody.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-red-500">Error loading transactions.</td></tr>';
     }
   }
+
+  // --- selectors
+const filterEl = document.getElementById('transaction-filter');
+const tbodySent = document.getElementById('transactions-table-sent');
+const tbodyRecv = document.getElementById('transactions-table-received');
+
+// you already have activeTab via Alpine; mirror a global helper for JS:
+window.__loadTx = async function loadTx(type) {
+  const days = filterEl.value || '7';
+  const res = await fetch(`/api/user/transactions?type=${type}&days=${days}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const data = await res.json();
+  if (!Array.isArray(data)) return;
+
+  const rows = data.map(t => `
+    <tr class="border-t border-[#2b2b2b]">
+      <td class="p-2 text-[#ddd] text-sm">${new Date(t.date || t.createdAt).toLocaleDateString()}</td>
+      <td class="p-2 text-[#ddd] text-sm">${t.counterparty || '—'}</td>
+      <td class="p-2 text-[#ddd] text-sm">€${Number(t.amount).toLocaleString()}</td>
+      <td class="p-2 text-[#ddd] text-sm capitalize">${t.status}</td>
+    </tr>
+  `).join('');
+
+  if (type === 'sent') tbodySent.innerHTML = rows;
+  else tbodyRecv.innerHTML = rows;
+};
+
+// initial load
+window.__loadTx('sent');
+
+// re-load both when filter changes
+filterEl.addEventListener('change', () => {
+  window.__loadTx('sent');
+  window.__loadTx('received');
+});
+
+// simple polling while "Received" is active
+let recvInterval = null;
+function startRecvPolling() {
+  if (recvInterval) return;
+  recvInterval = setInterval(() => window.__loadTx('received'), 6000); // 6s
+}
+function stopRecvPolling() {
+  if (recvInterval) { clearInterval(recvInterval); recvInterval = null; }
+}
+
+// tab buttons: add data attributes to your two buttons
+document.querySelector('[data-tab="sent"]')?.addEventListener('click', () => {
+  stopRecvPolling();
+  window.__loadTx('sent');
+});
+document.querySelector('[data-tab="received"]')?.addEventListener('click', () => {
+  window.__loadTx('received');
+  startRecvPolling();
+});
+
+// refresh on window focus (useful after you insert via Mongo)
+window.addEventListener('focus', () => {
+  window.__loadTx('sent');
+  window.__loadTx('received');
+});
+
+// (Optional) pause polling when page hidden
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) stopRecvPolling();
+});
 
   // ✅ Reusable function to fetch user data
   async function fetchUserData() {
