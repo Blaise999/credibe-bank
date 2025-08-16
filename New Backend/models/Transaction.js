@@ -6,12 +6,12 @@ const transactionSchema = new mongoose.Schema(
     from: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true, // sender
+      required: true,
     },
     to: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      default: null,  // stays null until approved; set on approval so it shows in "Received"
+      default: null,
     },
     recipient: {
       type: String,
@@ -49,12 +49,6 @@ const transactionSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-/** 🔎 Indexes for fast Sent/Received/date filters */
-transactionSchema.index({ from: 1, createdAt: -1 });       // Sent: by sender
-transactionSchema.index({ to: 1, createdAt: -1 });         // Received: by recipient
-transactionSchema.index({ status: 1, createdAt: -1 });     // Filter by status quickly
-transactionSchema.index({ date: -1 });                     // Your explicit 'date' field
 
 // Check if model exists before defining
 module.exports = mongoose.models.Transaction || mongoose.model('Transaction', transactionSchema);

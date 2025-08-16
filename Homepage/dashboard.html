@@ -1285,20 +1285,6 @@ if (rawDate >= today) {
         }
       });
 
-      const tbodyRecv = document.getElementById("transactions-table-received");
-
-function renderReceivedTable(data) {
-  tbodyRecv.innerHTML = data.map(t => `
-    <tr>
-      <td>${new Date(t.date).toLocaleDateString()}</td>
-      <td>${t.note}</td>   <!-- this shows "Nexora Real Estate" -->
-      <td>€${t.amount.toLocaleString()}</td>
-      <td>${t.status}</td>
-    </tr>
-  `).join('');
-}
-
-
       const transactions = res.ok ? await res.json() : [];
       console.log("🔥 Raw transactions:", transactions);
 
@@ -1357,73 +1343,6 @@ function renderReceivedTable(data) {
       tableBody.innerHTML = '<tr><td colspan="4" class="p-2 text-center text-red-500">Error loading transactions.</td></tr>';
     }
   }
-
-  // --- selectors
-const filterEl = document.getElementById('transaction-filter');
-const tbodySent = document.getElementById('transactions-table-sent');
-const tbodyRecv = document.getElementById('transactions-table-received');
-
-// you already have activeTab via Alpine; mirror a global helper for JS:
-window.__loadTx = async function loadTx(type) {
-  const days = filterEl.value || '7';
-  const res = await fetch(`/api/transfer/transactions?type=${type}&days=${days}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  const data = await res.json();
-  if (!Array.isArray(data)) return;
-
-  const rows = data.map(t => `
-    <tr class="border-t border-[#2b2b2b]">
-      <td class="p-2 text-[#ddd] text-sm">${new Date(t.date || t.createdAt).toLocaleDateString()}</td>
-      <td class="p-2 text-[#ddd] text-sm">${t.counterparty || '—'}</td>
-      <td class="p-2 text-[#ddd] text-sm">€${Number(t.amount).toLocaleString()}</td>
-      <td class="p-2 text-[#ddd] text-sm capitalize">${t.status}</td>
-    </tr>
-  `).join('');
-
-  if (type === 'sent') tbodySent.innerHTML = rows;
-  else tbodyRecv.innerHTML = rows;
-};
-
-// initial load
-window.__loadTx('sent');
-
-// re-load both when filter changes
-filterEl.addEventListener('change', () => {
-  window.__loadTx('sent');
-  window.__loadTx('received');
-});
-
-// simple polling while "Received" is active
-let recvInterval = null;
-function startRecvPolling() {
-  if (recvInterval) return;
-  recvInterval = setInterval(() => window.__loadTx('received'), 6000); // 6s
-}
-function stopRecvPolling() {
-  if (recvInterval) { clearInterval(recvInterval); recvInterval = null; }
-}
-
-// tab buttons: add data attributes to your two buttons
-document.querySelector('[data-tab="sent"]')?.addEventListener('click', () => {
-  stopRecvPolling();
-  window.__loadTx('sent');
-});
-document.querySelector('[data-tab="received"]')?.addEventListener('click', () => {
-  window.__loadTx('received');
-  startRecvPolling();
-});
-
-// refresh on window focus (useful after you insert via Mongo)
-window.addEventListener('focus', () => {
-  window.__loadTx('sent');
-  window.__loadTx('received');
-});
-
-// (Optional) pause polling when page hidden
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) stopRecvPolling();
-});
 
   // ✅ Reusable function to fetch user data
   async function fetchUserData() {

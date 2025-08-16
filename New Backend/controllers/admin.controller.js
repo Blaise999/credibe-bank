@@ -1,7 +1,7 @@
 // controllers/admin.controller.js
 const mongoose = require('mongoose');
 const User = require('../models/User');
-const Transaction = require('../models/transaction');
+const Transaction = require('../models/Transaction');
 const AdminStats = require('../models/AdminStats');
 const generatePDFMonkeyPDF = require('../utils/pdfmonkey');
 const { sendOTP } = require('../utils/sendOTP'); // Updated import
@@ -150,35 +150,9 @@ exports.handleTransaction = async (req, res) => {
         return res.status(400).json({ error: 'Insufficient balance' });
       }
 
-      // Deduct sender & mark approved
       sender.balance -= transaction.amount;
       transaction.status = 'approved';
 
-      // 🔧 Resolve and attach recipient on approval (so it appears in Received)
-      if (!transaction.to) {
-        let receiver = null;
-
-        // Try to resolve by email if "recipient" looks like an email
-        const isEmail =
-          typeof transaction.recipient === 'string' &&
-          /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(transaction.recipient);
-        if (isEmail) {
-          receiver = await User.findOne({ email: transaction.recipient }).session(session);
-        }
-
-        // Fallback: try by IBAN if no email match
-        if (!receiver && transaction.toIban) {
-          // Adjust these fields if your IBAN lives elsewhere (e.g., accounts.checking.iban)
-          receiver = await User.findOne({ iban: transaction.toIban }).session(session);
-        }
-
-        if (receiver) {
-          transaction.to = receiver._id; // <-- This makes it show in "Received"
-          await transaction.save({ session });
-        }
-      }
-
-      // Credit receiver if available
       if (transaction.to) {
         const receiver = transaction.to;
         receiver.balance += transaction.amount;
@@ -190,7 +164,6 @@ exports.handleTransaction = async (req, res) => {
         });
       }
 
-      // Track on sender
       if (!sender.transactions.includes(transaction._id)) {
         sender.transactions.push(transaction._id);
         console.log('🧪 handleTransaction - Added to sender transactions', {
