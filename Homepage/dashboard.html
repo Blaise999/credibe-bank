@@ -2191,6 +2191,21 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
   // ✅ Populate form + dashboard
+  async function fetchUserData() {
+  const token = localStorage.getItem("userToken");
+  if (!token) return null;
+
+  try {
+    const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Failed to fetch user data");
+    return await res.json();
+  } catch (err) {
+    console.error("⚠️ fetchUserData error:", err);
+    return null;
+  }
+}
   (async () => {
     const data = await fetchUserData();
     if (!data) return;
