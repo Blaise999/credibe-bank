@@ -1382,6 +1382,19 @@ document.addEventListener('DOMContentLoaded', () => {
   </footer>
   
 <script>
+  async function fetchUserData() {
+  try {
+    const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (e) {
+    console.error("fetchUserData error:", e);
+    return null;
+  }
+}
+
 (async () => {
  // Utility function to format dollar amounts
 function formatDollar(amount) {
