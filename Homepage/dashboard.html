@@ -2027,6 +2027,8 @@ function renderTxnCard(tx, view) {
 // 🔹 STATIC FAKE TXNS (separate Sent & Received)
 // =============================
 const FAKE_KEY = "fakePairedTxns_v3";
+// ⛔ Show no received transactions after this date
+const RECEIVED_CUTOFF = new Date("2025-08-15T23:59:59Z");
 
 function generatePairedFakeTransactions(count = 25) {
   const cached = localStorage.getItem(FAKE_KEY);
@@ -2106,7 +2108,7 @@ const CUSTOM_TXNS = {
 function filterTxns(txns, days) {
   const now = new Date();
   return (txns || []).filter(t => {
-    // Always include our custom injected transactions
+    // Always include our custom injected transactions (we'll still apply the cutoff later for received)
     if (t && t.isCustom) return true;
 
     const d = new Date(t.date);
@@ -2114,54 +2116,6 @@ function filterTxns(txns, days) {
     if (d <= FREEZE_CAP) return true;
     if (days === "all") return true;
     return (now - d) / 86400000 <= parseInt(days, 10);
-  });
-}
-
-// =============================
-// HELPERS
-// =============================
-
-// Replace placeholder 'Incoming' with a cleaner fallback
-function cleanPartyLabel(label) {
-  const s = (label || '').trim();
-  return s && s.toLowerCase() !== 'incoming' ? s : '—';
-}
-
-// Keep only one row per (YYYY-MM-DD | party | amount | status) — RECEIVED only
-function dedupeReceivedBySignature(items) {
-  const seen = new Set();
-  return (items || []).filter(t => {
-    const d = new Date(t.date || t.createdAt);
-    const day = isNaN(d) ? "" : d.toISOString().slice(0, 10);
-    const party = (t.from?.name || t.from?.email || t.party || "").trim().toLowerCase();
-    const amt = Number(t.amount);
-    const status = (t.status || "approved").trim().toLowerCase();
-    const key = `${day}|${party}|${amt}|${status}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-}
-
-// Optional: if backend returns MANY exact AJK $40k approved on the same day, keep only ONE
-function keepSingleAjk40k(items) {
-  let kept = false;
-  return (items || []).filter(t => {
-    const d = new Date(t.date || t.createdAt);
-    const day = !isNaN(d) ? d.toISOString().slice(0, 10) : "";
-    const party = (t.from?.name || t.from?.email || t.party || "").trim().toLowerCase();
-    const amt = Number(t.amount);
-    const status = (t.status || "approved").trim().toLowerCase();
-
-    const isAjk40k =
-      day === "2025-08-20" &&
-      party === "ajk construction building materials" &&
-      amt === 40000 &&
-      status === "approved";
-
-    if (!isAjk40k) return true;         // keep non-AJK rows
-    if (!kept) { kept = true; return true; } // keep first AJK 40k
-    return false;                        // drop subsequent duplicates
   });
 }
 
@@ -2178,7 +2132,7 @@ async function loadTransactions(days = "all") {
   ]);
 
   // merge with NEW static fake sets
-  const { sent: sentFake, received: recvFake } = generatePairedFakeTransactions(25);
+  const { sent: sentFake, received: recvFakeRaw } = generatePairedFakeTransactions(25);
 
   // include any permanent, user-specific custom txns
   const custom = CUSTOM_TXNS[userId] || { sent: [], received: [] };
@@ -2194,28 +2148,35 @@ async function loadTransactions(days = "all") {
     }))
     .sort((a,b) => new Date(b.date) - new Date(a.date));
 
-  // ---------- RECEIVED (dedupe & special-case AJK 40k) ----------
-  const receivedRealClean = keepSingleAjk40k(
-    dedupeReceivedBySignature(receivedReal || [])
-  );
+  // ---------- RECEIVED (hard cutoff at 15 Aug 2025 for ALL sources) ----------
+  // Force fake received dates to be BEFORE or ON the cutoff so they never appear newer
+  const recvFake = (recvFakeRaw || []).map(t => {
+    const max = new Date(RECEIVED_CUTOFF);
+    const min = new Date(max);
+    min.setDate(min.getDate() - 60); // keep them within 60 days before cutoff
+    const rand = new Date(min.getTime() + Math.random() * (max - min));
+    return { ...t, date: rand.toISOString() };
+  });
 
-  const recvTxns = filterTxns(
-      [...receivedRealClean, ...recvFake, ...custom.received],
-      days
-    )
+  const receivedAll = [
+    ...((receivedReal || []).filter(t => {
+      const d = new Date(t.date || t.createdAt);
+      return !isNaN(d) && d <= RECEIVED_CUTOFF;
+    })),
+    ...recvFake.filter(t => {
+      const d = new Date(t.date);
+      return !isNaN(d) && d <= RECEIVED_CUTOFF;
+    }),
+    ...((custom.received || []).filter(t => {
+      const d = new Date(t.date || t.createdAt);
+      return !isNaN(d) && d <= RECEIVED_CUTOFF;
+    })),
+  ];
+
+  const recvTxns = filterTxns(receivedAll, days)
     .map(t => ({
       date : t.date || t.createdAt,
-      party: cleanPartyLabel(
-        t.from?.name ||
-        t.from?.email ||
-        t.counterparty?.name ||
-        t.counterparty ||
-        t.senderName ||
-        t.note ||
-        t.reference ||
-        t.to?.name ||
-        t.to?.email
-      ),
+      party: t.from?.name || t.from?.email || "Incoming",
       amount: t.amount,
       status: t.status || "approved",
       view : "received",
