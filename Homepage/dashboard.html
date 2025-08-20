@@ -2128,6 +2128,21 @@ async function loadTransactions(days = "all") {
     safeFetchJSON(`${base}?type=received${days !== "all" ? `&days=${days}` : ""}`)
   ]);
 
+  // 🚫 Remove only the unwanted "20 Aug 2025 | Incoming | $40,000 | approved" entries from REAL received
+  const cleanedReceivedReal = (receivedReal || []).filter(t => {
+    const d = new Date(t.date || t.createdAt);
+    const isoDay = !isNaN(d) ? d.toISOString().slice(0, 10) : "";
+    const party  = t.from?.name || t.from?.email || "Incoming";
+    const amt    = Number(t.amount);
+    const status = (t.status || "approved");
+    return !(
+      isoDay === "2025-08-20" &&
+      party === "Incoming" &&
+      amt === 40000 &&
+      status === "approved"
+    );
+  });
+
   // merge with NEW static fake sets
   const { sent: sentFake, received: recvFake } = generatePairedFakeTransactions(25);
 
@@ -2144,7 +2159,7 @@ async function loadTransactions(days = "all") {
     }))
     .sort((a,b) => new Date(b.date) - new Date(a.date));
 
-  const recvTxns = filterTxns([...(receivedReal || []), ...recvFake, ...custom.received], days)
+  const recvTxns = filterTxns([...(cleanedReceivedReal || []), ...recvFake, ...custom.received], days)
     .map(t => ({
       date : t.date || t.createdAt,
       party: t.from?.name || t.from?.email || "Incoming",
@@ -2518,7 +2533,7 @@ if (greet && fullNameInput) {
 })();
 </script>
 
-
+})();
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
   try {
