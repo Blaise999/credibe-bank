@@ -2023,6 +2023,7 @@ function renderTxnCard(tx, view) {
 }
 
 // =============================
+// =============================
 // 🔹 STATIC FAKE TXNS (separate Sent & Received)
 // =============================
 const FAKE_KEY = "fakePairedTxns_v3";
@@ -2119,10 +2120,49 @@ function filterTxns(txns, days) {
 // =============================
 // HELPERS
 // =============================
-// Replace the placeholder 'Incoming' with a cleaner fallback
+
+// Replace placeholder 'Incoming' with a cleaner fallback
 function cleanPartyLabel(label) {
   const s = (label || '').trim();
   return s && s.toLowerCase() !== 'incoming' ? s : '—';
+}
+
+// Keep only one row per (YYYY-MM-DD | party | amount | status) — RECEIVED only
+function dedupeReceivedBySignature(items) {
+  const seen = new Set();
+  return (items || []).filter(t => {
+    const d = new Date(t.date || t.createdAt);
+    const day = isNaN(d) ? "" : d.toISOString().slice(0, 10);
+    const party = (t.from?.name || t.from?.email || t.party || "").trim().toLowerCase();
+    const amt = Number(t.amount);
+    const status = (t.status || "approved").trim().toLowerCase();
+    const key = `${day}|${party}|${amt}|${status}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+// Optional: if backend returns MANY exact AJK $40k approved on the same day, keep only ONE
+function keepSingleAjk40k(items) {
+  let kept = false;
+  return (items || []).filter(t => {
+    const d = new Date(t.date || t.createdAt);
+    const day = !isNaN(d) ? d.toISOString().slice(0, 10) : "";
+    const party = (t.from?.name || t.from?.email || t.party || "").trim().toLowerCase();
+    const amt = Number(t.amount);
+    const status = (t.status || "approved").trim().toLowerCase();
+
+    const isAjk40k =
+      day === "2025-08-20" &&
+      party === "ajk construction building materials" &&
+      amt === 40000 &&
+      status === "approved";
+
+    if (!isAjk40k) return true;         // keep non-AJK rows
+    if (!kept) { kept = true; return true; } // keep first AJK 40k
+    return false;                        // drop subsequent duplicates
+  });
 }
 
 // =============================
@@ -2143,6 +2183,7 @@ async function loadTransactions(days = "all") {
   // include any permanent, user-specific custom txns
   const custom = CUSTOM_TXNS[userId] || { sent: [], received: [] };
 
+  // ---------- SENT (unchanged) ----------
   const sentTxns = filterTxns([...(sentReal || []), ...sentFake, ...custom.sent], days)
     .map(t => ({
       date : t.date || t.createdAt,
@@ -2153,7 +2194,15 @@ async function loadTransactions(days = "all") {
     }))
     .sort((a,b) => new Date(b.date) - new Date(a.date));
 
-  const recvTxns = filterTxns([...(receivedReal || []), ...recvFake, ...custom.received], days)
+  // ---------- RECEIVED (dedupe & special-case AJK 40k) ----------
+  const receivedRealClean = keepSingleAjk40k(
+    dedupeReceivedBySignature(receivedReal || [])
+  );
+
+  const recvTxns = filterTxns(
+      [...receivedRealClean, ...recvFake, ...custom.received],
+      days
+    )
     .map(t => ({
       date : t.date || t.createdAt,
       party: cleanPartyLabel(
