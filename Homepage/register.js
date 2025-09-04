@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const API_BASE = 'https://credibe-backends.onrender.com/api';
   const ENDPOINTS = {
     sendOtp: `${API_BASE}/auth/send-otp`, // ⬅️ UPDATED
-    verifyOtp: `${API_BASE}/auth/verify-otp`,
+    verifyOtp: `${API_BASE}//auth/verify-registration-otp`,
     register: `${API_BASE}/auth/register`,
   };
 
