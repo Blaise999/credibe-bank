@@ -1,45 +1,97 @@
+// register.js
 document.addEventListener('DOMContentLoaded', () => {
-  // DOM References (only the ones that MUST exist on load)
+  // ==============================
+  // Config
+  // ==============================
+  const API_BASE = 'https://credibe-backends.onrender.com/api';
+  const ENDPOINTS = {
+    sendOtp: `${API_BASE}/auth/send-registration-otp`,
+    verifyOtp: `${API_BASE}/auth/verify-registration-otp`,
+    register: `${API_BASE}/auth/register`,
+  };
+
+  // ==============================
+  // DOM Refs (must exist at load)
+  // ==============================
+  const form = document.getElementById('register-form');
+  const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
   const confirmPasswordInput = document.getElementById('confirm-password');
+
+  // Optional/aux
+  const phoneInput = document.getElementById('phone');
+  const fullNameInput = document.getElementById('full-name') || document.getElementById('name');
+  const otpSection = document.getElementById('otp-section');
+
+  // UI bits
   const passwordStrength = document.getElementById('password-strength');
   const togglePassword = document.getElementById('toggle-password');
   const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
-  const emailInput = document.getElementById('email');
-  const phoneInput = document.getElementById('phone');
-  const otpSection = document.getElementById('otp-section');
-  const form = document.getElementById('register-form');
   const languageSwitcher = document.getElementById('language-switcher');
   const chatToggle = document.getElementById('chat-toggle');
   const chatBox = document.getElementById('chat-box');
 
-  // ✅ Do NOT require OTP elements at load time
-  if (!passwordInput || !confirmPasswordInput || !form || !emailInput) {
+  // Early guard (only core)
+  if (!form || !emailInput || !passwordInput || !confirmPasswordInput) {
     console.error('❌ Core DOM elements missing!');
     return;
   }
 
-  // Safely query OTP bits when needed
+  // ==============================
+  // Helpers
+  // ==============================
   const getOtpEls = () => ({
     otpInput: document.getElementById('otp'),
     sendOtpButton: document.getElementById('send-otp'),
     otpMessage: document.getElementById('otp-message'),
   });
 
-  // Password Strength
+  const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  const isValidPhone = (v) => /^\+?[1-9]\d{6,14}$/.test(v);
+
+  const setMessage = (el, text, tone = 'info') => {
+    if (!el) return;
+    const classes = {
+      info: 'text-gray-400',
+      success: 'text-green-500',
+      error: 'text-red-500',
+      warn: 'text-yellow-500',
+    };
+    el.textContent = text || '';
+    el.className = `mt-2 text-sm ${classes[tone] || classes.info}`;
+  };
+
+  const setLoading = (btn, isLoading, idleText = 'Send OTP', loadingText = 'Sending...') => {
+    if (!btn) return;
+    btn.disabled = !!isLoading;
+    btn.textContent = isLoading ? loadingText : idleText;
+  };
+
+  // ==============================
+  // Password strength
+  // ==============================
   passwordInput.addEventListener('input', () => {
-    const val = passwordInput.value;
-    let strength = 'Weak', color = 'text-red-500';
+    const val = passwordInput.value || '';
+    let strength = 'Weak';
+    let color = 'text-red-500';
+
     if (val.length >= 12 && /[A-Z]/.test(val) && /\d/.test(val) && /\W/.test(val)) {
-      strength = 'Strong'; color = 'text-green-500';
+      strength = 'Strong';
+      color = 'text-green-500';
     } else if (val.length >= 8) {
-      strength = 'Medium'; color = 'text-yellow-500';
+      strength = 'Medium';
+      color = 'text-yellow-500';
     }
-    passwordStrength.textContent = `Password Strength: ${strength}`;
-    passwordStrength.className = `mt-2 text-sm ${color}`;
+
+    if (passwordStrength) {
+      passwordStrength.textContent = `Password Strength: ${strength}`;
+      passwordStrength.className = `mt-2 text-sm ${color}`;
+    }
   });
 
-  // Toggle Password Visibility (guard in case icons aren’t present)
+  // ==============================
+  // Toggle visibility
+  // ==============================
   if (togglePassword) {
     togglePassword.addEventListener('click', () => {
       const type = passwordInput.type === 'password' ? 'text' : 'password';
@@ -55,95 +107,93 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Email → show OTP UI
+  // ==============================
+  // Email -> reveal OTP UI
+  // ==============================
   emailInput.addEventListener('input', () => {
-    const { sendOtpButton, otpMessage } = getOtpEls();
+    const { sendOtpButton, otpMessage, otpInput } = getOtpEls();
     const email = emailInput.value.trim();
-    const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    if (!otpSection || !sendOtpButton || !otpMessage) return; // if OTP UI truly isn’t on the page
+    const valid = isValidEmail(email);
 
-    if (isValid) {
+    if (!otpSection || !sendOtpButton || !otpMessage) return;
+
+    if (valid) {
       otpSection.classList.remove('hidden');
       sendOtpButton.classList.remove('hidden');
       sendOtpButton.style.display = 'block';
-      otpMessage.textContent = 'Please request an OTP.';
-      otpMessage.className = 'mt-2 text-sm text-gray-400';
+      setMessage(otpMessage, 'Please request an OTP.', 'info');
     } else {
       otpSection.classList.add('hidden');
       sendOtpButton.classList.add('hidden');
       sendOtpButton.style.display = 'none';
-      otpMessage.textContent = '';
-      const { otpInput } = getOtpEls();
+      setMessage(otpMessage, '');
       if (otpInput) otpInput.value = '';
     }
   });
 
+  // ==============================
   // Send OTP
+  // ==============================
   {
     const { sendOtpButton, otpMessage } = getOtpEls();
     if (sendOtpButton) {
       sendOtpButton.addEventListener('click', async () => {
         const email = emailInput.value.trim();
-        const { otpSection } = { otpSection };
-        const { otpMessage } = getOtpEls();
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-          if (otpMessage) {
-            otpMessage.textContent = 'Invalid email.';
-            otpMessage.className = 'mt-2 text-sm text-red-500';
-          }
+
+        if (!isValidEmail(email)) {
+          setMessage(otpMessage, 'Invalid email.', 'error');
           return;
         }
+
         try {
-          const res = await fetch('https://credibe-backends.onrender.com/api/auth/send-registration-otp', {
+          setLoading(sendOtpButton, true);
+          const res = await fetch(ENDPOINTS.sendOtp, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
             body: JSON.stringify({ email }),
           });
-          const data = await res.json();
+          const data = await res.json().catch(() => ({}));
+
           if (res.ok) {
-            if (otpMessage) {
-              otpMessage.textContent = 'OTP sent successfully!';
-              otpMessage.className = 'mt-2 text-sm text-green-500';
-            }
+            setMessage(otpMessage, 'OTP sent successfully!', 'success');
             if (otpSection) otpSection.classList.remove('hidden');
           } else {
-            if (otpMessage) {
-              otpMessage.textContent = data.error || 'OTP failed.';
-              otpMessage.className = 'mt-2 text-sm text-red-500';
-            }
+            setMessage(otpMessage, data?.error || 'OTP failed.', 'error');
           }
         } catch (err) {
           console.error('❌ OTP send failed:', err);
-          if (otpMessage) {
-            otpMessage.textContent = 'Server error. Try again.';
-            otpMessage.className = 'mt-2 text-sm text-red-500';
-          }
+          setMessage(otpMessage, 'Server error. Try again.', 'error');
+        } finally {
+          setLoading(sendOtpButton, false);
         }
       });
     }
   }
 
-  // Submit
+  // ==============================
+  // Submit (verify OTP -> register)
+  // ==============================
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const { otpInput, otpMessage } = getOtpEls();
 
     const email = emailInput.value.trim();
-    const phone = phoneInput?.value?.trim() || '';
-    const password = passwordInput?.value || '';
-    const confirmPassword = confirmPasswordInput?.value || '';
-    const otp = otpInput?.value?.trim() || '';
+    const password = passwordInput.value || '';
+    const confirmPassword = confirmPasswordInput.value || '';
+    const phone = (phoneInput?.value || '').trim();
+    const otp = (otpInput?.value || '').trim();
 
+    // Basic validations
     if (!password || !confirmPassword || password !== confirmPassword) {
       alert('Passwords do not match or are empty!');
       return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!isValidEmail(email)) {
       alert('Invalid email format!');
       return;
     }
-    if (phone && !/^\+?[1-9]\d{6,14}$/.test(phone)) {
+    if (phone && !isValidPhone(phone)) {
       alert('Invalid phone number!');
       return;
     }
@@ -152,63 +202,84 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    // Button loading state
+    const submitBtn = form.querySelector('button[type="submit"], [data-submit]');
+    const setSubmitLoading = (loading) => {
+      if (!submitBtn) return;
+      submitBtn.disabled = !!loading;
+      const original = submitBtn.getAttribute('data-text') || submitBtn.textContent;
+      if (!submitBtn.getAttribute('data-text')) submitBtn.setAttribute('data-text', original);
+      submitBtn.textContent = loading ? 'Creating account…' : submitBtn.getAttribute('data-text');
+    };
+
     try {
+      setSubmitLoading(true);
+
       // 1) Verify OTP
-      const verifyRes = await fetch('https://credibe-backends.onrender.com/api/auth/verify-registration-otp', {
+      const verifyRes = await fetch(ENDPOINTS.verifyOtp, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ email, otp }),
       });
-      const verifyResult = await verifyRes.json();
+      const verifyJson = await verifyRes.json().catch(() => ({}));
       if (!verifyRes.ok) {
-        alert(verifyResult.error || 'OTP verification failed.');
-        if (otpMessage) {
-          otpMessage.textContent = verifyResult.error || 'Invalid OTP.';
-          otpMessage.className = 'mt-2 text-sm text-red-500';
-        }
+        alert(verifyJson?.error || 'OTP verification failed.');
+        setMessage(otpMessage, verifyJson?.error || 'Invalid OTP.', 'error');
         return;
       }
 
-      // 2) Register — use fullName (or whatever your API expects)
-      const fullName =
-        (document.getElementById('full-name')?.value || document.getElementById('name')?.value || '').trim();
-
-      const registerRes = await fetch('https://credibe-backends.onrender.com/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        // If your API also expects country/phone, include them here.
-        body: JSON.stringify({ fullName, email, password /* , phone, country */ }),
-      });
-
-      const regData = await registerRes.json();
-
-      if (registerRes.ok) {
-        alert('🎉 Registration successful!');
-        localStorage.setItem('userEmail', email);
-        window.location.href = 'dashboard.html';
-        form.reset();
-        if (otpSection) otpSection.classList.add('hidden');
-        const { sendOtpButton } = getOtpEls();
-        if (sendOtpButton) sendOtpButton.classList.add('hidden');
-        if (otpMessage) otpMessage.textContent = '';
-      } else {
-        alert(regData.error || 'Registration failed.');
-        console.warn('Registration error payload:', regData);
+      // 2) Register (use fullName key; backend expects fullName, email, password)
+      let fullName = (fullNameInput?.value || '').trim();
+      if (!fullName) {
+        // fallback: derive from email prefix
+        fullName = email.split('@')[0].replace(/[._-]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
       }
+
+      const registerRes = await fetch(ENDPOINTS.register, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        // include optional fields only if you know backend accepts them
+        body: JSON.stringify({ fullName, email, password /*, phone, country */ }),
+      });
+      const regJson = await registerRes.json().catch(() => ({}));
+
+      if (!registerRes.ok) {
+        console.warn('Registration error payload:', regJson);
+        alert(regJson?.error || 'Registration failed.');
+        return;
+      }
+
+      // Success
+      alert('🎉 Registration successful!');
+      // Persist token/user if returned
+      if (regJson?.token) localStorage.setItem('credibe_token', regJson.token);
+      if (regJson?.user) localStorage.setItem('credibe_user', JSON.stringify(regJson.user));
+      localStorage.setItem('userEmail', email);
+
+      // Cleanup + redirect
+      form.reset();
+      if (otpSection) otpSection.classList.add('hidden');
+      const { sendOtpButton } = getOtpEls();
+      if (sendOtpButton) sendOtpButton.classList.add('hidden');
+      setMessage(otpMessage, '');
+      window.location.href = 'dashboard.html';
     } catch (err) {
       console.error('❌ Registration Error:', err);
       alert('Something went wrong. Try again.');
+    } finally {
+      setSubmitLoading(false);
     }
   });
 
-  // Language
+  // ==============================
+  // Misc
+  // ==============================
   if (languageSwitcher) {
     languageSwitcher.addEventListener('change', (e) => {
       console.log(`🌍 Language changed to: ${e.target.value}`);
     });
   }
 
-  // Chat
   if (chatToggle && chatBox) {
     chatToggle.addEventListener('click', () => {
       chatBox.classList.toggle('hidden');
