@@ -159,7 +159,6 @@ exports.sendOTP = async (req, res) => {
 // 🔐 Login – email & password only
 exports.login = async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const trimmedEmail = email ? email.trim() : "";
     const user = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, "i") });
