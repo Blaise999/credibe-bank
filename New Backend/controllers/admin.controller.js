@@ -1,7 +1,7 @@
 // controllers/admin.controller.js
 const mongoose = require('mongoose');
 const User = require('../models/User');
-const Transaction = require('../models/transaction'); // ✅
+const Transaction = require('../models/Transaction'); // ✅
 const AdminStats = require('../models/AdminStats');
 const generatePDFMonkeyPDF = require('../utils/pdfmonkey');
 const { sendOTP } = require('../utils/sendOTP'); // Updated import

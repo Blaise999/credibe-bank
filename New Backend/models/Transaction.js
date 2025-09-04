@@ -51,4 +51,4 @@ const transactionSchema = new mongoose.Schema(
 );
 
 // Check if model exists before defining
-module.exports = mongoose.models.Transaction || mongoose.model('transaction', transactionSchema);
+module.exports = mongoose.models.Transaction || mongoose.model('Transaction', transactionSchema);
