@@ -12,7 +12,7 @@ exports.sendRegistrationOTP = async (req, res) => {
 
   try {
     const trimmedEmail = email.trim();
-    const existingUser = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, 'i') });
+    const existingUser = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, "i") });
     if (existingUser) {
       return res.status(400).json({ error: "Email already registered" });
     }
@@ -21,13 +21,12 @@ exports.sendRegistrationOTP = async (req, res) => {
     setOtp(trimmedEmail, { otp, expires: Date.now() + 10 * 60 * 1000 });
 
     await sendOTP({
-  to: trimmedEmail,
-  subject: "Your Registration OTP",
-  body: `Your OTP is ${otp}`
-});
+      to: trimmedEmail,
+      subject: "Your Registration OTP",
+      body: `Your OTP is ${otp}`,
+    });
 
     console.log(`🧪 REGISTRATION OTP for ${trimmedEmail}: ${otp}`);
-
     res.status(200).json({ message: "OTP sent for registration" });
   } catch (err) {
     console.error("❌ Registration OTP error:", err.message);
@@ -69,24 +68,31 @@ exports.verifyRegistrationOTP = async (req, res) => {
 
 // ✅ STEP 3: Register User (only after OTP is verified)
 exports.registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { email, password, name: nameRaw, fullName } = req.body;
 
   try {
-    const trimmedEmail = email.trim();
-    const existing = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, 'i') });
+    const trimmedEmail = (email || "").trim();
+    const name = (fullName || nameRaw || "").trim();
+
+    if (!name || !trimmedEmail || !password) {
+      return res.status(400).json({ error: "name, email, and password are required" });
+    }
+
+    const existing = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, "i") });
     if (existing) return res.status(400).json({ error: "User already exists" });
 
     const newUser = new User({
       name,
       email: trimmedEmail,
-      password,
+      password, // (kept as-is to avoid changing your flow)
       isVerified: true,
       balance: 0,
       savings: 0,
       credits: 0,
       transactions: [],
-      spendingChart: []
+      spendingChart: [],
     });
+
     await newUser.save();
 
     res.status(201).json({ message: "User created", id: newUser._id });
@@ -96,30 +102,59 @@ exports.registerUser = async (req, res) => {
   }
 };
 
-// 📩 Transfer OTP Only
+// 📩 Unified OTP sender (supports 'registration' and 'transfer')
+// - Defaults to 'registration' if no type is provided
 exports.sendOTP = async (req, res) => {
   const { email, type } = req.body;
-  console.log("📩 Incoming OTP request type:", type);
+  const trimmedEmail = email?.trim();
+  const kind = (type || "registration").toLowerCase();
 
   try {
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    if (!trimmedEmail) return res.status(400).json({ error: "Email is required" });
 
-    if (type === "transfer" && email) {
+    // ==========================
+    // Registration OTP (uses otpMemory store)
+    // ==========================
+    if (kind === "registration") {
+      const existingUser = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, "i") });
+      if (existingUser) {
+        return res.status(400).json({ error: "Email already registered" });
+      }
+
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      setOtp(trimmedEmail, { otp, expires: Date.now() + 10 * 60 * 1000 });
+
       await sendOTP({
-        to: email,
+        to: trimmedEmail,
+        subject: "Your Registration OTP",
+        body: `Your OTP is ${otp}`,
+      });
+
+      console.log(`🧪 REGISTRATION OTP for ${trimmedEmail}: ${otp}`);
+      return res.status(200).json({ message: "OTP sent for registration" });
+    }
+
+    // ==========================
+    // Transfer OTP (stateless email)
+    // ==========================
+    if (kind === "transfer") {
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+      await sendOTP({
+        to: trimmedEmail,
         subject: "Your OTP Code",
         body: `Your OTP is ${otp}`,
       });
+
       return res.status(200).json({ message: "OTP sent (transfer only)" });
     }
 
-    return res.status(400).json({ error: "OTP only supported for transfers" });
+    return res.status(400).json({ error: "Unsupported OTP type" });
   } catch (err) {
     console.error("❌ OTP Send Error:", err.message);
     res.status(500).json({ error: "Failed to send OTP" });
   }
 };
-
 
 // 🔐 Login – email & password only
 exports.login = async (req, res) => {
@@ -127,7 +162,7 @@ exports.login = async (req, res) => {
 
   try {
     const trimmedEmail = email ? email.trim() : "";
-    const user = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, 'i') });
+    const user = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, "i") });
 
     if (!user) return res.status(404).json({ error: "User not found" });
     if (user.password !== password) return res.status(401).json({ error: "Invalid credentials" });
@@ -138,15 +173,15 @@ exports.login = async (req, res) => {
       { expiresIn: "24h" }
     );
 
-   res.status(200).json({
-  message: "Login successful",
-  token,
-  user: {
-    _id: user._id,
-    email: user.email,
-    name: user.name,
-    isBlocked: user.isBlocked // ✅ needed for frontend logic
-  }
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: {
+        _id: user._id,
+        email: user.email,
+        name: user.name,
+        isBlocked: user.isBlocked, // ✅ needed for frontend logic
+      },
     });
   } catch (err) {
     console.error("❌ Login Error:", err.message);
@@ -162,7 +197,7 @@ exports.adminLogin = async (req, res) => {
   }
 
   try {
-    const user = await User.findOne({ email: new RegExp(`^${email.trim()}$`, 'i') });
+    const user = await User.findOne({ email: new RegExp(`^${email.trim()}$`, "i") });
     if (!user || user.password !== password) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
@@ -172,32 +207,24 @@ exports.adminLogin = async (req, res) => {
     }
 
     const token = jwt.sign(
-      {
-        id: user._id,              // ✅ critical for DB lookup
-        role: user.role,           // ✅ required for isAdmin
-        email: user.email
-      },
+      { id: user._id, role: user.role, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: "12h" }
     );
 
-    res.json({
-      message: "Admin logged in",
-      token
-    });
+    res.json({ message: "Admin logged in", token });
   } catch (err) {
     console.error("❌ Admin login error:", err);
     res.status(500).json({ error: "Server error during admin login" });
   }
 };
 
-
 // ✅ OTP Verification (for login only)
 exports.verifyOTP = async (req, res) => {
   const { email, otp } = req.body;
 
   try {
-    const user = await User.findOne({ email: new RegExp(`^${email.trim()}$`, 'i') });
+    const user = await User.findOne({ email: new RegExp(`^${email.trim()}$`, "i") });
     if (!user) return res.status(404).json({ error: "User not found" });
 
     if (!user.otp || !user.otpExpires) {

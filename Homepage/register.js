@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const res = await fetch(ENDPOINTS.sendOtp, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-            body: JSON.stringify({ email }),
+           body: JSON.stringify({ email, type: 'registration' }),
           });
           const data = await res.json().catch(() => ({}));
 
