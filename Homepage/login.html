@@ -206,21 +206,10 @@
     © 2025 Credibe. All rights reserved.
   </footer>
 
-  <!-- Small, self-contained UX helpers -->
-  <script>
-    // Toggle password visibility
-    (function () {
-      const btn = document.getElementById('toggle-password');
-      const input = document.getElementById('password');
-      if (!btn || !input) return;
-      btn.addEventListener('click', () => {
-        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
-        input.setAttribute('type', type);
-        btn.setAttribute('aria-label', type === 'password' ? 'Show password' : 'Hide password');
-      });
-    })();
 
+  
+    
    
-  </script>
+  <script src="login.js"></script>
 </body>
 </html>
