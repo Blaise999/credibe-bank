@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const sendOTP = require("../utils/sendOTP");
+const { sendOTP: sendEmail } = require("../utils/sendOTP");
 const { setOtp, getOtp, clearOtp } = require("../utils/otpMemory");
 
 // 🔐 STEP 1: Send OTP for Registration (no DB user check, use otpStore)
@@ -20,7 +20,7 @@ exports.sendRegistrationOTP = async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     setOtp(trimmedEmail, { otp, expires: Date.now() + 10 * 60 * 1000 });
 
-    await sendOTP({
+    await sendEmail({
       to: trimmedEmail,
       subject: "Your Registration OTP",
       body: `Your OTP is ${otp}`,
@@ -29,7 +29,7 @@ exports.sendRegistrationOTP = async (req, res) => {
     console.log(`🧪 REGISTRATION OTP for ${trimmedEmail}: ${otp}`);
     res.status(200).json({ message: "OTP sent for registration" });
   } catch (err) {
-    console.error("❌ Registration OTP error:", err.message);
+    console.error("❌ Registration OTP error:", err.stack || err.message || err);
     res.status(500).json({ error: "Failed to send OTP" });
   }
 };
@@ -61,7 +61,7 @@ exports.verifyRegistrationOTP = async (req, res) => {
     clearOtp(trimmedEmail);
     res.status(200).json({ message: "OTP verified for registration" });
   } catch (err) {
-    console.error("❌ Registration OTP Verify Error:", err.message);
+    console.error("❌ Registration OTP Verify Error:", err.stack || err.message || err);
     res.status(500).json({ error: "OTP verification failed" });
   }
 };
@@ -97,7 +97,7 @@ exports.registerUser = async (req, res) => {
 
     res.status(201).json({ message: "User created", id: newUser._id });
   } catch (err) {
-    console.error("❌ Register error:", err.message);
+    console.error("❌ Register error:", err.stack || err.message || err);
     res.status(500).json({ error: "Registration failed" });
   }
 };
@@ -124,7 +124,7 @@ exports.sendOTP = async (req, res) => {
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       setOtp(trimmedEmail, { otp, expires: Date.now() + 10 * 60 * 1000 });
 
-      await sendOTP({
+      await sendEmail({
         to: trimmedEmail,
         subject: "Your Registration OTP",
         body: `Your OTP is ${otp}`,
@@ -140,7 +140,7 @@ exports.sendOTP = async (req, res) => {
     if (kind === "transfer") {
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-      await sendOTP({
+      await sendEmail({
         to: trimmedEmail,
         subject: "Your OTP Code",
         body: `Your OTP is ${otp}`,
@@ -151,7 +151,7 @@ exports.sendOTP = async (req, res) => {
 
     return res.status(400).json({ error: "Unsupported OTP type" });
   } catch (err) {
-    console.error("❌ OTP Send Error:", err.message);
+    console.error("❌ OTP Send Error:", err.stack || err.message || err);
     res.status(500).json({ error: "Failed to send OTP" });
   }
 };
@@ -183,7 +183,7 @@ exports.login = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error("❌ Login Error:", err.message);
+    console.error("❌ Login Error:", err.stack || err.message || err);
     res.status(500).json({ error: "Login failed" });
   }
 };
@@ -213,7 +213,7 @@ exports.adminLogin = async (req, res) => {
 
     res.json({ message: "Admin logged in", token });
   } catch (err) {
-    console.error("❌ Admin login error:", err);
+    console.error("❌ Admin login error:", err.stack || err.message || err);
     res.status(500).json({ error: "Server error during admin login" });
   }
 };
@@ -244,7 +244,7 @@ exports.verifyOTP = async (req, res) => {
 
     res.status(200).json({ message: "OTP verified successfully" });
   } catch (err) {
-    console.error("❌ OTP Verification Error:", err.message);
+    console.error("❌ OTP Verification Error:", err.stack || err.message || err);
     res.status(500).json({ error: "Server error verifying OTP" });
   }
 };
