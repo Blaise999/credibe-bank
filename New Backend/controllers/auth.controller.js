@@ -101,6 +101,18 @@ exports.registerUser = async (req, res) => {
     res.status(500).json({ error: "Registration failed" });
   }
 };
+const token = jwt.sign(
+  { id: newUser._id, role: newUser.role },
+  process.env.JWT_SECRET,
+  { expiresIn: '24h' }
+);
+
+return res.status(201).json({
+  message: 'User created',
+  id: newUser._id,
+  user: { _id: newUser._id, email: newUser.email, name: newUser.name },
+  token
+});
 
 // 📩 Unified OTP sender (supports 'registration' and 'transfer')
 // - Defaults to 'registration' if no type is provided
