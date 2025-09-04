@@ -1,190 +1,323 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Credibe - Register</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-    html {
-        scroll-behavior: smooth;
-        overflow-x: hidden;
-    }
-    body {
-        max-width: 100vw;
-        overflow-x: hidden;
-    }
-    </style>
-</head>
-<body class="bg-[#1a1a1a] text-[#e0e0e0] min-h-screen">
-  <!-- HEADER -->
-  <header class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-5 bg-[#2d2d2d] shadow-lg sticky top-0 z-50 gap-4 sm:gap-0">
-    <!-- Logo -->
-    <a href="index.html" class="text-3xl font-bold text-[#00b4d8] flex items-center justify-center sm:justify-start">
-      🏦 Credibe
-    </a>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Credibe — Register</title>
 
-    <!-- Nav Items -->
-    <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-center">
-      <a href="login.html" class="text-[#e0e0e0] border-2 border-[#00b4d8] rounded-full px-4 py-2 hover:bg-[#00b4d8] hover:text-white transition text-sm w-full sm:w-auto text-center">Login</a>
-      <a href="#" class="text-[#e0e0e0] hover:text-[#00b4d8] transition text-sm w-full sm:w-auto text-center">Support</a>
-      <select id="language-switcher" class="bg-[#3a3a3a] text-[#e0e0e0] border border-[#00b4d8] rounded-full px-3 py-1 focus:outline-none focus:ring-2 focus:ring-[#00b4d8] text-sm w-full sm:w-auto">
-        <option value="en">English</option>
-        <option value="fr">Français</option>
-      </select>
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root{
+      --ink:#e5e7eb;
+      --muted:#9ca3af;
+      --bg:#0f1115;         /* page background */
+      --panel:#161a22;      /* panels/cards */
+      --brand:#00b4d8;      /* brand cyan */
+      --brand-2:#00d4ff;    /* accent cyan */
+    }
+
+    html,body{height:100%}
+    body{
+      font-family: Inter, Poppins, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      background:
+        radial-gradient(1200px 400px at 10% -10%, rgba(0,212,255,.12), transparent 60%),
+        radial-gradient(900px 300px at 110% 0%, rgba(167,139,250,.10), transparent 60%),
+        var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    /* Frosted */
+    .glass{
+      background: color-mix(in srgb, white 6%, transparent);
+      backdrop-filter: blur(10px);
+      border: 1px solid color-mix(in srgb, white 12%, transparent);
+    }
+
+    /* Gradient border wrapper */
+    .g-border{position:relative;border-radius:16px;overflow:hidden}
+    .g-border::before{
+      content:""; position:absolute; inset:-1px;
+      background: conic-gradient(from 180deg at 30% 30%, #7dd3fc, #a78bfa, #34d399, #7dd3fc);
+      filter: blur(12px); opacity:.35; z-index:0;
+    }
+    .g-border>.inner{
+      position:relative; z-index:1; border-radius:15px;
+      background: radial-gradient(900px 300px at -10% 0%, rgba(0,212,255,.06), transparent 60%), var(--panel);
+    }
+
+    /* Elevation + focus */
+    .elev-1{ box-shadow: 0 10px 30px rgba(0,0,0,.22) }
+    .focus-ring:focus-visible{
+      outline: 3px solid color-mix(in srgb, var(--brand) 60%, white);
+      outline-offset: 3px; border-radius: 12px;
+    }
+
+    /* Header */
+    .hdr{ transition: backdrop-filter .2s ease, background-color .2s ease, height .2s ease; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="hdr sticky top-0 z-50 border-b border-white/10 bg-[#12161f]/70 backdrop-blur-xl">
+    <div class="max-w-[1100px] mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2 group" aria-label="Credibe — banking, beautifully simple">
+        <!-- Credibe mark -->
+        <svg class="h-6 w-6 text-[var(--brand)] shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5"
+             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 10L12 4l9 6" />
+          <path d="M4 20h16" />
+          <path d="M6 10v8M10 10v8M14 10v8M18 10v8" />
+        </svg>
+        <span class="flex flex-col leading-tight">
+          <span class="text-2xl font-extrabold tracking-tight text-[var(--brand)]">Credibe</span>
+          <span class="text-[10px] italic text-[#A9C0DF]/80 -mt-1">Smart. Secure. Seamless</span>
+        </span>
+      </a>
+
+      <nav class="flex items-center gap-3">
+        <a href="login.html" class="hidden sm:inline-flex rounded-full bg-[var(--brand)] hover:bg-[#0096b2] text-white text-sm px-4 py-2 transition">Login</a>
+        <a href="support.html" class="text-sm text-gray-300 hover:text-white">Support</a>
+        <select id="language-switcher" class="glass border border-white/10 text-sm rounded-full px-3 py-1 text-gray-200">
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+        </select>
+      </nav>
     </div>
   </header>
 
-  <!-- FORM SECTION -->
-  <section class="py-16 px-4 md:px-8 bg-[#2d2d2d]">
-    <div class="max-w-3xl mx-auto">
-      <h1 class="text-3xl sm:text-4xl font-bold text-[#e0e0e0] mb-6 text-center">
-        Create Your Credibe Account
-      </h1>
-
-      <form id="register-form" method="POST" action="#" class="space-y-6 bg-[#3a3a3a] p-6 sm:p-8 rounded-lg shadow-lg" enctype="multipart/form-data">
-    
-                <!-- Full Name -->
-<div>
-    <label for="full-name" class="block text-[#e0e0e0] mb-2">Full Name</label>
-    <input type="text" id="full-name" name="full_name" class="w-full bg-[#1a1a1a] ..." placeholder="Enter your full name" required>
-    <input type="hidden" id="name">
-</div>
-
-                <!-- Date of Birth -->
-                <div>
-                    <label for="dob" class="block text-[#e0e0e0] mb-2">Date of Birth</label>
-                    <input type="date" id="dob" name="dob" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" required>
-                </div>
-                <!-- Gender -->
-                <div>
-                    <label for="gender" class="block text-[#e0e0e0] mb-2">Gender</label>
-                    <select id="gender" name="gender" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" required>
-                        <option value="" disabled selected>Select gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-               <!-- Email Address -->
-<div>
-    <label for="email" class="block text-[#e0e0e0] mb-2">Email Address</label>
-    <input type="email" id="email" name="email" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter your email" required>
-    <!-- OTP Section -->
-    <div id="otp-section" class="mt-4 hidden">
-        <label for="otp" class="block text-[#e0e0e0] mb-2">Enter OTP</label>
-        <div class="flex gap-2">
-            <input type="text" id="otp" name="otp" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter OTP" maxlength="6">
-        <button type="button" id="send-otp" class="hidden bg-[#00b4d8] text-white rounded-lg px-4 py-2 hover:opacity-90 transition">Send OTP</button>
-        </div>
-        <p id="otp-message" class="mt-2 text-sm text-[#e0e0e0]"></p>
+  <!-- Hero / Title -->
+  <section class="px-4 md:px-6 pt-10 md:pt-14">
+    <div class="max-w-[1100px] mx-auto text-center md:text-left">
+      <h1 class="text-3xl sm:text-4xl font-bold mb-2">Create your Credibe account</h1>
+      <p class="text-sm text-gray-300">A few details to verify you. Strong security, clear consent, no surprises.</p>
     </div>
-</div>
-                <!-- Phone Number -->
-                <div>
-                    <label for="phone" class="block text-[#e0e0e0] mb-2">Phone Number</label>
-                    <input type="tel" id="phone" name="phone" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="+44 123 456 7890" pattern="[0-9\+\-\s]+" required>
-                </div>
-                <!-- Address -->
-                <div>
-                    <label for="address" class="block text-[#e0e0e0] mb-2">Address</label>
-                    <textarea id="address" name="address" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter your full address" rows="4" required></textarea>
-                </div>
-                <!-- National ID or Passport Number -->
-                <div>
-                    <label for="id-number" class="block text-[#e0e0e0] mb-2">National ID or Passport Number</label>
-                    <input type="text" id="id-number" name="id_number" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter ID or passport number" required>
-                </div>
-                <!-- Upload ID Document -->
-                <div>
-                    <label for="id-document" class="block text-[#e0e0e0] mb-2">Upload ID Document</label>
-                    <input type="file" id="id-document" name="id_document" accept=".pdf,.jpg,.png" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" required>
-                </div>
-                <!-- Password -->
-                <div>
-                    <label for="password" class="block text-[#e0e0e0] mb-2">Create Password</label>
-                    <div class="relative">
-                        <input type="password" id="password" name="password" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Create a password" required>
-                        <button type="button" id="toggle-password" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#00b4d8] hover:text-[#87ceeb]">👁️</button>
-                    </div>
-                    <div id="password-strength" class="mt-2 text-sm"></div>
-                </div>
-                <!-- Confirm Password -->
-                <div>
-                    <label for="confirm-password" class="block text-[#e0e0e0] mb-2">Confirm Password</label>
-                    <div class="relative">
-                        <input type="password" id="confirm-password" name="confirm_password" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Confirm your password" required>
-                        <button type="button" id="toggle-confirm-password" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#00b4d8] hover:text-[#87ceeb]">👁️</button>
-                    </div>
-                </div>
-                <!-- Security Question -->
-                <div>
-                    <label for="security-question" class="block text-[#e0e0e0] mb-2">Security Question</label>
-                    <select id="security-question" name="security_question" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" required>
-                        <option value="" disabled selected>Select a security question</option>
-                        <option value="q1">What was the name of your first pet?</option>
-                        <option value="q2">What is your mother's maiden name?</option>
-                        <option value="q3">What was your childhood nickname?</option>
-                    </select>
-                </div>
-                <!-- Security Answer -->
-                <div>
-                    <label for="security-answer" class="block text-[#e0e0e0] mb-2">Security Answer</label>
-                    <input type="text" id="security-answer" name="security_answer" class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter your answer" required>
-                </div>
-                <!-- Terms & Conditions -->
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" id="terms" name="terms" class="h-5 w-5 text-[#00b4d8] bg-[#1a1a1a] border-[#444] rounded focus:ring-[#00b4d8]" required>
-                    <label for="terms" class="text-[#e0e0e0]">I agree to the <a href="#" class="text-[#00b4d8] hover:underline">Terms & Conditions</a></label>
-                </div>
-                <!-- Submit Button -->
-                <div>
-                    <button type="submit" class="w-full bg-[#00b4d8] text-white rounded-lg px-4 py-2 hover:opacity-90 transition">Register</button>
-                </div>
-            </form>
-            <p class="mt-4 text-center text-[#bbb]">Already have an account? <a href="login.html" class="text-[#00b4d8] hover:underline">Log in</a></p>
-        </div>
-        </form>
-    </section>
+  </section>
 
+  <!-- Form card -->
+  <main class="px-4 md:px-6 py-8 md:py-10">
+    <div class="max-w-[1100px] mx-auto">
+      <div class="g-border elev-1">
+        <div class="inner rounded-[15px] p-6 md:p-8">
+          <form id="register-form" method="POST" action="#" class="space-y-6" enctype="multipart/form-data" novalidate>
+            <!-- Grid: two columns on md+ -->
+            <div class="grid md:grid-cols-2 gap-6">
+              <!-- Full Name -->
+              <div class="md:col-span-1">
+                <label for="full-name" class="block mb-2 text-sm">Full name</label>
+                <input
+                  type="text" id="full-name" name="full_name" placeholder="Jane Alexandra Doe"
+                  class="w-full rounded-lg bg-[#12161f] border border-white/10 text-[var(--ink)] px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:border-transparent focus-ring"
+                  required />
+                <input type="hidden" id="name" />
+              </div>
 
-    <footer class="bg-[#1a1a1a] text-[#e0e0e0] py-12 px-4 text-center">
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-center gap-8 mb-6">
-            <div>
-                <h4 class="text-xl font-semibold mb-4">Download App</h4>
-                <a href="#" class="block text-[#87ceeb] hover:underline">App Store</a>
-                <a href="#" class="block text-[#87ceeb] hover:underline">Google Play</a>
-            </div>
-            <div>
-                <h4 class="text-xl font-semibold mb-4">Contact</h4>
-                <p>Email: support@credibe.com</p>
-                <p>Phone: +44 800 123 456</p>
-            </div>
-            <div>
-                <h4 class="text-xl font-semibold mb-4">Follow Us</h4>
-                <a href="#" class="block text-[#87ceeb] hover:underline">Facebook</a>
-                <a href="#" class="block text-[#87ceeb] hover:underline">Twitter</a>
-                <a href="#" class="block text-[#87ceeb] hover:underline">LinkedIn</a>
-            </div>
-        </div>
-        <div class="border-t border-[#444] pt-6">
-            <p>© 2025 Credibe. All rights reserved. <a href="#" class="text-[#87ceeb] hover:underline">Privacy Policy</a> | <a href="#" class="text-[#87ceeb] hover:underline">Terms</a></p>
-        </div>
-    </footer>
+              <!-- Date of Birth -->
+              <div class="md:col-span-1">
+                <label for="dob" class="block mb-2 text-sm">Date of birth</label>
+                <input
+                  type="date" id="dob" name="dob"
+                  class="w-full rounded-lg bg-[#12161f] border border-white/10 text-[var(--ink)] px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:border-transparent focus-ring"
+                  required />
+              </div>
 
-    <div class="fixed bottom-5 right-5">
-        <button id="chat-toggle" class="bg-[#00b4d8] text-white rounded-full px-6 py-3 shadow-lg hover:opacity-90 transition">💬 Live Chat</button>
-        <div id="chat-box" class="hidden bg-[#2d2d2d] p-5 rounded-lg shadow-lg w-80 mt-2">
-            <p class="mb-4 text-[#e0e0e0]">Welcome to Credibe Chat! How can we assist you today?</p>
-            <input type="text" placeholder="Type your message..." class="w-full bg-[#3a3a3a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 mb-4">
-            <button class="w-full bg-[#00b4d8] text-white rounded-lg px-4 py-2 hover:opacity-90 transition">Send</button>
+              <!-- Gender -->
+              <div class="md:col-span-1">
+                <label for="gender" class="block mb-2 text-sm">Gender</label>
+                <select
+                  id="gender" name="gender"
+                  class="w-full rounded-lg bg-[#12161f] border border-white/10 text-[var(--ink)] px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:border-transparent focus-ring"
+                  required>
+                  <option value="" disabled selected>Select gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <!-- Email + OTP -->
+              <div class="md:col-span-1">
+                <label for="email" class="block mb-2 text-sm">Email address</label>
+                <input
+                  type="email" id="email" name="email" placeholder="you@domain.com"
+                  class="w-full rounded-lg bg-[#12161f] border border-white/10 text-[var(--ink)] px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:border-transparent focus-ring"
+                  required />
+                <div id="otp-section" class="mt-3 hidden">
+                  <label for="otp" class="block mb-2 text-sm">Enter OTP</label>
+                  <div class="flex gap-2">
+                    <input
+                      type="text" id="otp" name="otp" maxlength="6" placeholder="6-digit code"
+                      class="w-full rounded-lg bg-[#12161f] border border-white/10 text-[var(--ink)] px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:border-transparent focus-ring" />
+                    <button type="button" id="send-otp"
+                      class="hidden rounded-lg bg-[var(--brand)] hover:bg-[#0096b2] text-white px-4 py-2 transition">
+                      Send OTP
+                    </button>
+                  </div>
+                  <p id="otp-message" class="mt-2 text-xs text-gray-400"></p>
+                </div>
+              </div>
+
+              <!-- Phone -->
+              <div class="md:col-span-1">
+                <label for="phone" class="block mb-2 text-sm">Phone number</label>
+                <input
+                  type="tel" id="phone" name="phone" placeholder="+44 123 456 7890" pattern="[0-9\+\-\s]+"
+                  class="w-full rounded-lg bg-[#12161f] border border-white/10 text-[var(--ink)] px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:border-transparent focus-ring"
+                  required />
+              </div>
+
+              <!-- Address -->
+              <div class="md:col-span-2">
+                <label for="address" class="block mb-2 text-sm">Address</label>
+                <textarea
+                  id="address" name="address" rows="4" placeholder="Building, street, city, postcode"
+                  class="w-full rounded-lg bg-[#12161f] border border-white/10 text-[var(--ink)] px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:border-transparent focus-ring"
+                  required></textarea>
+              </div>
+
+              <!-- ID number -->
+              <div class="md:col-span-1">
+                <label for="id-number" class="block mb-2 text-sm">National ID or Passport number</label>
+                <input
+                  type="text" id="id-number" name="id_number" placeholder="ID / Passport"
+                  class="w-full rounded-lg bg-[#12161f] border border-white/10 text-[var(--ink)] px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:border-transparent focus-ring"
+                  required />
+              </div>
+
+              <!-- ID document -->
+              <div class="md:col-span-1">
+                <label for="id-document" class="block mb-2 text-sm">Upload ID document</label>
+                <input
+                  type="file" id="id-document" name="id_document" accept=".pdf,.jpg,.png"
+                  class="w-full rounded-lg bg-[#12161f] border border-white/10 text-[var(--ink)] file:bg-[#0f1115] file:border-0 file:text-[var(--ink)] file:px-3 file:py-2 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:border-transparent focus-ring"
+                  required />
+              </div>
+
+              <!-- Password -->
+              <div class="md:col-span-1">
+                <label for="password" class="block mb-2 text-sm">Create password</label>
+                <div class="relative">
+                  <input
+                    type="password" id="password" name="password" placeholder="••••••••"
+                    class="w-full rounded-lg bg-[#12161f] border border-white/10 text-[var(--ink)] px-4 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:border-transparent focus-ring"
+                    required />
+                  <button type="button" id="toggle-password"
+                    class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[var(--brand)]"
+                    aria-label="Show password">👁️</button>
+                </div>
+                <div id="password-strength" class="mt-2 text-xs text-gray-400"></div>
+              </div>
+
+              <!-- Confirm -->
+              <div class="md:col-span-1">
+                <label for="confirm-password" class="block mb-2 text-sm">Confirm password</label>
+                <div class="relative">
+                  <input
+                    type="password" id="confirm-password" name="confirm_password" placeholder="••••••••"
+                    class="w-full rounded-lg bg-[#12161f] border border-white/10 text-[var(--ink)] px-4 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:border-transparent focus-ring"
+                    required />
+                  <button type="button" id="toggle-confirm-password"
+                    class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[var(--brand)]"
+                    aria-label="Show password">👁️</button>
+                </div>
+              </div>
+
+              <!-- Security Q/A -->
+              <div class="md:col-span-1">
+                <label for="security-question" class="block mb-2 text-sm">Security question</label>
+                <select
+                  id="security-question" name="security_question"
+                  class="w-full rounded-lg bg-[#12161f] border border-white/10 text-[var(--ink)] px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:border-transparent focus-ring"
+                  required>
+                  <option value="" disabled selected>Select a question</option>
+                  <option value="q1">What was the name of your first pet?</option>
+                  <option value="q2">What is your mother's maiden name?</option>
+                  <option value="q3">What was your childhood nickname?</option>
+                </select>
+              </div>
+
+              <div class="md:col-span-1">
+                <label for="security-answer" class="block mb-2 text-sm">Security answer</label>
+                <input
+                  type="text" id="security-answer" name="security_answer" placeholder="Your answer"
+                  class="w-full rounded-lg bg-[#12161f] border border-white/10 text-[var(--ink)] px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:border-transparent focus-ring"
+                  required />
+              </div>
+            </div>
+
+            <!-- Terms -->
+            <div class="flex items-start gap-3">
+              <input type="checkbox" id="terms" name="terms" class="mt-1 rounded bg-[#12161f] border-white/10" required />
+              <label for="terms" class="text-sm text-gray-300">
+                I agree to the <a href="terms.html" class="text-[var(--brand)] hover:underline">Terms</a> and
+                <a href="privacy.html" class="text-[var(--brand)] hover:underline">Privacy Policy</a>.
+              </label>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit"
+              class="w-full md:w-auto rounded-lg bg-[var(--brand)] hover:bg-[#0096b2] text-white font-semibold px-6 py-3 transition focus-ring">
+              Create account
+            </button>
+
+            <p class="text-sm text-gray-400">
+              Already have an account?
+              <a href="login.html" class="text-[var(--brand)] hover:underline">Log in</a>
+            </p>
+          </form>
         </div>
+      </div>
     </div>
+  </main>
 
-    <script src="register.js"></script>
+  <!-- Footer -->
+  <footer class="py-10 text-center text-xs text-gray-500">
+    <div class="max-w-[1100px] mx-auto px-4">
+      <div class="grid sm:grid-cols-3 gap-6 mb-6">
+        <div>
+          <h4 class="text-white font-semibold mb-2">Download App</h4>
+          <a href="https://www.apple.com/app-store/" class="text-[var(--brand)] hover:underline">App Store</a>
+          <!-- Play Store link intentionally omitted -->
+        </div>
+        <div>
+          <h4 class="text-white font-semibold mb-2">Contact</h4>
+          <p>Email: <a href="mailto:support@credibe.com" class="text-[var(--brand)] hover:underline">support@credibe.com</a></p>
+          <p>Phone: <a href="tel:+44800123456" class="text-[var(--brand)] hover:underline">+44 800 123 456</a></p>
+        </div>
+        <div>
+          <h4 class="text-white font-semibold mb-2">Follow us</h4>
+          <a href="https://www.facebook.com" class="block text-[var(--brand)] hover:underline">Facebook</a>
+          <a href="https://www.twitter.com" class="block text-[var(--brand)] hover:underline">Twitter</a>
+          <a href="https://www.linkedin.com" class="block text-[var(--brand)] hover:underline">LinkedIn</a>
+        </div>
+      </div>
+      <div class="border-t border-white/10 pt-4">
+        © 2025 Credibe. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Live Chat (kept, visual polish only) -->
+  <div class="fixed bottom-5 right-5">
+    <button id="chat-toggle" class="rounded-full bg-[var(--brand)] hover:bg-[#0096b2] text-white px-6 py-3 shadow-lg transition">
+      💬 Live Chat
+    </button>
+    <div id="chat-box" class="hidden mt-2 w-80 glass rounded-xl p-5 elev-1">
+      <p class="mb-4 text-gray-200">Welcome to Credibe Chat. How can we help?</p>
+      <input type="text" placeholder="Type your message..." class="w-full rounded-lg bg-[#12161f] border border-white/10 text-[var(--ink)] px-4 py-2 mb-3 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:border-transparent focus-ring">
+      <button class="w-full rounded-lg bg-[var(--brand)] hover:bg-[#0096b2] text-white px-4 py-2 transition">Send</button>
+    </div>
+  </div>
+
+  <!-- Your scripts (unchanged) -->
+  <script src="register.js"></script>
 </body>
 </html>

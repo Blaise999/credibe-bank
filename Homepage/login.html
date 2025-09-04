@@ -3,75 +3,224 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Credibe - Login</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <title>Credibe — Secure Login</title>
+
+  <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+
   <style>
-    html {
-      scroll-behavior: smooth;
+    :root{
+      --ink:#e5e7eb;
+      --muted:#9ca3af;
+      --bg:#0f1115;         /* page background */
+      --panel:#161a22;      /* panels/cards */
+      --brand:#00b4d8;      /* brand cyan */
+      --brand-2:#00d4ff;    /* accent cyan */
+    }
+
+    html, body { height: 100%; }
+    body{
+      font-family: Inter, Poppins, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      background:
+        radial-gradient(1200px 400px at 10% -10%, rgba(0,212,255,.12), transparent 60%),
+        radial-gradient(900px 300px at 110% 0%, rgba(167,139,250,.10), transparent 60%),
+        var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
     }
-    body {
-      font-family: 'Poppins', sans-serif;
-      max-width: 100vw;
-      overflow-x: hidden;
-      background-color: #1a1a1a;
-      color: #e0e0e0;
-      min-height: 100vh;
+
+    /* Frosted bar */
+    .glass {
+      background: color-mix(in srgb, white 6%, transparent);
+      backdrop-filter: blur(10px);
+      border: 1px solid color-mix(in srgb, white 12%, transparent);
+    }
+
+    /* Gradient border wrapper */
+    .g-border { position:relative; border-radius:16px; overflow:hidden; }
+    .g-border::before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: conic-gradient(from 180deg at 30% 30%, #7dd3fc, #a78bfa, #34d399, #7dd3fc);
+      filter: blur(12px);
+      opacity:.35;
+      z-index:0;
+    }
+    .g-border > .inner{
+      position:relative; z-index:1; border-radius:15px;
+      background: radial-gradient(900px 300px at -10% 0%, rgba(0,212,255,.06), transparent 60%), var(--panel);
+    }
+
+    /* Focus ring */
+    .focus-ring:focus-visible{
+      outline: 3px solid color-mix(in srgb, var(--brand) 60%, white);
+      outline-offset: 3px;
+      border-radius: 12px;
+    }
+
+    /* Subtle elevation */
+    .elev-1{ box-shadow: 0 10px 30px rgba(0,0,0,.22) }
+
+    /* Header shrink (on scroll ready if you add a script later) */
+    .hdr { transition: backdrop-filter .2s ease, background-color .2s ease, height .2s ease; }
+
+    @media (prefers-reduced-motion: reduce){
+      .hdr { transition: none !important; }
     }
   </style>
 </head>
 <body>
 
-  <!-- 🔐 Header -->
-  <header class="flex justify-between items-center p-5 bg-[#2d2d2d] shadow-lg sticky top-0 z-50">
-    <a href="index.html" class="text-3xl font-bold text-[#00b4d8] flex items-center">🏦 Credibe</a>
-    <div class="flex items-center gap-3">
-      <a href="#" class="text-[#e0e0e0] hover:text-[#00b4d8] transition">Support</a>
-      <select id="language-switcher" class="bg-[#3a3a3a] text-[#e0e0e0] border border-[#00b4d8] rounded-full px-3 py-1">
-        <option value="en">English</option>
-        <option value="fr">Français</option>
-      </select>
+  <!-- Header -->
+  <header class="hdr sticky top-0 z-50 border-b border-white/10 bg-[#12161f]/70 backdrop-blur-xl">
+    <div class="max-w-[1100px] mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2 group" aria-label="Credibe — banking, beautifully simple">
+        <!-- Credibe mark -->
+        <svg class="h-6 w-6 text-[var(--brand)] shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5"
+             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 10L12 4l9 6" />
+          <path d="M4 20h16" />
+          <path d="M6 10v8M10 10v8M14 10v8M18 10v8" />
+        </svg>
+        <span class="flex flex-col leading-tight">
+          <span class="text-2xl font-extrabold tracking-tight text-[var(--brand)]">Credibe</span>
+          <span class="text-[10px] italic text-[#A9C0DF]/80 -mt-1">Smart. Secure. Seamless</span>
+        </span>
+      </a>
+
+      <nav class="flex items-center gap-4">
+        <a href="support.html" class="text-sm text-gray-300 hover:text-white">Support</a>
+        <select id="language-switcher" class="glass border border-white/10 text-sm rounded-full px-3 py-1 text-gray-200">
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+        </select>
+      </nav>
     </div>
   </header>
 
-  <!-- 🔐 Login Form Section -->
-  <section class="py-16 px-4 md:px-8 bg-[#2d2d2d]">
-    <div class="max-w-md mx-auto bg-[#3a3a3a] p-8 rounded-lg shadow-lg">
-      <div class="text-center mb-6">
-        <h1 class="text-3xl font-bold flex items-center justify-center gap-2">
-          <span>🏦 Credibe</span>
-          <span class="text-[#00b4d8] text-lg">🔒 Secure Login</span>
-        </h1>
-        <p class="text-[#bbb] mt-2">Empowering Your Financial Future</p>
-      </div>
+  <!-- Main -->
+  <main class="px-4 md:px-6 py-12 md:py-16">
+    <div class="max-w-[1100px] mx-auto grid md:grid-cols-2 gap-8 items-start">
 
-      <form id="login-form" class="space-y-6">
-        <div>
-          <label for="username" class="block mb-2">Username or Email</label>
-          <input type="text" id="username" name="username" placeholder="Enter username or email"
-            class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]"
-            required>
-        </div>
-
-        <div>
-          <label for="password" class="block mb-2">Password</label>
-          <div class="relative">
-            <input type="password" id="password" name="password" placeholder="Enter your password"
-              class="w-full bg-[#1a1a1a] border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]"
-              required>
-            <button type="button" id="toggle-password"
-              class="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#00b4d8] hover:text-[#87ceeb]">👁️</button>
+      <!-- Left: Copy (serious, fintech tone) -->
+      <section class="hidden md:block">
+        <div class="g-border elev-1">
+          <div class="inner rounded-[15px] p-6">
+            <h1 class="text-3xl font-bold mb-2">Welcome back</h1>
+            <p class="text-gray-300 text-sm leading-relaxed">
+              Log in to manage accounts, move money, and keep everything in one clean view. Strong encryption, clear activity, no nonsense.
+            </p>
+            <ul class="mt-4 space-y-2 text-sm text-gray-300">
+              <li class="flex items-center gap-2"><span class="text-[var(--brand)]">•</span> Instant transfers on supported rails</li>
+              <li class="flex items-center gap-2"><span class="text-[var(--brand)]">•</span> Spend controls and real-time alerts</li>
+              <li class="flex items-center gap-2"><span class="text-[var(--brand)]">•</span> Two-factor ready</li>
+            </ul>
           </div>
         </div>
+      </section>
 
-        <div>
-          <button type="submit" id="login-button" class="w-full bg-[#00b4d8] text-white rounded-lg px-4 py-2">Login</button>
+      <!-- Right: Login Card -->
+      <section>
+        <div class="g-border elev-1">
+          <div class="inner rounded-[15px] p-6 md:p-8">
+            <div class="mb-6">
+              <h2 class="text-2xl font-semibold">Secure login</h2>
+              <p class="text-sm text-gray-400">Use your email and password to continue.</p>
+            </div>
+
+            <form id="login-form" class="space-y-5" autocomplete="on" novalidate>
+              <div>
+                <label for="username" class="block mb-2 text-sm">Email or username</label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  placeholder="you@domain.com"
+                  class="w-full rounded-lg bg-[#12161f] border border-white/10 text-[var(--ink)] px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:border-transparent focus-ring"
+                  required
+                  autocomplete="username"
+                />
+              </div>
+
+              <div>
+                <label for="password" class="block mb-2 text-sm">Password</label>
+                <div class="relative">
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="••••••••"
+                    class="w-full rounded-lg bg-[#12161f] border border-white/10 text-[var(--ink)] px-4 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:border-transparent focus-ring"
+                    required
+                    autocomplete="current-password"
+                  />
+                  <button type="button" id="toggle-password"
+                          class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[var(--brand)]"
+                          aria-label="Show password">👁️</button>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <label class="inline-flex items-center gap-2 text-sm text-gray-300">
+                  <input type="checkbox" class="rounded bg-[#12161f] border-white/10" id="remember" />
+                  Remember me
+                </label>
+                <a href="forgot-password.html" class="text-sm text-[var(--brand)] hover:underline">Forgot password?</a>
+              </div>
+
+              <button
+                type="submit"
+                id="login-button"
+                class="w-full rounded-lg bg-[var(--brand)] hover:bg-[#0096b2] text-white font-semibold px-4 py-3 transition focus-ring"
+              >
+                Sign in
+              </button>
+
+              <p class="text-xs text-gray-400 text-center">
+                By continuing you agree to the <a href="terms.html" class="text-[var(--brand)] hover:underline">Terms</a> and
+                <a href="privacy.html" class="text-[var(--brand)] hover:underline">Privacy Policy</a>.
+              </p>
+            </form>
+
+            <div id="form-error" role="alert" class="mt-4 hidden text-sm text-red-300">
+              <!-- Errors will appear here -->
+            </div>
+
+            <div class="mt-6 text-sm text-center text-gray-300">
+              New to Credibe?
+              <a href="registration.html" class="text-[var(--brand)] hover:underline">Open an account</a>
+            </div>
+          </div>
         </div>
-      </form>
+      </section>
     </div>
-  </section>
+  </main>
 
-  <script src="login.js"></script>
+  <!-- Footer (minimal) -->
+  <footer class="py-8 text-center text-xs text-gray-500">
+    © 2025 Credibe. All rights reserved.
+  </footer>
+
+  <!-- Small, self-contained UX helpers -->
+  <script>
+    // Toggle password visibility
+    (function () {
+      const btn = document.getElementById('toggle-password');
+      const input = document.getElementById('password');
+      if (!btn || !input) return;
+      btn.addEventListener('click', () => {
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+        btn.setAttribute('aria-label', type === 'password' ? 'Show password' : 'Hide password');
+      });
+    })();
+
+   
+  </script>
 </body>
 </html>

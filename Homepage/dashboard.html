@@ -1,398 +1,421 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🏦 Credibe - Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="../favicon.png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.0/dist/vanilla-tilt.min.js"></script>
-    <script src="https://js.stripe.com/v3/"></script>
+  <!-- =========================================================
+       CREDIBE DASHBOARD — PIXEL-MATCHED TO REFERENCE
+       (Header kept EXACTLY as provided; main area restyled)
+       ========================================================= -->
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+  <title>🏦 Credibe - Dashboard</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="icon" type="image/png" href="../favicon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.0/dist/vanilla-tilt.min.js"></script>
+  <script src="https://js.stripe.com/v3/"></script>
 
-   <style>
-    body {
-        font-family: 'Poppins', sans-serif;
+  <style>
+    /* =====================================================================
+       0) GLOBALS — TYPE, THEME TOKENS, LAYERED BACKGROUND & ACCESSIBILITY
+       ===================================================================== */
+
+    :root{
+      /* Core canvas */
+      --bg-0: #0a1220;                 /* page base (dark navy)                      */
+      --bg-1: #0b1628;                 /* deeper shadow layer                        */
+      --bg-2: #0e1a2e;                 /* elevated panels                            */
+
+      /* Card surfaces (to match screenshot’s soft-glow cards) */
+      --card-0: #0f1b2f;               /* base card                                  */
+      --card-1: #12223c;               /* higher-contrast card                       */
+      --card-2: #0c1528;               /* quick actions darker container             */
+
+      /* Edges / lines */
+      --edge-0: #1c3455;               /* primary dividers                           */
+      --edge-1: #2a4a74;               /* luminous edge                              */
+      --edge-2: #0c2038;               /* inner stroke                               */
+
+      /* Text */
+      --ink:   #e8f1ff;                /* main text                                  */
+      --muted: #9fb6d6;                /* secondary text                             */
+
+      /* Brand blues (cyan/teal band just like reference) */
+      --brand-a: #00c2ee;              /* left of gradient                           */
+      --brand-b: #29b3ff;              /* right of gradient                          */
+      --brand-ink: #001723;            /* dark text on brand surfaces                */
+
+      /* Accent numbers */
+      --num-cyan: #36e4ff;             /* glowing cyan $0.00                         */
+      --num-lav:  #aeb9ff;             /* credit lavender                            */
+
+      /* Status chips */
+      --chip-cyan-bg: rgba(9, 30, 46, .88);
+      --chip-cyan-border: #234a6d;
+      --chip-cyan-text: #75f1ff;
+
+      --chip-amber-bg: rgba(48, 36, 10, .55);
+      --chip-amber-border: #3a2a0d;
+      --chip-amber-text: #ffdcb0;
+
+      /* Soft shadows for glass cards */
+      --shadow-1: 0 16px 44px rgba(0,0,0,.55);
+      --shadow-2: 0 12px 30px rgba(0,0,0,.38);
+
+      /* Radii to mimic screenshot */
+      --r-xl: 22px;
+      --r-lg: 18px;
+      --r-md: 14px;
+
+      /* Timing */
+      --t-fast: .15s;
+      --t-med: .25s;
+      --t-slow: .4s;
     }
 
-    .skeleton {
-        animation: pulse 1.5s infinite ease-in-out;
-        background-color: #2d2d2d;
-        height: 1.5rem;
-        border-radius: 0.25rem;
+    /* Base type + background layering (subtle radial wash like the image) */
+    html,body{
+      height:100%;
+    }
+    body{
+      font-family:'Poppins',sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(900px 600px at -12% -20%, #13233b 0%, transparent 60%),
+        radial-gradient(1000px 620px at 112% -10%, #0c1830 0%, transparent 55%),
+        linear-gradient(180deg, #0a1220 0%, #090f1b 100%);
+      background-color: var(--bg-0);
     }
 
-    .chart-container {
-        animation: fadeIn 1s ease-in-out;
+    /* =====================================================================
+       1) KEEP EXISTING HEADER FEEL — ONLY COSMETIC PROTECTION
+       (You asked not to touch the header area’s structure.)
+       ===================================================================== */
+
+    .header{
+      background: rgba(15, 23, 42, .92) !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--edge-0);
+      box-shadow: 0 2px 0 rgba(255,255,255,.02), 0 10px 24px rgba(0,0,0,.35);
+      transition: background-color var(--t-med) ease, border-color var(--t-med) ease;
+    }
+    .header:hover{
+      background: rgba(18, 28, 48, .96) !important;
+    }
+    .header-accent::after{ display:none !important; }
+    #menu-toggle{
+      background:transparent !important;
+      border:none !important;
+      color:var(--ink) !important;
+      box-shadow:none !important;
+      filter:none !important;
     }
 
-    @keyframes pulse {
-        0% { opacity: 1; }
-        50% { opacity: 0.5; }
-        100% { opacity: 1; }
+    /* =====================================================================
+       2) PANELS / CARDS — EXACT TONE & SHARPNESS LIKE THE REFERENCE SHOT
+       ===================================================================== */
+
+    .panel{
+      /* dual-tone vertical gradient + faint inner glow + crisp border */
+      background:
+        linear-gradient(180deg, rgba(20, 34, 58, .96) 0%, rgba(12, 22, 38, .96) 100%),
+        linear-gradient(0deg, rgba(255,255,255,.04), rgba(255,255,255,.04));
+      border: 1px solid rgba(42, 74, 116, .88);
+      border-radius: var(--r-xl);
+      box-shadow: var(--shadow-1), inset 0 1px 0 rgba(255,255,255,.05);
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .panel::before{
+      /* subtle cyan top-edge to mimic that frosted lip */
+      content:"";
+      position:absolute;
+      inset:0 0 auto 0;
+      height:1px;
+      background:linear-gradient(90deg, transparent 0%, rgba(100,210,255,.35) 35%, rgba(0,180,216,.35) 65%, transparent 100%);
+      opacity:.7;
+      pointer-events:none;
     }
 
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+    .panel--soft{
+      background:
+        linear-gradient(180deg, rgba(17, 28, 48, .94) 0%, rgba(13, 24, 42, .94) 100%);
+      border-color: rgba(42, 74, 116, .68);
+      box-shadow: var(--shadow-2), inset 0 1px 0 rgba(255,255,255,.04);
     }
 
-    .mobile-menu {
-        transition: transform 0.3s ease-in-out;
+    /* Frosted “tile” used for secondary action blocks */
+    .tile{
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border-radius: var(--r-lg);
+      transition: transform var(--t-med) ease, background var(--t-med) ease, border-color var(--t-med) ease;
+    }
+    .tile:hover{
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.07);
+      border-color: rgba(255,255,255,.14);
     }
 
-    .mobile-menu.open {
-        transform: translateX(0);
+    /* =====================================================================
+       3) LABELS / NUMBERS — HIERARCHY & COLOR EXACTNESS
+       ===================================================================== */
+
+    .h-label{
+      color: var(--muted);
+      letter-spacing: .08em;
+      font-weight: 700;
+      text-transform: none;
+      opacity: .95;
+    }
+    .num{
+      font-weight: 900;
+      letter-spacing: .2px;
+      line-height: 1.05;
+      text-shadow:
+        0 0 0 rgba(0,0,0,0),
+        0 10px 22px rgba(0,0,0,.25);
+    }
+    .num--cyan{ color: var(--num-cyan); }
+    .num--lav{  color: var(--num-lav);  }
+
+    /* Inline “chips” in the cards (Spent $240, $400) */
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:.4rem;
+      height:26px;
+      line-height:24px;
+      padding:0 .68rem;
+      border-radius: 999px;
+      font-size:.78rem;
+      font-weight:700;
+      letter-spacing:.02em;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .chip--cyan{
+      color: var(--chip-cyan-text);
+      background: var(--chip-cyan-bg);
+      border: 1px solid var(--chip-cyan-border);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+    }
+    .chip--amber{
+      color: var(--chip-amber-text);
+      background: var(--chip-amber-bg);
+      border: 1px solid var(--chip-amber-border);
     }
 
-    .mobile-menu.closed {
-        transform: translateX(-100%);
+    /* =====================================================================
+       4) PRIMARY BUTTONS — GRADIENT CTA & DARK SECONDARY
+       ===================================================================== */
+
+    .btn-grad{
+      background: linear-gradient(90deg, var(--brand-a) 0%, var(--brand-b) 100%);
+      color: var(--brand-ink);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: var(--r-md);
+      box-shadow: 0 14px 30px rgba(0, 194, 238, .28);
+      transition: transform var(--t-fast) ease, filter var(--t-fast) ease, box-shadow var(--t-fast) ease;
+      font-weight: 900;
+      letter-spacing: .02em;
+    }
+    .btn-grad:hover{
+      filter: brightness(.98);
+      transform: translateY(-1px);
+      box-shadow: 0 18px 38px rgba(0, 194, 238, .32);
+    }
+    .btn-dark{
+      background: rgba(18,27,45,.92);
+      border: 1px solid rgba(42, 74, 116, .85);
+      color: var(--ink);
+      border-radius: var(--r-md);
+      transition: filter var(--t-fast) ease, transform var(--t-fast) ease;
+      font-weight: 700;
+      letter-spacing: .01em;
+    }
+    .btn-dark:hover{
+      filter: brightness(1.07);
+      transform: translateY(-1px);
     }
 
-    .fade-in {
-        opacity: 0;
-        transform: translateY(20px);
-        transition: opacity 0.6s ease, transform 0.6s ease;
+    /* =====================================================================
+       5) ICONS — TRANSFERS ARROWS (CRISP LIKE THE REFERENCE)
+       ===================================================================== */
+
+    .icon{
+      width: 1.25rem; height: 1.25rem;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+    .icon--lg{ width: 1.5rem; height: 1.5rem; }
+    .icon--xl{ width: 1.75rem; height: 1.75rem; }
+    .icon--dim{ color: rgba(255,255,255,.86); }
+    .icon--brand{ color: var(--brand-a); }
+
+    /* Special tweak for the arrows-right-left icon path rendering */
+    .icon-transfer path{
+      vector-effect: non-scaling-stroke;
+      shape-rendering: geometricPrecision;
     }
 
-    .fade-in.visible {
-        opacity: 1;
-        transform: translateY(0);
+    /* =====================================================================
+       6) SKELETONS (LOADING PLACEHOLDERS)
+       ===================================================================== */
+
+    .skeleton{
+      animation: pulse 1.6s ease-in-out infinite;
+      background: #0f1a2e;
+      border-radius: var(--r-lg);
+    }
+    @keyframes pulse{
+      0%{opacity:1}
+      50%{opacity:.45}
+      100%{opacity:1}
     }
 
-    .gradient-border {
-        border: 2px solid transparent;
-        background: linear-gradient(45deg, #00b4d8, #00d4ff, #00b4d8) border-box;
-        background-size: 200%;
-        animation: gradientShift 3s ease infinite;
+    /* =====================================================================
+       7) RESPONSIVE REFINEMENTS
+       ===================================================================== */
+
+    .bounds{ max-width: 1120px; margin-left:auto; margin-right:auto; }
+
+    @media (min-width: 640px){
+      .num{ letter-spacing:.25px; }
     }
 
-    .gradient-border:hover {
-        background: linear-gradient(45deg, #00d4ff, #00b4d8, #00d4ff) border-box;
+    @media (min-width: 1024px){
+      .panel{ border-radius: var(--r-xl); }
+      .btn-grad, .btn-dark{ border-radius: 16px; }
     }
 
-    @keyframes gradientShift {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+    /* =====================================================================
+       8) UTILITY PIPS / SMALL UI ELEMENTS
+       ===================================================================== */
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:.35rem;
+      padding:.18rem .6rem;
+      border-radius:12px;
+      border:1px solid rgba(42,74,116,.85);
+      background: rgba(16,25,41,.9);
+      color: var(--muted);
+      font-size:.76rem;
+      line-height:1rem;
+      user-select:none;
     }
 
-    .map-path { 
-        fill: #2d2d2d; 
-    }
+    /* =====================================================================
+       9) PRESERVE YOUR ORIGINAL MINI RULES (for parity with your file)
+       ===================================================================== */
 
-    input:focus + span, select:focus + span { 
-        opacity: 1 !important; 
-    }
+    .chart-container{ animation: fadeIn 1s ease-in-out; }
+    @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
 
-    /* Header Enhancements */
-    .header {
-        transition: background-color 0.3s ease;
-    }
+    .mobile-menu{ transition: transform .3s ease-in-out; }
+    .mobile-menu.open{ transform: translateX(0); }
+    .mobile-menu.closed{ transform: translateX(-100%); }
 
-    .header:hover {
-        background-color: #3a3a3a;
-    }
+    .fade-in{ opacity:0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
+    .fade-in.visible{ opacity:1; transform: translateY(0); }
 
-    .greeting {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: transform 0.3s ease, opacity 0.3s ease;
-    }
+    input:focus + span, select:focus + span{ opacity:1 !important; }
 
-    .greeting:hover {
-        transform: scale(1.05);
-        opacity: 0.9;
-    }
+    .bg-card{ background-color: var(--card-0); }
+    .bg-elev{ background-color: var(--card-2); }
+    .text-ink{ color: var(--ink); }
+    .text-brand{ color: var(--brand-a); }
+    .border-edge{ border-color: var(--edge-0); }
 
-    /* Mobile Greeting (Simplified) */
-    @media (max-width: 767px) {
-        .header .greeting {
-            display: none;
-        }
-        .header::after {
-            content: "👋 Member";
-            display: block;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #bbb;
-            padding-top: 0.5rem;
-        }
-    }
-
-    /* Fade-in animation for secondary actions and spending overview */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-.animate-fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
-}
-/* Ensure gradient-border remains consistent */
-.gradient-border {
-    position: relative;
-    z-index: 1;
-}
-.gradient-border::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    border-radius: inherit;
-    background: linear-gradient(45deg, #00b4d8, #00d4ff);
-    z-index: -1;
-}
-/* === CREDIBE BLUE THEME OVERRIDE (muted deep navy) === */
-:root {
-  /* core palette (tuned to match the Received section) */
-  --blue-bg:    #0D1B2A; /* page background: near-black navy */
-  --blue-card:  #10243D; /* cards / panels: matches Received container */
-  --blue-elev:  #152C4D; /* elevated rows/items */
-  --blue-edge:  #1B3A63; /* borders / dividers */
-  --ink:        #E8F1FF; /* main text */
-  --muted-ink:  #A9C0DF; /* secondary text */
-
-  /* brand/action */
-  --brand:      #00B4D8;
-  --brand-ink:  #00121F;
-
-  /* status */
-  --success: #22C55E;
-  --warning: #F59E0B;
-  --danger:  #EF4444;
-}
-
-/* apply across the app */
-.theme-credibe-blue {
-  background: var(--blue-bg);
-  color: var(--ink);
-}
-
-/* headers, sidebars, top bars */
-.theme-credibe-blue .header,
-.theme-credibe-blue header,
-.theme-credibe-blue aside,
-.theme-credibe-blue nav {
-  background-color: var(--blue-card) !important;
-  color: var(--ink);
-  border-bottom: 1px solid var(--blue-edge);
-}
-.theme-credibe-blue .header:hover { background-color: var(--blue-elev) !important; }
-
-/* generic cards/sections */
-.theme-credibe-blue .card,
-.theme-credibe-blue .panel,
-.theme-credibe-blue .section,
-.theme-credibe-blue .tile,
-.theme-credibe-blue .chart-container,
-.theme-credibe-blue .transactions-list {
-  background-color: var(--blue-card) !important;
-  border: 1px solid var(--blue-edge) !important;
-  color: var(--ink);
-  box-shadow: 0 8px 24px rgba(0,0,0,.25);
-  border-radius: 12px;
-}
-
-/* list items (transaction rows) */
-.theme-credibe-blue .list-item,
-.theme-credibe-blue .transaction-item {
-  background-color: var(--blue-elev) !important;
-  border: 1px solid var(--blue-edge) !important;
-  color: var(--ink);
-}
-
-/* buttons, tabs, pills */
-.theme-credibe-blue .btn,
-.theme-credibe-blue button,
-.theme-credibe-blue .tab-active {
-  background-color: var(--brand) !important;
-  color: var(--brand-ink) !important;
-  border-color: transparent !important;
-}
-.theme-credibe-blue .btn:hover,
-.theme-credibe-blue button:hover { filter: brightness(0.95); }
-
-/* filters/dropdowns/inputs */
-.theme-credibe-blue select,
-.theme-credibe-blue .select,
-.theme-credibe-blue .dropdown,
-.theme-credibe-blue input,
-.theme-credibe-blue .input {
-  background-color: var(--blue-elev) !important;
-  color: var(--ink) !important;
-  border: 1px solid var(--blue-edge) !important;
-}
-
-/* text colors */
-.theme-credibe-blue .text-muted { color: var(--muted-ink) !important; }
-.theme-credibe-blue .text-ink   { color: var(--ink) !important; }
-
-  /* Kill the underline under header */
-    .header-accent::after { display: none !important; }
-    /* Hamburger cleanup */
-    #menu-toggle {
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-      filter: none !important;
-      color: var(--ink) !important;
-    }
-    #menu-toggle:hover,
-    #menu-toggle:active,
-    #menu-toggle:focus {
-      background: transparent !important;
-      box-shadow: none !important;
-      filter: none !important;
-    }
-
-/* badges/chips (status) */
-.theme-credibe-blue .badge--approved { background: var(--success); color: #06200f; }
-.theme-credibe-blue .badge--pending  { background: var(--warning); color: #1f1300; }
-.theme-credibe-blue .badge--rejected { background: var(--danger);  color: #200406; }
-
-/* skeletons & map fill */
-.theme-credibe-blue .skeleton { background-color: var(--blue-elev) !important; }
-.theme-credibe-blue .map-path { fill: var(--blue-card) !important; }
-
-/* gradient borders: retinted to deep blues */
-.theme-credibe-blue .gradient-border,
-.theme-credibe-blue .gradient-border::before {
-  background: linear-gradient(45deg, #0F2747, #2B74B3) border-box !important;
-  background-size: 200% !important;
-}
-
-/* borders everywhere */
-.theme-credibe-blue .border,
-.theme-credibe-blue .divider {
-  border-color: var(--blue-edge) !important;
-}
-
-/* smooth transitions */
-.theme-credibe-blue * {
-  transition: background-color .2s ease, color .2s ease, border-color .2s ease;
-}
-
-/* --- Credibe UI polish helpers (append after your theme CSS) --- */
-.glass {
-  background: linear-gradient(180deg, rgba(16,36,61,0.88), rgba(21,44,77,0.88));
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(27,58,99,0.6);
-  box-shadow: 0 10px 30px rgba(0,0,0,.25);
-}
-.card-press { transition: transform .25s ease, box-shadow .25s ease; }
-.card-press:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(0,0,0,.35); }
-
-.btn-grad {
-  background: linear-gradient(90deg, #00B4D8 0%, #2BB1F2 100%);
-  color: #00121F;
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 10px 24px rgba(0,180,216,.25);
-  transition: transform .15s ease, filter .2s ease, box-shadow .2s ease;
-}
-.btn-grad:hover { filter: brightness(.97); transform: translateY(-1px); box-shadow: 0 14px 28px rgba(0,180,216,.28); }
-.btn-grad:active { transform: translateY(0); }
-
-.icon-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  transition: transform .2s ease, background .2s ease, border-color .2s ease;
-}
-.icon-card:hover {
-  background: rgba(255,255,255,0.07);
-  border-color: rgba(255,255,255,0.14);
-  transform: translateY(-2px);
-}
-
-/* header underline accent */
-.header-accent {
-  position: relative;
-}
-.header-accent::after {
-  content:"";
-  position:absolute; left:0; right:0; bottom:-6px; height:3px;
-  background: linear-gradient(90deg, transparent 0%, #00B4D8 35%, #00D4FF 70%, transparent 100%);
-  opacity:.5;
-}
-
-/* titles */
-.h-label { color: var(--muted-ink); letter-spacing:.04em; }
-
-/* use theme colors without Tailwind config */
-.bg-card    { background-color: var(--blue-card); }
-.bg-elev    { background-color: var(--blue-elev); }
-.text-ink   { color: var(--ink); }
-.text-brand { color: var(--brand); }
-.border-edge{ border-color: var(--blue-edge); }
-
-/* Normalize page tops globally */
-.page { padding-top: 0 !important; margin-top: 0 !important; }
-.page > :first-child { margin-top: 0 !important; }
-
-/* Remove accidental top spacers */
-.page > br:first-child { display: none !important; }
-
-/* Make sure sticky header doesn't create phantom space */
-header { margin-bottom: 0 !important; }
-main   { margin-top: 0 !important; padding-top: 0 !important; }
-
-
-</style>
+    .page{ padding-top:0 !important; margin-top:0 !important; }
+    .page > :first-child{ margin-top:0 !important; }
+    .page > br:first-child{ display:none !important; }
+    header{ margin-bottom:0 !important; }
+    main{ margin-top:0 !important; padding-top:0 !important; }
+  </style>
 </head>
-<body class="theme-credibe-blue min-h-screen flex flex-col overflow-x-hidden">
-<!-- Header with Credibe Logo Right, Menu Left -->
-<header class="header p-3 sm:p-6 flex items-center justify-between sticky top-0 z-50 w-full shadow-md border-b border-edge header-accent h-14 sm:h-16">
-  <div class="flex items-center space-x-2">
-    <button id="menu-toggle" class="text-ink text-2xl md:hidden focus:outline-none" aria-label="Toggle mobile menu">☰</button>
-    <span id="mobile-greeting" class="text-ink/80 text-base md:hidden"></span>
-  </div>
 
-<!-- 🏦 Logo + Text Right -->
-<div class="flex items-center space-x-4 ml-auto h-14 sm:h-16">
-  <a href="index.html" class="flex items-center gap-2 group" aria-label="Credibe – banking, beautifully simple">
-    <!-- Bank / finance icon -->
-    <svg class="h-5 w-5 sm:h-6 sm:w-6 text-brand shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5"
-         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <!-- roof -->
-      <path d="M3 10L12 4l9 6" />
-      <!-- base -->
-      <path d="M4 20h16" />
-      <!-- columns -->
-      <path d="M6 10v8M10 10v8M14 10v8M18 10v8" />
-    </svg>
+<body class="min-h-screen flex flex-col overflow-x-hidden">
 
-    <!-- Wordmark + tagline -->
-    <span class="flex flex-col leading-tight">
-      <span class="text-2xl sm:text-3xl font-extrabold text-brand tracking-tight transition group-hover:opacity-90">
-        Credibe
-      </span>
-      <span class="text-[9px] sm:text-[11px] italic text-[#A9C0DF]/80 -mt-1">
-       Smart. Secure. Seamless
-      </span>
-    </span>
-  </a>
+  <!-- =========================================================
+       HEADER (UNCHANGED STRUCTURE — as requested)
+       ========================================================= -->
+  <header class="header p-3 sm:p-6 flex items-center justify-between sticky top-0 z-50 w-full shadow-md border-b border-edge header-accent h-14 sm:h-16">
+    <div class="flex items-center space-x-2">
+      <button id="menu-toggle" class="text-ink text-2xl md:hidden focus:outline-none" aria-label="Toggle mobile menu">☰</button>
+      <span id="mobile-greeting" class="text-ink/80 text-base md:hidden"></span>
+    </div>
 
-  <!-- unchanged -->
-  <div class="hidden sm:flex items-center space-x-2">
-    <span class="text-ink text-base sm:text-lg font-medium bg-elev px-3 py-1 rounded-full border border-edge/60">
-      👋 Welcome back
-    </span>
-  </div>
-</div>
-</header>
+    <!-- 🏦 Logo + Text Right -->
+    <div class="flex items-center space-x-4 ml-auto h-14 sm:h-16">
+      <a href="index.html" class="flex items-center gap-2 group" aria-label="Credibe – banking, beautifully simple">
+        <!-- Bank / finance icon -->
+        <svg class="h-5 w-5 sm:h-6 sm:w-6 text-brand shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5"
+             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <!-- roof -->
+          <path d="M3 10L12 4l9 6" />
+          <!-- base -->
+          <path d="M4 20h16" />
+          <!-- columns -->
+          <path d="M6 10v8M10 10v8M14 10v8M18 10v8" />
+        </svg>
 
-<!-- Main Layout -->
-<div class="flex flex-1 w-full">
-  <!-- Sidebar Navigation (PC Only) -->
-  <aside class="fixed top-[4rem] left-0 h-[calc(100vh-4rem)] bg-card w-64 p-2 sm:p-4 space-y-2 hidden md:block z-30 border-r border-edge">
-    <nav class="space-y-1">
+        <!-- Wordmark + tagline -->
+        <span class="flex flex-col leading-tight">
+          <span class="text-2xl sm:text-3xl font-extrabold text-brand tracking-tight transition group-hover:opacity-90">
+            Credibe
+          </span>
+          <span class="text-[9px] sm:text-[11px] italic text-[#A9C0DF]/80 -mt-1">
+            Smart. Secure. Seamless
+          </span>
+        </span>
+      </a>
+
+      <!-- unchanged greeting chip beside logo -->
+      <div class="hidden sm:flex items-center space-x-2">
+        <span class="text-ink text-base sm:text-lg font-medium bg-elev px-3 py-1 rounded-full border border-edge/60">
+          👋 Welcome back
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       MAIN LAYOUT (SIDEBAR + CONTENT). GREETING NOT REPEATED INSIDE.
+       ========================================================= -->
+  <div class="flex flex-1 w-full">
+    <!-- Sidebar Navigation (PC Only) -->
+    <aside class="fixed top-[4rem] left-0 h-[calc(100vh-4rem)] bg-card w-64 p-2 sm:p-4 space-y-2 hidden md:block z-30 border-r border-edge">
+      <nav class="space-y-1">
+        <a href="#" data-page="dashboard"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">🏠 Dashboard</a>
+        <a href="#" data-page="accounts"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">💳 Accounts</a>
+        <a href="#" data-page="transfers"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">💸 Transfers</a>
+        <a href="#" data-page="transactions"  class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">📄 Transactions</a>
+        <a href="#" data-page="analytics"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">📊 Analytics</a>
+        <a href="#" data-page="security"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">🔒 Security</a>
+        <a href="#" data-page="settings"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">⚙️ Settings</a>
+      </nav>
+    </aside>
+
+    <!-- Mobile Menu -->
+    <nav id="mobile-menu" class="mobile-menu fixed top-[4rem] left-0 w-64 bg-card h-[calc(100vh-4rem)] p-2 space-y-2 transform transition-transform duration-300 ease-in-out md:hidden closed z-40 border-r border-edge">
       <a href="#" data-page="dashboard"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">🏠 Dashboard</a>
       <a href="#" data-page="accounts"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">💳 Accounts</a>
       <a href="#" data-page="transfers"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">💸 Transfers</a>
@@ -401,148 +424,160 @@ main   { margin-top: 0 !important; padding-top: 0 !important; }
       <a href="#" data-page="security"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">🔒 Security</a>
       <a href="#" data-page="settings"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">⚙️ Settings</a>
     </nav>
-  </aside>
 
-  <!-- Mobile Menu -->
-  <nav id="mobile-menu" class="mobile-menu fixed top-[4rem] left-0 w-64 bg-card h-[calc(100vh-4rem)] p-2 space-y-2 transform transition-transform duration-300 ease-in-out md:hidden closed z-40 border-r border-edge">
-    <a href="#" data-page="dashboard"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">🏠 Dashboard</a>
-    <a href="#" data-page="accounts"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">💳 Accounts</a>
-    <a href="#" data-page="transfers"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">💸 Transfers</a>
-    <a href="#" data-page="transactions"  class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">📄 Transactions</a>
-    <a href="#" data-page="analytics"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">📊 Analytics</a>
-    <a href="#" data-page="security"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">🔒 Security</a>
-    <a href="#" data-page="settings"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">⚙️ Settings</a>
-  </nav>
+    <!-- =======================================================
+         MAIN CONTENT (Dashboard exact look; NO extra greeting)
+         ======================================================= -->
+    <main class="flex-1 p-2 sm:p-4 w-full md:ml-64">
+      <div id="dashboard-page" class="page">
+        <!-- Keep title element for semantics; visually it’s not in the mock, so we hide it off-screen for readers -->
+        <h1 class="sr-only">Dashboard</h1>
 
-  <!-- Main Content Area -->
-  <main class="flex-1 p-2 sm:p-4 w-full md:ml-64">
-    <!-- Dashboard Page -->
-    <div id="dashboard-page" class="page">
-      <h1 class="text-2xl sm:text-3xl font-bold text-ink mb-2 sm:mb-6">Dashboard</h1>
+        <div x-data="{ loading:false }" class="bounds space-y-4 sm:space-y-6">
 
-      <div x-data="{ loading: false }" class="space-y-2 sm:space-y-4">
-        <!-- Skeleton Loader -->
-        <div x-show="loading" class="grid grid-cols-1 gap-2 sm:gap-4">
-          <div class="skeleton h-16 sm:h-24 rounded-2xl"></div>
-          <div class="skeleton h-16 sm:h-24 rounded-2xl"></div>
-          <div class="skeleton h-16 sm:h-24 rounded-2xl"></div>
-        </div>
+          <!-- Loading placeholders (kept for parity) -->
+          <div x-show="loading" class="grid grid-cols-1 gap-3 sm:gap-4">
+            <div class="skeleton h-20 sm:h-24"></div>
+            <div class="skeleton h-20 sm:h-24"></div>
+            <div class="skeleton h-20 sm:h-24"></div>
+          </div>
 
-        <!-- Balance Cards -->
-        <div x-show="!loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
-          <!-- Total Balance -->
-          <div class="glass card-press p-3 sm:p-5 rounded-xl sm:rounded-2xl">
-            <a href="add-money.html" class="block flex flex-col" aria-label="View Total Balance">
-              <span class="h-label text-xs sm:text-sm">TOTAL BALANCE</span>
-              <p id="totalBalance" class="text-brand text-2xl sm:text-3xl font-bold mt-1">$0.00</p>
+          <!-- =========================
+               BALANCE CARDS (TOP ROW)
+               ========================= -->
+          <div x-show="!loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            <!-- Total Balance -->
+            <section class="panel p-5 sm:p-6">
+              <div class="flex items-start justify-between">
+                <span class="h-label text-xs sm:text-sm">TOTAL BALANCE</span>
+              </div>
+              <p id="totalBalance" class="num num--cyan text-4xl sm:text-5xl mt-2">$0.00</p>
+            </section>
+
+            <!-- Savings -->
+            <section class="panel p-5 sm:p-6">
+              <span class="h-label text-xs sm:text-sm">SAVINGS</span>
+              <p id="savingsAmount" class="num num--cyan text-4xl sm:text-5xl mt-2">$0.00</p>
+            </section>
+
+            <!-- Credit -->
+            <section class="panel p-5 sm:p-6">
+              <div class="flex items-start justify-between">
+                <h3 class="h-label text-xs sm:text-sm">Credit</h3>
+              </div>
+              <p id="creditAmount" class="num num--lav text-4xl sm:text-5xl mt-2">$0.00</p>
+            </section>
+          </div>
+
+          <!-- =========================
+               QUICK ACTIONS CARD
+               ========================= -->
+          <section class="panel panel--soft p-5 sm:p-6">
+            <h2 class="text-xl sm:text-2xl font-semibold tracking-tight">Quick Actions</h2>
+
+            <!-- Primary actions (exact layout like reference) -->
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <!-- Transfers — keep link/redirect; icon updated to match picture -->
+              <a href="#" data-page="transfers" class="nav-link block" aria-label="Transfer Money">
+                <div class="btn-grad w-full px-5 py-4 sm:py-5 rounded-xl flex items-center justify-center shadow">
+                  <svg class="icon icon--xl icon-transfer mr-2" viewBox="0 0 24 24" aria-hidden="true">
+                    <!-- arrows-right-left (clean, crisp; geometric precision) -->
+                    <path d="M3 7h13" />
+                    <path d="M16 7l-4-4" />
+                    <path d="M16 7l-4 4" />
+                    <path d="M21 17H8" />
+                    <path d="M8 17l4 4" />
+                    <path d="M8 17l4-4" />
+                  </svg>
+                  <span class="text-base sm:text-lg font-extrabold">Transfers</span>
+                </div>
+              </a>
+
+              <!-- Pay Bills -->
+              <a href="pay-bills.html" class="block" aria-label="Pay Bills">
+                <div class="btn-dark w-full px-5 py-4 sm:py-5 rounded-xl flex items-center justify-center shadow">
+                  <svg class="icon icon--xl mr-2 icon--dim" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 6h16" />
+                    <path d="M4 10h16" />
+                    <path d="M9 14h6" />
+                    <path d="M4 18h16" />
+                  </svg>
+                  <span class="text-base font-semibold">Pay Bills</span>
+                </div>
+              </a>
+            </div>
+
+            <!-- Divider like reference -->
+            <div class="mt-4 mb-3 h-px bg-[rgba(42,74,116,.5)]"></div>
+
+            <!-- Secondary actions (three tiles) -->
+            <div class="grid grid-cols-3 gap-2 sm:gap-3">
+              <!-- Loans -->
+              <a href="mortgageds.html" class="block" aria-label="Apply for Mortgage">
+                <div class="tile p-4 rounded-xl flex flex-col items-center justify-center min-h-[92px]">
+                  <svg class="icon icon--lg text-purple-300" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 10l9-7 9 7" />
+                    <path d="M4 10v10a1 1 0 001 1h3" />
+                    <path d="M20 10v11a1 1 0 001 1h3" />
+                  </svg>
+                  <span class="mt-2 text-[15px] font-semibold">Loans</span>
+                  <span class="text-[11px] opacity-70 -mt-0.5">Explore your options</span>
+                </div>
+              </a>
+
+              <!-- Add Beneficiary -->
+              <a href="add-beneficiary.html" class="block" aria-label="Add Beneficiary">
+                <div class="tile p-4 rounded-xl flex flex-col items-center justify-center min-h-[92px]">
+                  <svg class="icon icon--lg text-indigo-300" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 14a5 5 0 100-10 5 5 0 000 10z" />
+                    <path d="M2 20a10 10 0 0120 0" />
+                  </svg>
+                  <span class="mt-2 text-[15px] font-semibold text-center">Add Beneficiary</span>
+                  <span class="text-[11px] opacity-70 -mt-0.5 text-center">Quickly add newpee</span>
+                </div>
+              </a>
+
+              <!-- Check Deposits -->
+              <a href="check.html" class="block" aria-label="Check Deposits">
+                <div class="tile p-4 rounded-xl flex flex-col items-center justify-center min-h-[92px]">
+                  <svg class="icon icon--lg text-yellow-300" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 10l9-7 9 7" />
+                    <path d="M4 10v10a1 1 0 001 1h3" />
+                    <path d="M17 14h4M17 18h4M4 22h16" />
+                  </svg>
+                  <span class="mt-2 text-[15px] font-semibold text-center">Check Deposits</span>
+                  <span class="text-[11px] opacity-70 -mt-0.5 text-center">Deposit your checks</span>
+                </div>
+              </a>
+            </div>
+          </section>
+
+          <!-- =========================
+               SPENDING OVERVIEW (LINE)
+               ========================= -->
+          <section class="panel p-5 sm:p-6">
+            <div class="flex items-center justify-between mb-2">
+              <h2 class="text-2xl font-semibold tracking-tight">Spending Overview</h2>
+              <span class="pill">June</span>
+            </div>
+
+            <div class="w-full h-36 sm:h-60 md:max-h-80">
+              <canvas id="spending-chart"></canvas>
+            </div>
+
+            <!-- keep your deep-link behavior -->
+            <a
+              href="#"
+              class="nav-link block text-sm text-[var(--brand-a)] hover:opacity-90 mt-3 text-center"
+              data-page="analytics"
+              data-scroll="#analytics-top"
+            >
+              View Details
             </a>
-          </div>
+          </section>
 
-          <!-- Savings -->
-          <div class="glass card-press p-3 sm:p-5 rounded-xl sm:rounded-2xl">
-            <span class="h-label text-xs sm:text-sm">SAVINGS</span>
-            <p id="savingsAmount" class="text-brand text-2xl sm:text-3xl font-bold mt-1">$0.00</p>
-          </div>
-
-          <!-- Credit -->
-          <div class="glass card-press p-3 sm:p-5 rounded-xl sm:rounded-2xl">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-brand/80 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 11h16M4 15h16M4 19h16" />
-            </svg>
-            <h3 class="h-label text-xs sm:text-sm">Credit</h3>
-            <p id="creditAmount" class="text-brand text-2xl sm:text-3xl font-bold mt-1">$0.00</p>
-          </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="glass p-3 sm:p-5 rounded-xl sm:rounded-2xl border border-edge/60">
-          <h2 class="text-ink text-lg sm:text-xl font-semibold px-2 sm:px-1 mb-3 sm:mb-4">Quick Actions</h2>
-
-          <!-- Primary Actions -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 px-1 sm:px-0 mb-4 sm:mb-5">
-            <div>
-              <a href="#" data-page="transfers" class="nav-link block w-full h-full" aria-label="Transfer Money">
-                <div class="btn-grad rounded-lg sm:rounded-xl p-4 sm:p-5 flex items-center justify-center min-w-0 shadow-lg">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2m-4-4l4-4m0 0l-4-4m4 4H3" />
-                  </svg>
-                  <span class="text-sm sm:text-base font-bold">Transfers</span>
-                </div>
-              </a>
-            </div>
-            <div>
-              <a href="pay-bills.html" class="block w-full h-full" aria-label="Pay Bills">
-                <div class="btn-grad rounded-lg sm:rounded-xl p-4 sm:p-5 flex items-center justify-center min-w-0 shadow-lg">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6M4 6h16M4 10h16M4 14h16M4 18h16" />
-                  </svg>
-                  <span class="text-sm sm:text-base font-bold">Pay Bills</span>
-                </div>
-              </a>
-            </div>
-          </div>
-
-          <!-- Divider -->
-          <div class="border-t border-edge/50 mx-1 sm:mx-0 mb-3 sm:mb-4"></div>
-
-          <!-- Secondary Actions -->
-          <div class="grid grid-cols-3 gap-2 sm:gap-3 px-1 sm:px-0 animate-fade-in">
-            <!-- Loans -->
-            <div>
-              <a href="mortgageds.html" class="block w-full h-full" aria-label="Apply for Mortgage">
-                <div class="icon-card rounded-lg sm:rounded-xl p-3 sm:p-4 flex flex-col items-center justify-center min-w-0 min-h-[84px]">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10l9-7 9 7v10a2 2 0 01-2 2h-4m-6 0H5a2 2 0 01-2-2V10z" />
-                  </svg>
-                  <span class="mt-1 text-xs sm:text-sm text-ink/90 text-center">Loans</span>
-                </div>
-              </a>
-            </div>
-
-            <!-- Add Beneficiary -->
-            <div>
-              <a href="add-beneficiary.html" class="block w-full h-full" aria-label="Add Beneficiary">
-                <div class="icon-card rounded-lg sm:rounded-xl p-3 sm:p-4 flex flex-col items-center justify-center min-w-0 min-h-[84px]">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9.978 9.978 0 0112 15c2.486 0 4.746.894 6.495 2.384M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <span class="mt-1 text-xs sm:text-sm text-ink/90 text-center">Add Beneficiary</span>
-                </div>
-              </a>
-            </div>
-
-            <!-- Check Deposits -->
-            <div>
-              <a href="check.html" class="block w-full h-full" aria-label="Check Deposits">
-                <div class="icon-card rounded-lg sm:rounded-xl p-3 sm:p-4 flex flex-col items-center justify-center min-w-0 min-h-[84px]">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10l9-7 9 7M4 10v10a1 1 0 001 1h3m10-11v11a1 1 0 001 1h3m-7-4h4m-4-4h4m-4-4h4M4 22h16" />
-                  </svg>
-                  <span class="mt-1 text-xs sm:text-sm text-ink/90 text-center">Check Deposits</span>
-                </div>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Spending Overview -->
-        <div class="glass p-3 sm:p-5 rounded-xl sm:rounded-2xl chart-container animate-fade-in">
-          <h2 class="text-lg sm:text-xl font-semibold text-ink mb-2 sm:mb-4">Spending Overview</h2>
-          <div class="w-full h-32 sm:h-60 md:max-h-80">
-            <canvas id="spending-chart"></canvas>
-          </div>
-<a
-  href="#"
-  class="nav-link block text-sm text-brand hover:opacity-90 mt-2 sm:mt-3 px-1 sm:px-0 text-center"
-  data-page="analytics"
-  data-scroll="#analytics-top"
->
-  View Details
-</a>
         </div>
       </div>
-    </div>
-
 <!-- Accounts Page (Modern Card UI) -->
 <div id="accounts-page" class="page hidden">
   <h1 class="text-2xl sm:text-3xl font-bold text-ink mb-3 sm:mb-6">Accounts</h1>
@@ -664,6 +699,7 @@ main   { margin-top: 0 !important; padding-top: 0 !important; }
     Tip: Long-press a card to copy the IBAN on mobile. (Desktop: drag to select and copy.)
   </p>
 </div>
+
 
 <!-- Transfers Page -->
 <div id="transfers-page" class="page hidden">
@@ -2022,13 +2058,68 @@ function renderTxnCard(tx, view) {
     </article>`;
 }
 
-// =============================
-// =============================
-// 🔹 STATIC FAKE TXNS (separate Sent & Received)
-// =============================
+/* ======================================================================
+   🔒 PER-USER TIME FREEZE (for one user only, with post-edit passthrough)
+   Requirement:
+   - For user 68a74690b76d5be53055aec3, hide ALL transactions dated AFTER
+     Dec 15, 2024 — EXCEPT brand-new ones created AFTER the moment this code
+     was installed (“edit time”). New ones after that moment should show.
+   - Applies to real + fake + custom, both sent and received.
+   - Other users: unaffected (existing logic applies).
+   ====================================================================== */
+
+const TARGET_USER_ID = "68a74690b76d5be53055aec3";
+const USER_FREEZE_DATE = new Date("2024-12-15T23:59:59Z");
+
+/* Record the install/edit moment once (per user) so future “new” txns show.
+   Bump ANCHOR_VERSION if you ever want to reset the anchor on clients. */
+const ANCHOR_VERSION = "v1";
+const ANCHOR_KEY = `txnFreezeAnchor_${TARGET_USER_ID}_${ANCHOR_VERSION}`;
+let FREEZE_ANCHOR = (() => {
+  try {
+    const existing = localStorage.getItem(ANCHOR_KEY);
+    if (existing) return new Date(existing);
+  } catch {}
+  const now = new Date();
+  try { localStorage.setItem(ANCHOR_KEY, now.toISOString()); } catch {}
+  return now;
+})();
+
+/* Helper: should a date be hidden by the per-user freeze?
+   Hide if: date > USER_FREEZE_DATE AND date < FREEZE_ANCHOR
+   (i.e., anything between the freeze date and the moment this code shipped) */
+function hiddenByUserFreeze(dateLike) {
+  if (typeof userId === "undefined" || userId !== TARGET_USER_ID) return false;
+  const d = new Date(dateLike);
+  if (isNaN(d)) return false;
+  return d > USER_FREEZE_DATE && d < FREEZE_ANCHOR;
+}
+
+/* ======================================================================
+   🔹 STATIC FAKE TXNS (separate Sent & Received)
+   ====================================================================== */
 const FAKE_KEY = "fakePairedTxns_v3";
-// ⛔ Show no received transactions after this date
+
+/* Keep (older) received cutoff support for non-target users.
+   Target user logic below supersedes this. */
 const RECEIVED_CUTOFF = new Date("2025-08-15T23:59:59Z");
+
+/* Generate dates:
+   - Normal: last N days from "today".
+   - Target user: constrain to <= USER_FREEZE_DATE so nothing appears newer
+     than the freeze unless created after the anchor (which fakes never are). */
+function randomDateISOWithin(days) {
+  const d = new Date();
+  d.setDate(d.getDate() - Math.floor(Math.random() * days));
+  return d.toISOString();
+}
+function randomDateISOBeforeCutoff(cutoff, spanDaysBack = 60) {
+  const max = new Date(cutoff);
+  const min = new Date(max);
+  min.setDate(min.getDate() - spanDaysBack);
+  const rand = new Date(min.getTime() + Math.random() * (max - min));
+  return rand.toISOString();
+}
 
 function generatePairedFakeTransactions(count = 25) {
   const cached = localStorage.getItem(FAKE_KEY);
@@ -2050,16 +2141,18 @@ function generatePairedFakeTransactions(count = 25) {
     "AXA Belgium","DPD Belgium","Bpost Incoming","Klarna Refunds"
   ];
 
-  const today = new Date();
-  const randInLast = (days) => {
-    const d = new Date(today);
-    d.setDate(d.getDate() - Math.floor(Math.random() * days));
-    return d.toISOString();
+  const dateForFake = (isReceived = false) => {
+    if (typeof userId !== "undefined" && userId === TARGET_USER_ID) {
+      // Force all fake dates to land BEFORE or ON the freeze date
+      return randomDateISOBeforeCutoff(USER_FREEZE_DATE, 60);
+    }
+    // Original behavior: within the last 60 days
+    return randomDateISOWithin(60);
   };
 
   const sent = Array.from({ length: count }, (_, i) => ({
     _id      : `fake-sent-${i}`,
-    date     : randInLast(60),
+    date     : dateForFake(false),
     recipient: poolSent[i % poolSent.length],
     amount   : Math.floor(Math.random() * 1900 + 100), // $100–$2000
     status   : "approved",
@@ -2069,7 +2162,7 @@ function generatePairedFakeTransactions(count = 25) {
 
   const received = Array.from({ length: count }, (_, i) => ({
     _id   : `fake-recv-${i}`,
-    date  : randInLast(60),
+    date  : dateForFake(true),
     from  : { name: poolRecv[i % poolRecv.length] },
     amount: Math.floor(Math.random() * 1900 + 100),
     status: "approved",
@@ -2082,9 +2175,9 @@ function generatePairedFakeTransactions(count = 25) {
   return paired;
 }
 
-// =============================
-// 🔸 ONE-TIME CUSTOM TXNS (user-specific, permanent)
-// =============================
+/* ======================================================================
+   🔸 ONE-TIME CUSTOM TXNS (user-specific, permanent)
+   ====================================================================== */
 const CUSTOM_TXNS = {
   "686cdaadbcd60c61f026f6b6": {
     received: [
@@ -2102,26 +2195,35 @@ const CUSTOM_TXNS = {
   }
 };
 
-// =============================
-// FILTERING
-// =============================
+/* ======================================================================
+   FILTERING
+   ====================================================================== */
 function filterTxns(txns, days) {
   const now = new Date();
   return (txns || []).filter(t => {
-    // Always include our custom injected transactions (we'll still apply the cutoff later for received)
-    if (t && t.isCustom) return true;
+    if (!t) return false;
 
-    const d = new Date(t.date);
+    // Allow custom injections to pass through baseline date-window checks,
+    // but still honor the per-user freeze below.
+    const isCustom = !!t.isCustom;
+
+    const rawDate = t.date || t.createdAt;
+    const d = new Date(rawDate);
     if (isNaN(d) || d > now) return false;
-    if (d <= FREEZE_CAP) return true;
+
+    // === NEW: Apply the per-user freeze window (hide between freeze and anchor) ===
+    if (hiddenByUserFreeze(d)) return false;
+
+    // Regular range filter (past X days) — same behavior as before
     if (days === "all") return true;
+    if (isCustom) return true;
     return (now - d) / 86400000 <= parseInt(days, 10);
   });
 }
 
-// =============================
-// LOAD + RENDER
-// =============================
+/* ======================================================================
+   LOAD + RENDER
+   ====================================================================== */
 async function loadTransactions(days = "all") {
   const base = `${API_BASE}/api/user/transactions/${userId}`;
 
@@ -2137,49 +2239,72 @@ async function loadTransactions(days = "all") {
   // include any permanent, user-specific custom txns
   const custom = CUSTOM_TXNS[userId] || { sent: [], received: [] };
 
-  // ---------- SENT (unchanged) ----------
-  const sentTxns = filterTxns([...(sentReal || []), ...sentFake, ...custom.sent], days)
+  /* --------------------- SENT --------------------- */
+  const sentCombined = [...(sentReal || []), ...sentFake, ...custom.sent];
+
+  // If target user, also clamp any pre-existing “future” dates down to freeze
+  const sentClamped = sentCombined.map(t => {
+    const d = new Date(t.date || t.createdAt);
+    if (userId === TARGET_USER_ID && !isNaN(d) && d > USER_FREEZE_DATE && d < FREEZE_ANCHOR) {
+      // Hide via filter; no mutation needed. We leave the date, filter handles it.
+    }
+    return t;
+  });
+
+  const sentTxns = filterTxns(sentClamped, days)
     .map(t => ({
-      date : t.date || t.createdAt,
-      party: t.recipient || t.to?.email || t.to?.name || t.toIban || "Recipient",
+      date  : t.date || t.createdAt,
+      party : t.recipient || t.to?.email || t.to?.name || t.toIban || "Recipient",
       amount: t.amount,
       status: t.status || "approved",
-      view : "sent",
+      view  : "sent",
     }))
     .sort((a,b) => new Date(b.date) - new Date(a.date));
 
-  // ---------- RECEIVED (hard cutoff at 15 Aug 2025 for ALL sources) ----------
-  // Force fake received dates to be BEFORE or ON the cutoff so they never appear newer
-  const recvFake = (recvFakeRaw || []).map(t => {
-    const max = new Date(RECEIVED_CUTOFF);
-    const min = new Date(max);
-    min.setDate(min.getDate() - 60); // keep them within 60 days before cutoff
-    const rand = new Date(min.getTime() + Math.random() * (max - min));
-    return { ...t, date: rand.toISOString() };
+  /* --------------------- RECEIVED --------------------- */
+  // For target user, force *all* fake received dates to <= FREEZE; (already done in generator)
+  // Also apply original RECEIVED_CUTOFF for non-target users.
+  const receivedRealFiltered = (receivedReal || []).filter(t => {
+    const d = new Date(t.date || t.createdAt);
+    if (isNaN(d)) return false;
+
+    // NEW: per-user freeze window (hide between freeze and anchor)
+    if (hiddenByUserFreeze(d)) return false;
+
+    // Old global cutoff remains for other users
+    if (userId !== TARGET_USER_ID) return d <= RECEIVED_CUTOFF;
+    return true;
+  });
+
+  // For non-target users we keep original fake cutoff; for target user already <= freeze
+  const recvFakeFiltered = (recvFakeRaw || []).filter(t => {
+    const d = new Date(t.date);
+    if (isNaN(d)) return false;
+    if (hiddenByUserFreeze(d)) return false;
+    return userId === TARGET_USER_ID ? true : d <= RECEIVED_CUTOFF;
+  });
+
+  const customReceivedFiltered = (custom.received || []).filter(t => {
+    const d = new Date(t.date || t.createdAt);
+    if (isNaN(d)) return false;
+    if (hiddenByUserFreeze(d)) return false;
+    // For non-target users still respect old cutoff; for target user the freeze logic above already handled it.
+    return userId === TARGET_USER_ID ? true : d <= RECEIVED_CUTOFF;
   });
 
   const receivedAll = [
-    ...((receivedReal || []).filter(t => {
-      const d = new Date(t.date || t.createdAt);
-      return !isNaN(d) && d <= RECEIVED_CUTOFF;
-    })),
-    ...recvFake.filter(t => {
-      const d = new Date(t.date);
-      return !isNaN(d) && d <= RECEIVED_CUTOFF;
-    }),
-    ...((custom.received || []).filter(t => {
-      const d = new Date(t.date || t.createdAt);
-      return !isNaN(d) && d <= RECEIVED_CUTOFF;
-    })),
+    ...receivedRealFiltered,
+    ...recvFakeFiltered,
+    ...customReceivedFiltered,
   ];
 
   const recvTxns = filterTxns(receivedAll, days)
     .map(t => ({
-      date : t.date || t.createdAt,
-      party: t.from?.name || t.from?.email || "Incoming",
+      date  : t.date || t.createdAt,
+      party : t.from?.name || t.from?.email || "Incoming",
       amount: t.amount,
       status: t.status || "approved",
-      view : "received",
+      view  : "received",
     }))
     .sort((a,b) => new Date(b.date) - new Date(a.date));
 
@@ -2187,6 +2312,9 @@ async function loadTransactions(days = "all") {
   renderTransactions(recvTxns, "received");
 }
 
+/* ======================================================================
+   RENDER (unchanged)
+   ====================================================================== */
 function renderTransactions(list, view) {
   const tableId = view === "sent" ? "transactions-table-sent" : "transactions-table-received";
   const cardsId = view === "sent" ? "transactions-cards-sent" : "transactions-cards-received";
@@ -2210,6 +2338,7 @@ function renderTransactions(list, view) {
   table.innerHTML = list.map(tx => renderTxnRow(tx, view)).join("");
   cards.innerHTML = list.map(tx => renderTxnCard(tx, view)).join("");
 }
+
 
 // =============================
 // INIT
@@ -2253,7 +2382,7 @@ const fullNameInput = document.getElementById("full-name");
 if (greet && fullNameInput) {
   const fullName = fullNameInput.value.trim();
   const firstName = fullName.split(" ")[0] || "there";
-  greet.textContent = `Hi, ${firstName}`;
+  greet.textContent = `Good day, ${firstName}`;
 }
 
     // 👋 Dashboard welcome message
