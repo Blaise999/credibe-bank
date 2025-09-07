@@ -1976,6 +1976,7 @@ function buildChartColors() {
   }
 
 // =============================
+// =============================
 // CONFIG
 // =============================
 const API_BASE   = "https://credibe-backends.onrender.com";
@@ -2110,8 +2111,7 @@ const RECEIVED_CUTOFF = new Date("2025-08-15T23:59:59Z");
 
 /* Generate dates:
    - Normal: last N days from "today".
-   - Target user: constrain to <= respective freeze date so nothing appears newer
-     than the freeze unless created after the anchor (which fakes never are). */
+   - Target user: constrain to <= respective fake cutoff (older than oldest custom) so fakes appear below customs in descending sort. */
 function randomDateISOWithin(days) {
   const d = new Date();
   d.setDate(d.getDate() - Math.floor(Math.random() * days));
@@ -2147,8 +2147,8 @@ function generatePairedFakeTransactions(count = 25) {
 
   const dateForFake = (isReceived = false) => {
     if (typeof userId !== "undefined" && userId === TARGET_USER_ID) {
-      // Force all fake dates to land BEFORE or ON the respective freeze date
-      const cutoff = isReceived ? RECV_FREEZE_DATE : SENT_FREEZE_DATE;
+      // Force all fake dates to land BEFORE the oldest custom date
+      const cutoff = isReceived ? new Date("2025-03-11T00:00:00Z") : new Date("2025-01-26T00:00:00Z");
       return randomDateISOBeforeCutoff(cutoff, 60);
     }
     // Original behavior: within the last 60 days
