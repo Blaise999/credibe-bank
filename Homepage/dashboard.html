@@ -2004,18 +2004,15 @@ function fmtDate(d) {
   return isNaN(dt) ? "Unknown" : dt.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-// currencyCode = "EUR" or "USD"
-function fmtAmount(n, sign, currencyCode = "USD") {
+function fmtAmount(n, sign) {
   const num = Number(n);
-  if (!isFinite(num)) {
-    const zeroFmt = new Intl.NumberFormat("en-GB", { style: "currency", currency: currencyCode }).format(0);
-    return sign === "-" ? `-${zeroFmt}` : sign === "+" ? `+${zeroFmt}` : zeroFmt;
-  }
-  const formatted = new Intl.NumberFormat("en-GB", { style: "currency", currency: currencyCode }).format(num);
-  if (sign === "-") return `-${formatted}`;
-  if (sign === "+") return `+${formatted}`;
-  return formatted;
+  if (!isFinite(num)) return "€0";
+  const f = new Intl.NumberFormat("en-GB").format(num);
+  if (sign === "-") return `-€${f}`;
+  if (sign === "+") return `+€${f}`;
+  return `€${f}`;
 }
+
 
 function txnStatusBadge(status) {
   const base = "px-2 py-1 rounded-full text-xs font-semibold";
@@ -2031,18 +2028,16 @@ function txnStatusBadge(status) {
 // RENDER HELPERS
 // =============================
 function renderTxnRow(tx, view) {
-  const cur = tx.currency || (userId === TARGET_USER_ID ? "EUR" : "USD");
   return `
     <tr class="text-[#e5e7eb]">
       <td class="p-3 text-sm">${fmtDate(tx.date)}</td>
       <td class="p-3 text-sm">${tx.party}</td>
-      <td class="p-3 text-sm font-semibold">${fmtAmount(tx.amount, undefined, cur)}</td>
+      <td class="p-3 text-sm font-semibold">${fmtAmount(tx.amount)}</td>
       <td class="p-3 text-sm">${txnStatusBadge(tx.status)}</td>
     </tr>`;
 }
 
 function renderTxnCard(tx, view) {
-  const cur = tx.currency || (userId === TARGET_USER_ID ? "EUR" : "USD");
   return `
     <article class="rounded-xl border border-white/5 bg-[#0e1526] p-3 flex items-center justify-between">
       <div class="flex items-center gap-3">
@@ -2056,7 +2051,7 @@ function renderTxnCard(tx, view) {
       </div>
       <div class="text-right">
         <div class="text-sm font-bold ${view === "sent" ? "text-red-400" : "text-green-400"}">
-          ${fmtAmount(tx.amount, view === "sent" ? "-" : "+", cur)}
+          ${fmtAmount(tx.amount, view === "sent" ? "-" : "+")}
         </div>
         <div class="mt-1">${txnStatusBadge(tx.status)}</div>
       </div>
@@ -2064,12 +2059,23 @@ function renderTxnCard(tx, view) {
 }
 
 /* ======================================================================
-   🔒 ORIGINAL PER-USER TIME FREEZE (old rule)
+   🔒 PER-USER TIME FREEZE (for one user only, with post-edit passthrough)
+   Requirement:
+   - For user 68badb372a7035abfe40abd9, hide ALL transactions dated AFTER
+     the respective freeze dates — EXCEPT brand-new ones created AFTER the moment this code
+     was installed (“edit time”). New ones after that moment should show.
+   - Sent freeze: after Feb 13, 2025
+   - Received freeze: after Apr 07, 2025
+   - Applies to real + fake + custom, both sent and received.
+   - Other users: unaffected (existing logic applies).
    ====================================================================== */
-const TARGET_USER_ID = "68a74690b76d5be53055aec3";
-const USER_FREEZE_DATE = new Date("2024-12-15T23:59:59Z");
 
-/* Anchor for old freeze (kept so other users could reuse pattern) */
+const TARGET_USER_ID = "68badb372a7035abfe40abd9";
+const SENT_FREEZE_DATE = new Date("2025-02-13T23:59:59Z");
+const RECV_FREEZE_DATE = new Date("2025-04-07T23:59:59Z");
+
+/* Record the install/edit moment once (per user) so future “new” txns show.
+   Bump ANCHOR_VERSION if you ever want to reset the anchor on clients. */
 const ANCHOR_VERSION = "v1";
 const ANCHOR_KEY = `txnFreezeAnchor_${TARGET_USER_ID}_${ANCHOR_VERSION}`;
 let FREEZE_ANCHOR = (() => {
@@ -2082,32 +2088,30 @@ let FREEZE_ANCHOR = (() => {
   return now;
 })();
 
-/* Helper for old freeze — BUT we will bypass it for TARGET_USER_ID below */
-function hiddenByUserFreeze(dateLike) {
-  if (typeof userId === "undefined") return false;
-  // ⛔️ We are switching TARGET_USER_ID to per-stream caps, so skip old freeze for this user.
-  if (userId === TARGET_USER_ID) return false;
+/* Helper: should a date be hidden by the per-user freeze?
+   Hide if: date > freezeDate (sent or recv specific) AND date < FREEZE_ANCHOR
+   (i.e., anything between the freeze date and the moment this code shipped) */
+function hiddenByUserFreeze(dateLike, txnType) {
+  if (typeof userId === "undefined" || userId !== TARGET_USER_ID) return false;
+  const freezeDate = txnType === "debit" ? SENT_FREEZE_DATE : RECV_FREEZE_DATE;
   const d = new Date(dateLike);
   if (isNaN(d)) return false;
-  return d > USER_FREEZE_DATE && d < FREEZE_ANCHOR;
+  return d > freezeDate && d < FREEZE_ANCHOR;
 }
-
-/* ======================================================================
-   🆕 PER-STREAM CAPS FOR THE SAME USER (this replaces old freeze)
-   - SENT must not be after 13 Feb 2025
-   - RECEIVED must not be after 7 Apr 2025
-   ====================================================================== */
-const SENT_CAP     = new Date("2025-02-13T23:59:59Z");
-const RECEIVED_CAP = new Date("2025-04-07T23:59:59Z");
 
 /* ======================================================================
    🔹 STATIC FAKE TXNS (separate Sent & Received)
    ====================================================================== */
 const FAKE_KEY = "fakePairedTxns_v3";
 
-/* Keep (older) received cutoff support for non-target users. */
+/* Keep (older) received cutoff support for non-target users.
+   Target user logic below supersedes this. */
 const RECEIVED_CUTOFF = new Date("2025-08-15T23:59:59Z");
 
+/* Generate dates:
+   - Normal: last N days from "today".
+   - Target user: constrain to <= respective freeze date so nothing appears newer
+     than the freeze unless created after the anchor (which fakes never are). */
 function randomDateISOWithin(days) {
   const d = new Date();
   d.setDate(d.getDate() - Math.floor(Math.random() * days));
@@ -2128,54 +2132,47 @@ function generatePairedFakeTransactions(count = 25) {
   }
 
   const poolSent = [
-    "Coolblue BV","Zalando SE","IKEA Belgium","TotalEnergies",
-    "MediaMarkt","Colruyt","Belfius","BNP Paribas",
-    "ABN AMRO","Bol.com","Proximus","Telenet","Esso",
-    "Carrefour","KBC Group","NMBS/SNCB","De Lijn"
+    "ING Bank","BNP Paribas","KBC Group","Belfius","ABN AMRO",
+    "Carrefour","Colruyt","Delhaize","Bol.com","Coolblue",
+    "MediaMarkt","Zalando","IKEA Belgium","Proximus","Telenet",
+    "Esso","TotalEnergies","Q8 Belgium","NMBS/SNCB","De Lijn"
   ];
 
   const poolRecv = [
     "Stripe Payouts","PayPal Settlement","Wise Incoming","Revolut Ltd",
-    "Société Générale","Deutsche Bank","Klarna Refunds","AXA Belgium",
-    "Orange SA","Bpost Incoming","DPD Belgium","Heineken NV",
-    "Unilever EU","Coca-Cola Europacific","Nestlé Belgium","Jupiler NV"
+    "Société Générale","Deutsche Bank","Heineken NV","Unilever EU",
+    "Coca-Cola Europacific","Jupiler NV","Nestlé Belgium","Orange SA",
+    "AXA Belgium","DPD Belgium","Bpost Incoming","Klarna Refunds"
   ];
 
-  // For our TARGET_USER_ID, generate fake dates BEFORE each stream's cap (so pins stay on top)
-  const dateForFakeSent = () => {
+  const dateForFake = (isReceived = false) => {
     if (typeof userId !== "undefined" && userId === TARGET_USER_ID) {
-      return randomDateISOBeforeCutoff(SENT_CAP, 120);
+      // Force all fake dates to land BEFORE or ON the respective freeze date
+      const cutoff = isReceived ? RECV_FREEZE_DATE : SENT_FREEZE_DATE;
+      return randomDateISOBeforeCutoff(cutoff, 60);
     }
-    return randomDateISOWithin(60);
-  };
-  const dateForFakeRecv = () => {
-    if (typeof userId !== "undefined" && userId === TARGET_USER_ID) {
-      return randomDateISOBeforeCutoff(RECEIVED_CAP, 120);
-    }
+    // Original behavior: within the last 60 days
     return randomDateISOWithin(60);
   };
 
   const sent = Array.from({ length: count }, (_, i) => ({
     _id      : `fake-sent-${i}`,
-    date     : dateForFakeSent(),
+    date     : dateForFake(false),
     recipient: poolSent[i % poolSent.length],
-    amount   : Math.floor(Math.random() * 1900 + 100),
+    amount   : Math.floor(Math.random() * 1900 + 100), // €100–€2000
     status   : "approved",
     type     : "debit",
     isFake   : true,
-    // mark currency for our special user so UI shows €
-    currency : (userId === TARGET_USER_ID ? "EUR" : "USD")
   }));
 
   const received = Array.from({ length: count }, (_, i) => ({
     _id   : `fake-recv-${i}`,
-    date  : dateForFakeRecv(),
+    date  : dateForFake(true),
     from  : { name: poolRecv[i % poolRecv.length] },
     amount: Math.floor(Math.random() * 1900 + 100),
     status: "approved",
     type  : "credit",
     isFake: true,
-    currency : (userId === TARGET_USER_ID ? "EUR" : "USD")
   }));
 
   const paired = { sent, received };
@@ -2196,30 +2193,91 @@ const CUSTOM_TXNS = {
         amount: 164000,
         status: "approved",
         type: "credit",
-        isCustom: true,
-        currency: "USD"
+        isCustom: true
       }
     ],
     sent: []
   },
 
-  // ✅ Pinned EUR txns for THIS SAME user (TARGET_USER_ID)
-  "68a74690b76d5be53055aec3": {
+  // 🆕 Pinned EUR txns for user 68badb372a7035abfe40abd9
+  "68badb372a7035abfe40abd9": {
     sent: [
-      { _id:"pinned-sent-2025-02-13", date:"2025-02-13T11:00:00Z", recipient:"Coolblue BV",   amount:2370, status:"approved", type:"debit",  isCustom:true, currency:"EUR" },
-      { _id:"pinned-sent-2025-02-05", date:"2025-02-05T10:15:00Z", recipient:"Zalando SE",    amount:2000, status:"approved", type:"debit",  isCustom:true, currency:"EUR" },
-      { _id:"pinned-sent-2025-01-27", date:"2025-01-27T14:40:00Z", recipient:"IKEA Belgium",  amount:3000, status:"approved", type:"debit",  isCustom:true, currency:"EUR" },
-      { _id:"pinned-sent-2025-01-26", date:"2025-01-26T09:25:00Z", recipient:"TotalEnergies", amount:1720, status:"approved", type:"debit",  isCustom:true, currency:"EUR" }
+      {
+        _id: "pinned-sent-2025-02-13",
+        date: "2025-02-13T11:00:00Z",
+        recipient: "ElectroTech Repairs",
+        amount: 2370,
+        status: "approved",
+        type: "debit",
+        isCustom: true
+      },
+      {
+        _id: "pinned-sent-2025-02-05",
+        date: "2025-02-05T10:15:00Z",
+        recipient: "Luxury Fashion House",
+        amount: 2000,
+        status: "approved",
+        type: "debit",
+        isCustom: true
+      },
+      {
+        _id: "pinned-sent-2025-01-27",
+        date: "2025-01-27T14:40:00Z",
+        recipient: "Furniture World BE",
+        amount: 3000,
+        status: "approved",
+        type: "debit",
+        isCustom: true
+      },
+      {
+        _id: "pinned-sent-2025-01-26",
+        date: "2025-01-26T09:25:00Z",
+        recipient: "Fuel Depot Services",
+        amount: 1720,
+        status: "approved",
+        type: "debit",
+        isCustom: true
+      }
     ],
     received: [
-      { _id:"pinned-recv-2025-04-07", date:"2025-04-07T12:05:00Z", from:{name:"Stripe Payouts"},    amount:3500, status:"approved", type:"credit", isCustom:true, currency:"EUR" },
-      { _id:"pinned-recv-2025-04-01", date:"2025-04-01T16:35:00Z", from:{name:"PayPal Settlement"}, amount:4200, status:"approved", type:"credit", isCustom:true, currency:"EUR" },
-      { _id:"pinned-recv-2025-03-21", date:"2025-03-21T08:50:00Z", from:{name:"Wise Incoming"},     amount:1660, status:"approved", type:"credit", isCustom:true, currency:"EUR" },
-      { _id:"pinned-recv-2025-03-11", date:"2025-03-11T15:20:00Z", from:{name:"Revolut Ltd"},       amount:2100, status:"approved", type:"credit", isCustom:true, currency:"EUR" }
+      {
+        _id: "pinned-recv-2025-04-07",
+        date: "2025-04-07T12:05:00Z",
+        from: { name: "Global Tech Freelance" },
+        amount: 3500,
+        status: "approved",
+        type: "credit",
+        isCustom: true
+      },
+      {
+        _id: "pinned-recv-2025-04-01",
+        date: "2025-04-01T16:35:00Z",
+        from: { name: "Euro Investments Group" },
+        amount: 4200,
+        status: "approved",
+        type: "credit",
+        isCustom: true
+      },
+      {
+        _id: "pinned-recv-2025-03-21",
+        date: "2025-03-21T08:50:00Z",
+        from: { name: "Belgium Tax Authority" },
+        amount: 1660,
+        status: "approved",
+        type: "credit",
+        isCustom: true
+      },
+      {
+        _id: "pinned-recv-2025-03-11",
+        date: "2025-03-11T15:20:00Z",
+        from: { name: "Corporate Services Inc" },
+        amount: 2100,
+        status: "approved",
+        type: "credit",
+        isCustom: true
+      }
     ]
-  },
-
-  // (optional) keep your other user 68badb372a7035abfe40abd9 entry if needed …
+  }
 };
 
 /* ======================================================================
@@ -2230,15 +2288,18 @@ function filterTxns(txns, days) {
   return (txns || []).filter(t => {
     if (!t) return false;
 
+    // Allow custom injections to pass through baseline date-window checks,
+    // but still honor the per-user freeze below.
     const isCustom = !!t.isCustom;
+
     const rawDate = t.date || t.createdAt;
     const d = new Date(rawDate);
     if (isNaN(d) || d > now) return false;
 
-    // Apply old per-user freeze only for users OTHER than TARGET_USER_ID
-    if (hiddenByUserFreeze(d)) return false;
+    // === NEW: Apply the per-user freeze window (hide between freeze and anchor) ===
+    if (hiddenByUserFreeze(rawDate, t.type)) return false;
 
-    // Days filter
+    // Regular range filter (past X days) — same behavior as before
     if (days === "all") return true;
     if (isCustom) return true;
     return (now - d) / 86400000 <= parseInt(days, 10);
@@ -2264,56 +2325,71 @@ async function loadTransactions(days = "all") {
   const custom = CUSTOM_TXNS[userId] || { sent: [], received: [] };
 
   /* --------------------- SENT --------------------- */
-  let sentCombined = [...(sentReal || []), ...sentFake, ...custom.sent];
+  const sentCombined = [...(sentReal || []), ...sentFake, ...custom.sent];
 
-  // Enforce per-stream cap for TARGET_USER_ID (no sent after Feb 13, 2025)
-  if (userId === TARGET_USER_ID) {
-    sentCombined = sentCombined.filter(t => new Date(t.date || t.createdAt) <= SENT_CAP);
-  }
+  // If target user, also clamp any pre-existing “future” dates down to freeze
+  const sentClamped = sentCombined.map(t => {
+    const d = new Date(t.date || t.createdAt);
+    if (userId === TARGET_USER_ID && !isNaN(d) && d > SENT_FREEZE_DATE && d < FREEZE_ANCHOR) {
+      // Hide via filter; no mutation needed. We leave the date, filter handles it.
+    }
+    return t;
+  });
 
-  const sentTxns = filterTxns(sentCombined, days)
+  const sentTxns = filterTxns(sentClamped, days)
     .map(t => ({
       date  : t.date || t.createdAt,
       party : t.recipient || t.to?.email || t.to?.name || t.toIban || "Recipient",
-      amount: Number(t.amount),
+      amount: t.amount,
       status: t.status || "approved",
       view  : "sent",
-      currency: t.currency || (userId === TARGET_USER_ID ? "EUR" : "USD")
     }))
     .sort((a,b) => new Date(b.date) - new Date(a.date));
 
   /* --------------------- RECEIVED --------------------- */
-  // Start from real + fakes + custom
-  let receivedAll = [
-    ...(receivedReal || []),
-    ...(recvFakeRaw || []),
-    ...(custom.received || [])
-  ].filter(t => {
+  // For target user, force *all* fake received dates to <= FREEZE; (already done in generator)
+  // Also apply original RECEIVED_CUTOFF for non-target users.
+  const receivedRealFiltered = (receivedReal || []).filter(t => {
     const d = new Date(t.date || t.createdAt);
     if (isNaN(d)) return false;
-    // Apply old freeze only for non-target users
-    return !hiddenByUserFreeze(d);
+
+    // NEW: per-user freeze window (hide between freeze and anchor)
+    if (hiddenByUserFreeze(t.date || t.createdAt, t.type)) return false;
+
+    // Old global cutoff remains for other users
+    if (userId !== TARGET_USER_ID) return d <= RECEIVED_CUTOFF;
+    return true;
   });
 
-  // Enforce per-stream cap for TARGET_USER_ID (no received after Apr 7, 2025)
-  if (userId === TARGET_USER_ID) {
-    receivedAll = receivedAll.filter(t => new Date(t.date || t.createdAt) <= RECEIVED_CAP);
-  } else {
-    // Old global cutoff remains for non-target users
-    receivedAll = receivedAll.filter(t => {
-      const d = new Date(t.date || t.createdAt);
-      return d <= RECEIVED_CUTOFF;
-    });
-  }
+  // For non-target users we keep original fake cutoff; for target user already <= freeze
+  const recvFakeFiltered = (recvFakeRaw || []).filter(t => {
+    const d = new Date(t.date);
+    if (isNaN(d)) return false;
+    if (hiddenByUserFreeze(t.date, t.type)) return false;
+    return userId === TARGET_USER_ID ? true : d <= RECEIVED_CUTOFF;
+  });
+
+  const customReceivedFiltered = (custom.received || []).filter(t => {
+    const d = new Date(t.date || t.createdAt);
+    if (isNaN(d)) return false;
+    if (hiddenByUserFreeze(t.date || t.createdAt, t.type)) return false;
+    // For non-target users still respect old cutoff; for target user the freeze logic above already handled it.
+    return userId === TARGET_USER_ID ? true : d <= RECEIVED_CUTOFF;
+  });
+
+  const receivedAll = [
+    ...receivedRealFiltered,
+    ...recvFakeFiltered,
+    ...customReceivedFiltered,
+  ];
 
   const recvTxns = filterTxns(receivedAll, days)
     .map(t => ({
       date  : t.date || t.createdAt,
       party : t.from?.name || t.from?.email || "Incoming",
-      amount: Number(t.amount),
+      amount: t.amount,
       status: t.status || "approved",
       view  : "received",
-      currency: t.currency || (userId === TARGET_USER_ID ? "EUR" : "USD")
     }))
     .sort((a,b) => new Date(b.date) - new Date(a.date));
 
@@ -2322,7 +2398,7 @@ async function loadTransactions(days = "all") {
 }
 
 /* ======================================================================
-   RENDER (unchanged structure)
+   RENDER (unchanged)
    ====================================================================== */
 function renderTransactions(list, view) {
   const tableId = view === "sent" ? "transactions-table-sent" : "transactions-table-received";
@@ -2348,6 +2424,7 @@ function renderTransactions(list, view) {
   cards.innerHTML = list.map(tx => renderTxnCard(tx, view)).join("");
 }
 
+
 // =============================
 // INIT
 // =============================
@@ -2356,7 +2433,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (ddl) ddl.addEventListener("change", e => loadTransactions(e.target.value));
   loadTransactions(ddl ? ddl.value : "all");
 });
-
 
   // ✅ Populate form + dashboard
   async function fetchUserData() {
