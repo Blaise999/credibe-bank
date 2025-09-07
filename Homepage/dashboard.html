@@ -2059,731 +2059,422 @@ function renderTxnCard(tx, view) {
 }
 
 /* ======================================================================
-   🔒 PER-USER TIME FREEZE (for one user only, with post-edit passthrough)
-   Requirement:
-   - For user 68a74690b76d5be53055aec3, hide ALL transactions dated AFTER
-     Dec 15, 2024 — EXCEPT brand-new ones created AFTER the moment this code
-     was installed (“edit time”). New ones after that moment should show.
-   - Applies to real + fake + custom, both sent and received.
-   - Other users: unaffected (existing logic applies).
-   ====================================================================== */
+<script>
+(function () {
+  "use strict";
 
-const TARGET_USER_ID = "68a74690b76d5be53055aec3";
-const USER_FREEZE_DATE = new Date("2024-12-15T23:59:59Z");
-
-/* Record the install/edit moment once (per user) so future “new” txns show.
-   Bump ANCHOR_VERSION if you ever want to reset the anchor on clients. */
-const ANCHOR_VERSION = "v1";
-const ANCHOR_KEY = `txnFreezeAnchor_${TARGET_USER_ID}_${ANCHOR_VERSION}`;
-let FREEZE_ANCHOR = (() => {
-  try {
-    const existing = localStorage.getItem(ANCHOR_KEY);
-    if (existing) return new Date(existing);
-  } catch {}
-  const now = new Date();
-  try { localStorage.setItem(ANCHOR_KEY, now.toISOString()); } catch {}
-  return now;
-})();
-
-/* Helper: should a date be hidden by the per-user freeze?
-   Hide if: date > USER_FREEZE_DATE AND date < FREEZE_ANCHOR
-   (i.e., anything between the freeze date and the moment this code shipped) */
-function hiddenByUserFreeze(dateLike) {
-  if (typeof userId === "undefined" || userId !== TARGET_USER_ID) return false;
-  const d = new Date(dateLike);
-  if (isNaN(d)) return false;
-  return d > USER_FREEZE_DATE && d < FREEZE_ANCHOR;
-}
-
-/* ======================================================================
-   🔹 STATIC FAKE TXNS (separate Sent & Received)
-   ====================================================================== */
-const FAKE_KEY = "fakePairedTxns_v3";
-
-/* Keep (older) received cutoff support for non-target users.
-   Target user logic below supersedes this. */
-const RECEIVED_CUTOFF = new Date("2025-08-15T23:59:59Z");
-
-/* Generate dates:
-   - Normal: last N days from "today".
-   - Target user: constrain to <= USER_FREEZE_DATE so nothing appears newer
-     than the freeze unless created after the anchor (which fakes never are). */
-function randomDateISOWithin(days) {
-  const d = new Date();
-  d.setDate(d.getDate() - Math.floor(Math.random() * days));
-  return d.toISOString();
-}
-function randomDateISOBeforeCutoff(cutoff, spanDaysBack = 60) {
-  const max = new Date(cutoff);
-  const min = new Date(max);
-  min.setDate(min.getDate() - spanDaysBack);
-  const rand = new Date(min.getTime() + Math.random() * (max - min));
-  return rand.toISOString();
-}
-
-function generatePairedFakeTransactions(count = 25) {
-  const cached = localStorage.getItem(FAKE_KEY);
-  if (cached) {
-    try { return JSON.parse(cached); } catch { localStorage.removeItem(FAKE_KEY); }
-  }
-
-  const poolSent = [
-    "ING Bank","BNP Paribas","KBC Group","Belfius","ABN AMRO",
-    "Carrefour","Colruyt","Delhaize","Bol.com","Coolblue",
-    "MediaMarkt","Zalando","IKEA Belgium","Proximus","Telenet",
-    "Esso","TotalEnergies","Q8 Belgium","NMBS/SNCB","De Lijn"
-  ];
-
-  const poolRecv = [
-    "Stripe Payouts","PayPal Settlement","Wise Incoming","Revolut Ltd",
-    "Société Générale","Deutsche Bank","Heineken NV","Unilever EU",
-    "Coca-Cola Europacific","Jupiler NV","Nestlé Belgium","Orange SA",
-    "AXA Belgium","DPD Belgium","Bpost Incoming","Klarna Refunds"
-  ];
-
-  const dateForFake = (isReceived = false) => {
-    if (typeof userId !== "undefined" && userId === TARGET_USER_ID) {
-      // Force all fake dates to land BEFORE or ON the freeze date
-      return randomDateISOBeforeCutoff(USER_FREEZE_DATE, 60);
-    }
-    // Original behavior: within the last 60 days
-    return randomDateISOWithin(60);
+  /* ============================== CONFIG (namespaced) ============================== */
+  const CFG = {
+    API_BASE: window.CREDIBE_API_BASE || "https://credibe-backends.onrender.com",
+    TOKEN_KEY: "userToken"
   };
 
-  const sent = Array.from({ length: count }, (_, i) => ({
-    _id      : `fake-sent-${i}`,
-    date     : dateForFake(false),
-    recipient: poolSent[i % poolSent.length],
-    amount   : Math.floor(Math.random() * 1900 + 100), // $100–$2000
-    status   : "approved",
-    type     : "debit",
-    isFake   : true,
-  }));
-
-  const received = Array.from({ length: count }, (_, i) => ({
-    _id   : `fake-recv-${i}`,
-    date  : dateForFake(true),
-    from  : { name: poolRecv[i % poolRecv.length] },
-    amount: Math.floor(Math.random() * 1900 + 100),
-    status: "approved",
-    type  : "credit",
-    isFake: true,
-  }));
-
-  const paired = { sent, received };
-  localStorage.setItem(FAKE_KEY, JSON.stringify(paired));
-  return paired;
-}
-
-/* ======================================================================
-   🔸 ONE-TIME CUSTOM TXNS (user-specific, permanent)
-   ====================================================================== */
-const CUSTOM_TXNS = {
-  "686cdaadbcd60c61f026f6b6": {
-    received: [
-      {
-        _id: "manual-rx-2025-08-13-nexora",
-        date: "2025-08-13T10:30:00Z",
-        from: { name: "Nexora Real Estate" },
-        amount: 164000,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      }
-    ],
-    sent: []
-  }
-};
-
-/* ======================================================================
-   FILTERING
-   ====================================================================== */
-function filterTxns(txns, days) {
-  const now = new Date();
-  return (txns || []).filter(t => {
-    if (!t) return false;
-
-    // Allow custom injections to pass through baseline date-window checks,
-    // but still honor the per-user freeze below.
-    const isCustom = !!t.isCustom;
-
-    const rawDate = t.date || t.createdAt;
-    const d = new Date(rawDate);
-    if (isNaN(d) || d > now) return false;
-
-    // === NEW: Apply the per-user freeze window (hide between freeze and anchor) ===
-    if (hiddenByUserFreeze(d)) return false;
-
-    // Regular range filter (past X days) — same behavior as before
-    if (days === "all") return true;
-    if (isCustom) return true;
-    return (now - d) / 86400000 <= parseInt(days, 10);
-  });
-}
-
-/* ======================================================================
-   LOAD + RENDER
-   ====================================================================== */
-async function loadTransactions(days = "all") {
-  const base = `${API_BASE}/api/user/transactions/${userId}`;
-
-  // fetch real data
-  const [sentReal, receivedReal] = await Promise.all([
-    safeFetchJSON(`${base}?type=sent${days !== "all" ? `&days=${days}` : ""}`),
-    safeFetchJSON(`${base}?type=received${days !== "all" ? `&days=${days}` : ""}`)
-  ]);
-
-  // merge with NEW static fake sets
-  const { sent: sentFake, received: recvFakeRaw } = generatePairedFakeTransactions(25);
-
-  // include any permanent, user-specific custom txns
-  const custom = CUSTOM_TXNS[userId] || { sent: [], received: [] };
-
-  /* --------------------- SENT --------------------- */
-  const sentCombined = [...(sentReal || []), ...sentFake, ...custom.sent];
-
-  // If target user, also clamp any pre-existing “future” dates down to freeze
-  const sentClamped = sentCombined.map(t => {
-    const d = new Date(t.date || t.createdAt);
-    if (userId === TARGET_USER_ID && !isNaN(d) && d > USER_FREEZE_DATE && d < FREEZE_ANCHOR) {
-      // Hide via filter; no mutation needed. We leave the date, filter handles it.
+  /* ============================== HELPERS ============================== */
+  const safeFetchJSON = async (url, init = {}) => {
+    try {
+      const r = await fetch(url, init);
+      if (!r.ok) return [];
+      return await r.json();
+    } catch {
+      return [];
     }
-    return t;
-  });
+  };
 
-  const sentTxns = filterTxns(sentClamped, days)
-    .map(t => ({
-      date  : t.date || t.createdAt,
-      party : t.recipient || t.to?.email || t.to?.name || t.toIban || "Recipient",
-      amount: t.amount,
-      status: t.status || "approved",
-      view  : "sent",
-    }))
-    .sort((a,b) => new Date(b.date) - new Date(a.date));
+  const fmtMoney = (n, currency = "EUR") =>
+    new Intl.NumberFormat(undefined, { style: "currency", currency }).format(Number(n || 0));
 
-  /* --------------------- RECEIVED --------------------- */
-  // For target user, force *all* fake received dates to <= FREEZE; (already done in generator)
-  // Also apply original RECEIVED_CUTOFF for non-target users.
-  const receivedRealFiltered = (receivedReal || []).filter(t => {
-    const d = new Date(t.date || t.createdAt);
+  /* ==================== PER-USER TIME FREEZE (unchanged) ==================== */
+  const TARGET_USER_ID = "68a74690b76d5be53055aec3";
+  const USER_FREEZE_DATE = new Date("2024-12-15T23:59:59Z");
+  const ANCHOR_VERSION = "v1";
+  const ANCHOR_KEY = `txnFreezeAnchor_${TARGET_USER_ID}_${ANCHOR_VERSION}`;
+  let FREEZE_ANCHOR = (() => {
+    try {
+      const existing = localStorage.getItem(ANCHOR_KEY);
+      if (existing) return new Date(existing);
+    } catch {}
+    const now = new Date();
+    try { localStorage.setItem(ANCHOR_KEY, now.toISOString()); } catch {}
+    return now;
+  })();
+
+  function hiddenByUserFreeze(dateLike) {
+    if (typeof window.userId === "undefined" || window.userId !== TARGET_USER_ID) return false;
+    const d = new Date(dateLike);
     if (isNaN(d)) return false;
-
-    // NEW: per-user freeze window (hide between freeze and anchor)
-    if (hiddenByUserFreeze(d)) return false;
-
-    // Old global cutoff remains for other users
-    if (userId !== TARGET_USER_ID) return d <= RECEIVED_CUTOFF;
-    return true;
-  });
-
-  // For non-target users we keep original fake cutoff; for target user already <= freeze
-  const recvFakeFiltered = (recvFakeRaw || []).filter(t => {
-    const d = new Date(t.date);
-    if (isNaN(d)) return false;
-    if (hiddenByUserFreeze(d)) return false;
-    return userId === TARGET_USER_ID ? true : d <= RECEIVED_CUTOFF;
-  });
-
-  const customReceivedFiltered = (custom.received || []).filter(t => {
-    const d = new Date(t.date || t.createdAt);
-    if (isNaN(d)) return false;
-    if (hiddenByUserFreeze(d)) return false;
-    // For non-target users still respect old cutoff; for target user the freeze logic above already handled it.
-    return userId === TARGET_USER_ID ? true : d <= RECEIVED_CUTOFF;
-  });
-
-  const receivedAll = [
-    ...receivedRealFiltered,
-    ...recvFakeFiltered,
-    ...customReceivedFiltered,
-  ];
-
-  const recvTxns = filterTxns(receivedAll, days)
-    .map(t => ({
-      date  : t.date || t.createdAt,
-      party : t.from?.name || t.from?.email || "Incoming",
-      amount: t.amount,
-      status: t.status || "approved",
-      view  : "received",
-    }))
-    .sort((a,b) => new Date(b.date) - new Date(a.date));
-
-  renderTransactions(sentTxns, "sent");
-  renderTransactions(recvTxns, "received");
-}
-
-/* ======================================================================
-   RENDER (unchanged)
-   ====================================================================== */
-function renderTransactions(list, view) {
-  const tableId = view === "sent" ? "transactions-table-sent" : "transactions-table-received";
-  const cardsId = view === "sent" ? "transactions-cards-sent" : "transactions-cards-received";
-  const emptySel = view === "sent" ? ".empty-state-sent" : ".empty-state-received";
-
-  const table = document.getElementById(tableId);
-  const cards = document.getElementById(cardsId);
-  const empty = document.querySelector(emptySel);
-
-  if (!table || !cards) return;
-
-  table.innerHTML = "";
-  cards.innerHTML = "";
-
-  if (!list.length) {
-    if (empty) empty.classList.remove("hidden");
-    return;
+    return d > USER_FREEZE_DATE && d < FREEZE_ANCHOR;
   }
-  if (empty) empty.classList.add("hidden");
 
-  table.innerHTML = list.map(tx => renderTxnRow(tx, view)).join("");
-  cards.innerHTML = list.map(tx => renderTxnCard(tx, view)).join("");
-}
+  /* =========== PINNED TXNS + DATE CAPS FOR USER 68badb372a7035abfe40abd9 =========== */
+  const USER_PINNED_ID = "68badb372a7035abfe40abd9";
+  const PIN_SENT_CUTOFF     = new Date("2025-02-13T23:59:59Z");
+  const PIN_RECEIVED_CUTOFF = new Date("2025-04-07T23:59:59Z");
 
+  /* ======================= FAKE TXNS GENERATION (paired) ======================= */
+  const FAKE_KEY = "fakePairedTxns_v3";
 
-// =============================
-// INIT
-// =============================
-document.addEventListener("DOMContentLoaded", () => {
-  const ddl = document.getElementById("transaction-filter");
-  if (ddl) ddl.addEventListener("change", e => loadTransactions(e.target.value));
-  loadTransactions(ddl ? ddl.value : "all");
-});
+  function randomDateISOWithin(days) {
+    const d = new Date();
+    d.setDate(d.getDate() - Math.floor(Math.random() * days));
+    return d.toISOString();
+  }
+  function randomDateISOBeforeCutoff(cutoff, spanDaysBack = 120) {
+    const max = new Date(cutoff);
+    const min = new Date(max);
+    min.setDate(min.getDate() - spanDaysBack);
+    const rand = new Date(min.getTime() + Math.random() * (max - min));
+    return rand.toISOString();
+  }
 
-  // ✅ Populate form + dashboard
+  function generatePairedFakeTransactions(count = 25) {
+    const cached = localStorage.getItem(FAKE_KEY);
+    if (cached) {
+      try { return JSON.parse(cached); } catch { localStorage.removeItem(FAKE_KEY); }
+    }
+
+    const poolSent = [
+      "Coolblue BV","Zalando SE","IKEA Anderlecht","TotalEnergies Station 4132",
+      "MediaMarkt Brussels","Colruyt Leuven","Belfius Payments","BNP Paribas Fortis",
+      "ABN AMRO Services","Bol.com","Proximus NV","Telenet BV","Esso Express Evere",
+      "Carrefour Market Ixelles","KBC Group","NMBS/SNCB Tickets"
+    ];
+    const poolRecv = [
+      "Stripe Payouts","PayPal Settlement","Wise Incoming","Revolut Ltd",
+      "Société Générale","Deutsche Bank","Klarna Refunds","AXA Belgium",
+      "Orange SA","Bpost Incoming","DPD Belgium","Heineken NV",
+      "Unilever EU","Coca-Cola Europacific","Nestlé Belgium"
+    ];
+
+    const dateForFakeSent = () => {
+      if (window.userId === USER_PINNED_ID) return randomDateISOBeforeCutoff(PIN_SENT_CUTOFF, 120);
+      if (window.userId === TARGET_USER_ID) return randomDateISOBeforeCutoff(USER_FREEZE_DATE, 60);
+      return randomDateISOWithin(60);
+    };
+    const dateForFakeRecv = () => {
+      if (window.userId === USER_PINNED_ID) return randomDateISOBeforeCutoff(PIN_RECEIVED_CUTOFF, 120);
+      if (window.userId === TARGET_USER_ID) return randomDateISOBeforeCutoff(USER_FREEZE_DATE, 60);
+      return randomDateISOWithin(60);
+    };
+
+    const sent = Array.from({ length: count }, (_, i) => ({
+      _id      : `fake-sent-${i}`,
+      date     : dateForFakeSent(),
+      recipient: poolSent[i % poolSent.length],
+      amount   : Math.floor(Math.random() * 1900 + 100),
+      status   : "approved",
+      type     : "debit",
+      isFake   : true
+    }));
+
+    const received = Array.from({ length: count }, (_, i) => ({
+      _id   : `fake-recv-${i}`,
+      date  : dateForFakeRecv(),
+      from  : { name: poolRecv[i % poolRecv.length] },
+      amount: Math.floor(Math.random() * 1900 + 100),
+      status: "approved",
+      type  : "credit",
+      isFake: true
+    }));
+
+    const paired = { sent, received };
+    localStorage.setItem(FAKE_KEY, JSON.stringify(paired));
+    return paired;
+  }
+
+  /* ====================== ONE-TIME CUSTOM (pinned) TXNS ====================== */
+  const CUSTOM_TXNS = {
+    "686cdaadbcd60c61f026f6b6": {
+      received: [
+        { _id: "manual-rx-2025-08-13-nexora", date: "2025-08-13T10:30:00Z",
+          from: { name: "Nexora Real Estate" }, amount: 164000, status: "approved",
+          type: "credit", isCustom: true }
+      ],
+      sent: []
+    },
+    "68badb372a7035abfe40abd9": {
+      sent: [
+        { _id: "pinned-sent-2025-02-13", date: "2025-02-13T11:00:00Z", recipient: "Coolblue BV",               amount: 2370, status: "approved", type: "debit",  isCustom: true },
+        { _id: "pinned-sent-2025-02-05", date: "2025-02-05T10:15:00Z", recipient: "Zalando SE",                amount: 2000, status: "approved", type: "debit",  isCustom: true },
+        { _id: "pinned-sent-2025-01-27", date: "2025-01-27T14:40:00Z", recipient: "IKEA Anderlecht",           amount: 3000, status: "approved", type: "debit",  isCustom: true },
+        { _id: "pinned-sent-2025-01-26", date: "2025-01-26T09:25:00Z", recipient: "TotalEnergies Station 4132",amount: 1720, status: "approved", type: "debit",  isCustom: true }
+      ],
+      received: [
+        { _id: "pinned-recv-2025-04-07", date: "2025-04-07T12:05:00Z", from: { name: "Stripe Payouts" },    amount: 3500, status: "approved", type: "credit", isCustom: true },
+        { _id: "pinned-recv-2025-04-01", date: "2025-04-01T16:35:00Z", from: { name: "PayPal Settlement" }, amount: 4200, status: "approved", type: "credit", isCustom: true },
+        { _id: "pinned-recv-2025-03-21", date: "2025-03-21T08:50:00Z", from: { name: "Wise Incoming" },     amount: 1660, status: "approved", type: "credit", isCustom: true },
+        { _id: "pinned-recv-2025-03-11", date: "2025-03-11T15:20:00Z", from: { name: "Revolut Ltd" },       amount: 2100, status: "approved", type: "credit", isCustom: true }
+      ]
+    }
+  };
+
+  /* ============================== FILTERING ============================== */
+  function filterTxns(txns, days) {
+    const now = new Date();
+    return (txns || []).filter(t => {
+      if (!t) return false;
+      const isCustom = !!t.isCustom;
+      const rawDate = t.date || t.createdAt;
+      const d = new Date(rawDate);
+      if (isNaN(d) || d > now) return false;
+      if (hiddenByUserFreeze(d)) return false;
+      if (days !== "all" && !isCustom) {
+        if ((now - d) / 86400000 > parseInt(days, 10)) return false;
+      }
+      return true;
+    });
+  }
+
+  /* ============================== RENDER ============================== */
+  function fallbackRow(tx, view, currency) {
+    const sign = view === "received" || tx.amount >= 0 ? "" : "-";
+    return `
+      <tr>
+        <td>${new Date(tx.date).toLocaleString()}</td>
+        <td>${tx.party}</td>
+        <td style="text-align:right">${sign}${fmtMoney(Math.abs(tx.amount), currency)}</td>
+      </tr>`;
+  }
+  function fallbackCard(tx, view, currency) {
+    const sign = view === "received" || tx.amount >= 0 ? "" : "-";
+    return `
+      <div class="rounded-lg border p-3 flex items-center justify-between">
+        <div>
+          <div class="font-medium">${tx.party}</div>
+          <div class="text-xs opacity-70">${new Date(tx.date).toLocaleString()}</div>
+        </div>
+        <div class="font-semibold">${sign}${fmtMoney(Math.abs(tx.amount), currency)}</div>
+      </div>`;
+  }
+
+  function renderTransactions(list, view, currency = "EUR") {
+    const tableId = view === "sent" ? "transactions-table-sent" : "transactions-table-received";
+    const cardsId = view === "sent" ? "transactions-cards-sent" : "transactions-cards-received";
+    const emptySel = view === "sent" ? ".empty-state-sent" : ".empty-state-received";
+
+    const table = document.getElementById(tableId);
+    const cards = document.getElementById(cardsId);
+    const empty = document.querySelector(emptySel);
+    if (!table || !cards) return;
+
+    table.innerHTML = "";
+    cards.innerHTML = "";
+
+    if (!list.length) { if (empty) empty.classList.remove("hidden"); return; }
+    if (empty) empty.classList.add("hidden");
+
+    const rowRenderer  = (typeof window.renderTxnRow  === "function") ? window.renderTxnRow  : (tx) => fallbackRow(tx, view, currency);
+    const cardRenderer = (typeof window.renderTxnCard === "function") ? window.renderTxnCard : (tx) => fallbackCard(tx, view, currency);
+
+    table.innerHTML = list.map(tx => rowRenderer(tx, view, currency)).join("");
+    cards.innerHTML = list.map(tx => cardRenderer(tx, view, currency)).join("");
+  }
+
+  /* ============================== LOADERS ============================== */
   async function fetchUserData() {
-  const token = localStorage.getItem("userToken");
-  if (!token) return null;
-
-  try {
-    const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error("Failed to fetch user data");
-    return await res.json();
-  } catch (err) {
-    console.error("⚠️ fetchUserData error:", err);
-    return null;
-  }
-}
-  (async () => {
-    const data = await fetchUserData();
-    if (!data) return;
-
-    // ⚙️ Prefill settings
-    if (document.getElementById("full-name")) {
-      document.getElementById("full-name").value = data.name || "";
-      document.getElementById("email").value = data.email || "";
-      document.getElementById("phone").value = data.phone || "";
-    }
-    // 👋 Show greeting using name from settings
-const greet = document.getElementById("mobile-greeting");
-const fullNameInput = document.getElementById("full-name");
-
-if (greet && fullNameInput) {
-  const fullName = fullNameInput.value.trim();
-  const firstName = fullName.split(" ")[0] || "there";
-  greet.textContent = `Good day, ${firstName}`;
-}
-
-    // 👋 Dashboard welcome message
-    const welcomeTag = document.getElementById("welcome-user");
-    if (welcomeTag) {
-      welcomeTag.textContent = `Welcome, ${data.name || "User"}`;
-    }
-
-    // 💶 Dashboard balance
-    const balanceTag = document.getElementById("user-balance");
-    if (balanceTag) {
-      balanceTag.textContent = `$${data.balance ?? 0}`;
-    }
-
-    // 🔁 Update dashboard values
-    document.getElementById("totalBalance").textContent = `$${data.balance?.toLocaleString() || '0'}`;
-    document.getElementById("savingsAmount").textContent = `$${data.savings?.toLocaleString() || '0'}`;
-    document.getElementById("creditAmount").textContent = `$${data.credits?.toLocaleString() || '0'}`;
-  })();
-
-  // ✅ Populate account details
-  (async () => {
+    const token = localStorage.getItem(CFG.TOKEN_KEY);
+    if (!token) return null;
     try {
-      const res = await fetch("https://credibe-backends.onrender.com/api/user/profile", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      const checking = data.accounts?.checking || {};
-      const savings = data.accounts?.savings || {};
-      document.getElementById("checking-iban").textContent = checking.iban || "—";
-      document.getElementById("checking-date").textContent = checking.createdAt ? new Date(checking.createdAt).toLocaleDateString() : "—";
-      document.getElementById("savings-iban").textContent = savings.iban || "—";
-      document.getElementById("savings-date").textContent = savings.createdAt ? new Date(savings.createdAt).toLocaleDateString() : "—";
-    } catch (e) {
-      console.error("IBAN Fetch Error:", e);
+      const res = await fetch(`${CFG.API_BASE}/api/user/me`, { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) return null;
+      return await res.json();
+    } catch { return null; }
+  }
+
+  async function loadTransactions(days = "all") {
+    const token = localStorage.getItem(CFG.TOKEN_KEY);
+    if (!window.userId) return;
+
+    const base = `${CFG.API_BASE}/api/user/transactions/${window.userId}`;
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+    const [sentReal, receivedReal] = await Promise.all([
+      safeFetchJSON(`${base}?type=sent${days !== "all" ? `&days=${days}` : ""}`, { headers }),
+      safeFetchJSON(`${base}?type=received${days !== "all" ? `&days=${days}` : ""}`, { headers })
+    ]);
+
+    const { sent: sentFake, received: recvFakeRaw } = generatePairedFakeTransactions(25);
+    const custom = CUSTOM_TXNS[window.userId] || { sent: [], received: [] };
+
+    /* ---- SENT ---- */
+    let sentMerged = [...(sentReal || []), ...sentFake, ...custom.sent];
+    if (window.userId === USER_PINNED_ID) {
+      sentMerged = sentMerged.filter(t => new Date(t.date || t.createdAt) <= PIN_SENT_CUTOFF);
     }
-  })();
+    const sentTxns = filterTxns(sentMerged, days)
+      .map(t => ({
+        date  : t.date || t.createdAt,
+        party : t.recipient || t.to?.email || t.to?.name || t.toIban || "Recipient",
+        amount: Number(t.amount),
+        status: t.status || "approved",
+        view  : "sent"
+      }))
+      .sort((a,b) => new Date(b.date) - new Date(a.date));
 
-  // ✅ Submit settings form
-  const settingsForm = document.getElementById('settings-form');
-  if (settingsForm) {
-    settingsForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    /* ---- RECEIVED ---- */
+    let receivedMerged = [
+      ...(receivedReal || []),
+      ...(recvFakeRaw || []),
+      ...(custom.received || [])
+    ].filter(t => {
+      const d = new Date(t.date || t.createdAt);
+      if (isNaN(d)) return false;
+      return !hiddenByUserFreeze(d);
+    });
 
-      const name = document.getElementById('full-name').value;
-      const email = document.getElementById('email').value;
-      const phone = document.getElementById('phone').value;
+    if (window.userId === USER_PINNED_ID) {
+      receivedMerged = receivedMerged.filter(t => new Date(t.date || t.createdAt) <= PIN_RECEIVED_CUTOFF);
+    }
 
-      const submitButton = settingsForm.querySelector('button[type="submit"]');
-      submitButton.disabled = true;
+    const recvTxns = filterTxns(receivedMerged, days)
+      .map(t => ({
+        date  : t.date || t.createdAt,
+        party : t.from?.name || t.from?.email || "Incoming",
+        amount: Number(t.amount),
+        status: t.status || "approved",
+        view  : "received"
+      }))
+      .sort((a,b) => new Date(b.date) - new Date(a.date));
 
-      try {
-        const res = await fetch('https://credibe-backends.onrender.com/api/settings/update', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ name, email, phone })
-        });
+    renderTransactions(sentTxns, "sent", window.userCurrency || "EUR");
+    renderTransactions(recvTxns, "received", window.userCurrency || "EUR");
+  }
 
-        const response = await res.json();
+  /* ============================== BOOT ============================== */
+  document.addEventListener("DOMContentLoaded", async () => {
+    const token = localStorage.getItem(CFG.TOKEN_KEY);
 
-        if (res.ok) {
-          alert('✅ Settings updated successfully!');
-          console.log('Updated settings:', { name, email, phone });
+    if (typeof window.showPage === "function") window.showPage("dashboard");
+    document.querySelectorAll(".page").forEach(p => p.classList.add("fade-in", "visible"));
 
-          // 🔄 Refresh values
-          const newData = await fetchUserData();
-          if (newData) {
-            document.getElementById("full-name").value = newData.name || "";
-            document.getElementById("email").value = newData.email || "";
-            document.getElementById("phone").value = newData.phone || "";
+    const data = await fetchUserData();
+    if (data) {
+      window.userId =
+        data._id || data.id || data.user?._id || data.user?.id || window.userId;
+
+      window.userCurrency = (window.userId === USER_PINNED_ID) ? "EUR" : (data.currency || "EUR");
+
+      const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+      setVal("full-name", data.name || "");
+      setVal("email", data.email || "");
+      setVal("phone", data.phone || "");
+
+      const greet = document.getElementById("mobile-greeting");
+      if (greet) {
+        const firstName = (data.name || "").trim().split(" ")[0] || "there";
+        greet.textContent = `Good day, ${firstName}`;
+      }
+      const welcomeTag = document.getElementById("welcome-user");
+      if (welcomeTag) welcomeTag.textContent = `Welcome, ${data.name || "User"}`;
+
+      const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+      setTxt("totalBalance", fmtMoney(data.balance || 0, window.userCurrency));
+      setTxt("savingsAmount", fmtMoney(data.savings || 0, window.userCurrency));
+      setTxt("creditAmount", fmtMoney(data.credits || 0, window.userCurrency));
+      setTxt("user-balance", fmtMoney(data.balance || 0, window.userCurrency));
+    }
+
+    try {
+      if (token) {
+        const prof = await safeFetchJSON(`${CFG.API_BASE}/api/user/profile`, { headers: { Authorization: `Bearer ${token}` } });
+        const checking = prof?.accounts?.checking || {};
+        const savings  = prof?.accounts?.savings  || {};
+        const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        setTxt("checking-iban", checking.iban || "—");
+        setTxt("checking-date", checking.createdAt ? new Date(checking.createdAt).toLocaleDateString() : "—");
+        setTxt("savings-iban",  savings.iban  || "—");
+        setTxt("savings-date",  savings.createdAt ? new Date(savings.createdAt).toLocaleDateString() : "—");
+      }
+    } catch (e) { console.error("IBAN Fetch Error:", e); }
+
+    const ddl = document.getElementById("transaction-filter");
+    if (ddl) ddl.addEventListener("change", e => loadTransactions(e.target.value));
+    await loadTransactions(ddl ? ddl.value : "all");
+
+    const bindPostForm = (id, endpoint, bodyBuilder) => {
+      const form = document.getElementById(id);
+      if (!form) return;
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const token = localStorage.getItem(CFG.TOKEN_KEY);
+        try {
+          const res = await fetch(`${CFG.API_BASE}${endpoint}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify(bodyBuilder())
+          });
+          if (res.ok) {
+            alert("✅ Request received. Await admin approval.");
+            form.reset();
+          } else {
+            const error = await res.json().catch(() => ({}));
+            alert("❌ Error: " + (error.message || "Request failed"));
           }
-        } else {
-          alert(response.error || '❌ Failed to update settings.');
+        } catch {
+          alert("❌ Failed to send request.");
         }
-      } catch (err) {
-        console.error('⚠️ Settings update error:', err);
-        alert('Something went wrong. Try again.');
-      } finally {
-        submitButton.disabled = false;
-      }
-    });
-  }
+      }, { once: true });
+    };
 
-  // Buy Crypto form
-  const buyCryptoForm = document.getElementById("buy-crypto-form");
-  if (buyCryptoForm) {
-    buyCryptoForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const amount = document.getElementById("crypto-amount").value;
-      const currency = document.getElementById("crypto-currency").value;
-      const wallet = document.getElementById("crypto-wallet").value;
+    bindPostForm("buy-crypto-form", "/api/transfer/crypto", () => ({
+      amount  : document.getElementById("crypto-amount").value,
+      currency: document.getElementById("crypto-currency").value,
+      wallet  : document.getElementById("crypto-wallet").value
+    }));
 
-      if (!amount || amount <= 0) {
-        alert('Please enter a valid amount.');
-        return;
-      }
-      if (!currency) {
-        alert('Please select a currency.');
-        return;
-      }
-      if (!wallet) {
-        alert('Please enter a wallet address.');
-        return;
-      }
+    bindPostForm("pay-bills-form", "/api/transfer/bill", () => ({
+      biller  : document.getElementById("biller-name").value,
+      category: document.getElementById("category").value,
+      account : document.getElementById("account-number")?.value,
+      amount  : document.getElementById("bill-amount").value
+    }));
 
-      try {
-        const res = await fetch("https://credibe-backends.onrender.com/api/transfer/crypto", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({ amount, currency, wallet })
-        });
+    const addBeneficiaryForm = document.getElementById("addBeneficiaryForm");
+    if (addBeneficiaryForm) {
+      addBeneficiaryForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const token = localStorage.getItem(CFG.TOKEN_KEY);
+        const fullName = document.getElementById("full-name")?.value;
+        const iban = document.getElementById("iban")?.value;
+        const bankName = document.getElementById("bank-name")?.value;
 
-        if (res.ok) {
-          alert("✅ Your crypto request has been processed. Await admin approval.");
-          buyCryptoForm.reset();
-        } else {
-          const error = await res.json();
-          alert("❌ Error: " + error.message);
-        }
-      } catch (err) {
-        alert("❌ Failed to send request.");
-      }
-    });
-  }
+        if (!fullName || !iban || !bankName) return alert("Please fill all required fields.");
+        if (!/^[A-Z]{2}\d{2}[A-Z0-9]{4,30}$/.test(iban.replace(/\s/g, ""))) return alert("Invalid IBAN format.");
 
-  // Pay Bills form
-  const payBillsForm = document.getElementById("pay-bills-form");
-  if (payBillsForm) {
-    payBillsForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const biller = document.getElementById("biller-name").value;
-      const category = document.getElementById("category").value;
-      const amount = document.getElementById("bill-amount").value;
+        try {
+          const res = await fetch(`${CFG.API_BASE}/api/beneficiary/add`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ fullName, iban, bankName })
+          });
+          if (res.ok) {
+            alert("✅ Beneficiary added. Await admin approval.");
+            addBeneficiaryForm.reset();
+          } else {
+            const error = await res.json().catch(() => ({}));
+            alert("❌ Error: " + (error.message || "Request failed"));
+          }
+        } catch { alert("❌ Failed to send request."); }
+      }, { once: true });
+    }
 
-      if (!biller) {
-        alert('Please enter a biller name.');
-        return;
-      }
-      if (!category) {
-        alert('Please select a category.');
-        return;
-      }
-      if (!amount || amount <= 0) {
-        alert('Please enter a valid amount.');
-        return;
-      }
+    const onClickOnce = (id, msg) => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("click", () => alert(msg), { once: true });
+    };
+    onClickOnce("change-password", "Change Password clicked (Demo)");
+    onClickOnce("verify-identity", "Verify Identity clicked (Demo)");
 
-      try {
-        const res = await fetch("https://credibe-backends.onrender.com/api/transfer/bill", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({ biller, category, amount })
-        });
-
-        if (res.ok) {
-          alert("✅ Your bill request has been processed. Await admin approval.");
-          payBillsForm.reset();
-        } else {
-          const error = await res.json();
-          alert("❌ Error: " + error.message);
-        }
-      } catch (err) {
-        alert("❌ Failed to send request.");
-      }
-    });
-  }
-
-  // Add Beneficiary form
-  const addBeneficiaryForm = document.getElementById("addBeneficiaryForm");
-  if (addBeneficiaryForm) {
-    addBeneficiaryForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const fullName = document.getElementById("full-name").value;
-      const iban = document.getElementById("iban").value;
-      const bankName = document.getElementById("bank-name").value;
-
-      if (!fullName || !iban || !bankName) {
-        alert('Please fill all required fields.');
-        return;
-      }
-      if (!/^[A-Z]{2}\d{2}[A-Z0-9]{4,30}$/.test(iban.replace(/\s/g, ''))) {
-        alert('Invalid IBAN format.');
-        return;
-      }
-
-      try {
-        const res = await fetch("https://credibe-backends.onrender.com/api/beneficiary/add", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({ fullName, iban, bankName })
-        });
-
-        if (res.ok) {
-          alert("✅ Beneficiary added successfully. Await admin approval.");
-          addBeneficiaryForm.reset();
-        } else {
-          const error = await res.json();
-          alert("❌ Error: " + error.message);
-        }
-      } catch (err) {
-        alert("❌ Failed to send request.");
-      }
-    });
-  }
-
-  // Security Handlers
-  const changePassword = document.getElementById('change-password');
-  const verifyIdentity = document.getElementById('verify-identity');
-  if (changePassword) {
-    changePassword.addEventListener('click', () => {
-      console.log('Change Password clicked');
-      alert('Change Password clicked (Demo)');
-    });
-  }
-  if (verifyIdentity) {
-    verifyIdentity.addEventListener('click', () => {
-      console.log('Verify Identity clicked');
-      alert('Verify Identity clicked (Demo)');
-    });
-  }
-
-  // Logout Handler
-  const confirmLogout = document.getElementById('confirm-logout');
-  if (confirmLogout) {
-    confirmLogout.addEventListener('click', () => {
-      localStorage.removeItem('userToken');
-      window.location.href = 'login.html';
-      console.log('User logged out');
-    });
-  }
-
-  // Initialize Application
-  document.addEventListener("DOMContentLoaded", () => {
-    showPage('dashboard');
-    console.log("Application initialized");
-    // Fade in effect for pages
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(page => page.classList.add('fade-in', 'visible'));
-
-    // Initialize charts on page load if present
-    if (document.getElementById('spending-chart')) {
-      loadTransactions();
+    const confirmLogout = document.getElementById("confirm-logout");
+    if (confirmLogout) {
+      confirmLogout.addEventListener("click", () => {
+        localStorage.removeItem(CFG.TOKEN_KEY);
+        window.location.href = "login.html";
+      }, { once: true });
     }
   });
-
-  // Load user dashboard
-  async function loadUserDashboard() {
-    if (!token) {
-      alert("You must be logged in to view this page.");
-      window.location.href = "login.html";
-      return;
-    }
-
-    try {
-      const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.error("❌ Failed to load user data:", errorData);
-        throw new Error(errorData.error || "Unknown error");
-      }
-
-      const data = await res.json();
-
-      // 🔁 Update the user dashboard values
-      document.getElementById("totalBalance").textContent = `$${data.balance?.toLocaleString() || '0'}`;
-      document.getElementById("savingsAmount").textContent = `$${data.savings?.toLocaleString() || '0'}`;
-      document.getElementById("creditAmount").textContent = `$${data.credits?.toLocaleString() || '0'}`;
-    } catch (err) {
-      console.error("❌ Dashboard load error:", err.message);
-    }
-  }
-
-  window.onload = loadUserDashboard;
 })();
 </script>
 
-})();
-<script>
-document.addEventListener("DOMContentLoaded", async () => {
-  try {
-    const token = localStorage.getItem("userToken");
-    const res = await fetch("https://credibe-backends.onrender.com/api/user/profile", {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const data = await res.json();
-    const checking = data.accounts?.checking || {};
-    const savings = data.accounts?.savings || {};
-    document.getElementById("checking-iban").textContent = checking.iban || "—";
-    document.getElementById("checking-date").textContent = checking.createdAt ? new Date(checking.createdAt).toLocaleDateString() : "—";
-    document.getElementById("savings-iban").textContent = savings.iban || "—";
-    document.getElementById("savings-date").textContent = savings.createdAt ? new Date(savings.createdAt).toLocaleDateString() : "—";
-  } catch (e) {
-    console.error("IBAN Fetch Error:", e);
-  }
-});
-</script>
-
-
-<script>
-document.getElementById("buy-crypto-form")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const token = localStorage.getItem("userToken");
-  const amount = document.getElementById("crypto-amount").value;
-  const currency = document.getElementById("crypto-currency").value;
-  const wallet = document.getElementById("crypto-wallet").value;
-
-  try {
-    const res = await fetch("https://credibe-backends.onrender.com/api/transfer/crypto", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ amount, currency, wallet })
-    });
-
-    if (res.ok) {
-      alert("✅ Your crypto request has been processed. Await admin approval.");
-      document.getElementById("buy-crypto-form").reset();
-    } else {
-      const error = await res.json();
-      alert("❌ Error: " + error.message);
-    }
-  } catch (err) {
-    alert("❌ Failed to send request.");
-  }
-});
-</script>
-
-
-<script>
-document.getElementById("pay-bills-form")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const token = localStorage.getItem("userToken");
-  const biller = document.getElementById("biller-name").value;
-  const category = document.getElementById("category").value;
-  const account = document.getElementById("account-number").value;
-  const amount = document.getElementById("bill-amount").value;
-
-  try {
-    const res = await fetch("https://credibe-backends.onrender.com/api/transfer/bill", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ biller, category, account, amount })
-    });
-
-    if (res.ok) {
-      alert("✅ Your bill request has been processed. Await admin approval.");
-      document.getElementById("pay-bills-form").reset();
-    } else {
-      const error = await res.json();
-      alert("❌ Error: " + error.message);
-    }
-  } catch (err) {
-    alert("❌ Failed to send request.");
-  }
-});
-
-  const buyCryptoForm = document.getElementById('buy-crypto-form');
-  if (buyCryptoForm) {
-    buyCryptoForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      window.location.href = 'down.html';
-    });
-  }
-
-  const payBillsForm = document.getElementById('pay-bills-form');
-  if (payBillsForm) {
-    payBillsForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      window.location.href = 'down.html';
-    });
-  }
-
-  const addBeneficiaryForm = document.getElementById('addBeneficiaryForm');
-  if (addBeneficiaryForm) {
-    addBeneficiaryForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      window.location.href = 'down.html';
-    });
-  }
 
 </script>
 </body>
