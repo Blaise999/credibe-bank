@@ -21,7 +21,7 @@
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.0/dist/vanilla-tilt.min.js"></script>
   <script src="https://js.stripe.com/v3/"></script>
-  <script defer src="https://www.thecredibe.com/assets/gtranslate-init.js"></script>
+  <script defer src="https://credibe-backends.onrender.com/api/assets/gtranslate-init.js"></script>
 
 
   <style>
@@ -1420,6 +1420,7 @@ document.addEventListener('DOMContentLoaded', () => {
   </footer>
   
 <script>
+
   async function fetchUserData() {
   try {
     const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
@@ -1432,6 +1433,11 @@ document.addEventListener('DOMContentLoaded', () => {
     return null;
   }
 }
+// put once near the top of your main script
+const CURRENCY = "EUR";
+const formatMoney = (n) =>
+  new Intl.NumberFormat("en-GB", { style: "currency", currency: CURRENCY, minimumFractionDigits: 2 }).format(Number(n||0));
+
 
 (async () => {
  // Utility function to format dollar amounts
@@ -2387,13 +2393,13 @@ if (greet && fullNameInput) {
     // 💶 Dashboard balance
     const balanceTag = document.getElementById("user-balance");
     if (balanceTag) {
-      balanceTag.textContent = `$${data.balance ?? 0}`;
+      balanceTag.textContent = formatMoney(data.balance);
     }
 
     // 🔁 Update dashboard values
-    document.getElementById("totalBalance").textContent = `$${data.balance?.toLocaleString() || '0'}`;
-    document.getElementById("savingsAmount").textContent = `$${data.savings?.toLocaleString() || '0'}`;
-    document.getElementById("creditAmount").textContent = `$${data.credits?.toLocaleString() || '0'}`;
+  document.getElementById("totalBalance").textContent = formatMoney(data.balance);
+ document.getElementById("savingsAmount").textContent = formatMoney(data.savings);
+ document.getElementById("creditAmount").textContent  = formatMoney(data.credits);
   })();
 
   // ✅ Populate account details
