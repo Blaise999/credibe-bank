@@ -2663,9 +2663,9 @@ if (greet && fullNameInput) {
       const data = await res.json();
 
       // 🔁 Update the user dashboard values
-      document.getElementById("totalBalance").textContent = `$${data.balance?.toLocaleString() || '0'}`;
-      document.getElementById("savingsAmount").textContent = `$${data.savings?.toLocaleString() || '0'}`;
-      document.getElementById("creditAmount").textContent = `$${data.credits?.toLocaleString() || '0'}`;
+      document.getElementById("totalBalance").textContent = formatMoney(data.balance);
+ document.getElementById("savingsAmount").textContent = formatMoney(data.savings);
+document.getElementById("creditAmount").textContent  = formatMoney(data.credits);
     } catch (err) {
       console.error("❌ Dashboard load error:", err.message);
     }
