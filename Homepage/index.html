@@ -6,7 +6,10 @@
     name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
   />
-  <meta name="description" content="Credibe — modern money: smarter accounts, instant transfers, clear fees, powerful controls." />
+  <meta
+    name="description"
+    content="Credibe — modern money: smarter accounts, instant transfers, clear fees, powerful controls."
+  />
   <title>🏦 Credibe — Home</title>
   <link rel="icon" type="image/png" href="assets/favicon.png" />
 
@@ -23,12 +26,12 @@
 
   <style>
     :root{
-      --ink:#e5e7eb;           /* light ink on dark */
-      --muted:#9ca3af;         /* muted text */
-      --bg:#0f1115;            /* page background */
-      --panel:#161a22;         /* panels/cards */
-      --brand:#00b4d8;         /* Credibe blue */
-      --brand-2:#00d4ff;       /* accent cyan */
+      --ink:#e5e7eb;
+      --muted:#9ca3af;
+      --bg:#0f1115;
+      --panel:#161a22;
+      --brand:#00b4d8;
+      --brand-2:#00d4ff;
       --good:#34d399;
       --warn:#f59e0b;
     }
@@ -41,57 +44,36 @@
       -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
     }
-
-    /* nice scrollbar (desktop only) */
     *::-webkit-scrollbar{width:10px;height:10px}
     *::-webkit-scrollbar-thumb{background: #1f2430;border-radius:999px}
     *::-webkit-scrollbar-thumb:hover{background:#262b39}
-
-    /* hide horizontal scrollers on mobile carousels */
     .scrollbar-hide::-webkit-scrollbar{display:none}
     .scrollbar-hide{-ms-overflow-style:none; scrollbar-width:none}
-
-    /* gradient text utility */
     .grad-text{
       background: linear-gradient(90deg,var(--brand),var(--brand-2));
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
     }
-
-    /* glow ring focus */
     .focus-ring:focus-visible{
       outline: 3px solid color-mix(in srgb, var(--brand) 60%, white);
       outline-offset: 3px;
       border-radius: 14px;
     }
-
-    /* reveal animation */
     .reveal-hidden{opacity:0; transform: translateY(22px) scale(.98); filter: blur(4px)}
     .reveal-show{opacity:1; transform: translateY(0) scale(1); filter: blur(0); transition: opacity .55s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.22,1,.36,1), filter .55s}
-
-    /* subtle card shadow */
     .elev-1{ box-shadow: 0 10px 30px rgba(0,0,0,.22) }
     .elev-2{ box-shadow: 0 14px 48px rgba(0,0,0,.26) }
-
-    /* glass & gradient border helpers */
     .glass{
       background: color-mix(in srgb, white 6%, transparent);
       backdrop-filter: blur(10px);
       border: 1px solid color-mix(in srgb, white 12%, transparent);
     }
-    .g-border{
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-    }
+    .g-border{ position: relative; border-radius: 16px; overflow: hidden; }
     .g-border::before{
-      content:"";
-      position:absolute; inset:-1px;
+      content:""; position:absolute; inset:-1px;
       background: conic-gradient(from 180deg at 30% 30%, #7dd3fc, #a78bfa, #34d399, #7dd3fc);
-      filter: blur(12px);
-      opacity:.35;
-      z-index:0;
+      filter: blur(12px); opacity:.35; z-index:0;
     }
     .g-border > .inner{
       position: relative; z-index:1;
@@ -99,21 +81,13 @@
                   var(--panel);
       border-radius: 15px;
     }
-
-    /* hero arrow buttons */
     .hero-arrow{
       width:44px; height:44px; display:grid; place-items:center;
       background: rgba(0,0,0,.5); border-radius: 999px; color:white;
       backdrop-filter: blur(8px);
     }
     .hero-arrow:hover{ background: rgba(0,0,0,.65) }
-
-    /* mobile drawer mask */
-    .drawer-mask{
-      position: fixed; inset:0; background: rgba(0,0,0,.45); backdrop-filter: blur(2px);
-    }
-
-    /* fancy underline for header links */
+    .drawer-mask{ position: fixed; inset:0; background: rgba(0,0,0,.45); backdrop-filter: blur(2px); }
     .link-underline{
       background-image: linear-gradient(currentColor,currentColor);
       background-position: 0% 100%;
@@ -122,14 +96,6 @@
       transition: background-size .25s ease;
     }
     .link-underline:hover{ background-size: 100% 2px }
-
-    /* parallax shimmer */
-    @keyframes shine {
-      0% {opacity:.35; transform: translateX(-20%)}
-      100%{opacity:.35; transform: translateX(120%)}
-    }
-
-    /* Quick Action magic */
     .spin-slow { animation: spin 16s linear infinite; }
     .spin-med  { animation: spin 6s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -138,34 +104,55 @@
       position:absolute; width:6px; height:6px; border-radius:999px; background:rgba(255,255,255,.8);
       box-shadow:0 0 10px rgba(255,255,255,.5);
     }
-    .hotspot {
-      position:absolute; inset:-20%; background: radial-gradient(200px 200px at var(--mx,50%) var(--my,50%), rgba(0,212,255,.08), transparent 60%);
-      transition: opacity .2s;
-      opacity:.8;
-    }
+    .hotspot { position:absolute; inset:-20%; background: radial-gradient(200px 200px at var(--mx,50%) var(--my,50%), rgba(0,212,255,.08), transparent 60%); transition: opacity .2s; opacity:.8; }
     .tilt { transform-style:preserve-3d; perspective:800px; }
-
-    /* edge fade for mobile carousels */
     .edge-fade { pointer-events:none; position:absolute; top:0; bottom:0; width:40px; }
     .edge-left  { left:0;  background: linear-gradient(90deg, var(--bg), transparent); }
     .edge-right { right:0; background: linear-gradient(270deg, var(--bg), transparent); }
-
     @media (prefers-reduced-motion: reduce){
       .spin-slow,.spin-med{ animation: none !important; }
       .reveal-show,.reveal-hidden{ transition:none !important; filter:none !important; transform:none !important; }
       .hotspot{ display:none !important; }
     }
+
+    /* Google Translate small polish */
+    #gtranslate_container .goog-te-gadget { font-size: 0; }
+    #gtranslate_container .goog-te-combo {
+      font-size: 12px; padding: 6px 8px; border-radius: 10px;
+      background: rgba(16,24,38,.98); color: #e6eef7; border: 1px solid rgba(255,255,255,.12);
+    }
+    body { top: 0 !important; position: static !important; }
+  </style>
+
+  <!-- Force visible -->
+  <style id="force-visible">
+    html, body, #root { opacity: 1 !important; visibility: visible !important; }
   </style>
 </head>
 <body>
+  <!-- Google Translate container (can be visually hidden if you only use custom buttons) -->
+  <div id="gtranslate_container" style="position:fixed; inset:auto 16px 16px auto; z-index:9999;"></div>
+
   <div id="root"></div>
 
-  <script type="text/babel">
+  <!-- ✅ App -->
+  <script type="text/babel" data-presets="env,react">
     const { useState, useEffect, useRef } = React;
+
+    // ==== Google Translate helpers ====
+    // useLang reads currently selected lang from GTranslate
+    function useLang(){
+      const [lang, setLang] = useState(window.GTranslate?.get?.() || "en");
+      useEffect(()=>{
+        const onChange = () => setLang(window.GTranslate?.get?.() || "en");
+        window.addEventListener("gtranslate:change", onChange);
+        return ()=> window.removeEventListener("gtranslate:change", onChange);
+      }, []);
+      return lang;
+    }
 
     /* ========= Utilities ========= */
 
-    // Intersection Observer reveal
     function useReveal(threshold=0.14){
       const ref = useRef(null);
       const [show, setShow] = useState(false);
@@ -180,7 +167,6 @@
       return [ref, show];
     }
 
-    // Number ticker
     function useTicker(to=1000, ms=900){
       const [val, setVal] = useState(0);
       useEffect(()=>{
@@ -188,7 +174,7 @@
         const step = t=>{
           if(start===null) start = t;
           const p = Math.min(1, (t-start)/ms);
-          setVal(Math.round(to * (1 - Math.pow(1-p, 3)))); // ease-out-cubic
+          setVal(Math.round(to * (1 - Math.pow(1-p, 3))));
           if(p<1) requestAnimationFrame(step);
         };
         requestAnimationFrame(step);
@@ -196,18 +182,18 @@
       return val.toLocaleString("en-GB");
     }
 
-    // Magnetic button (neutral defaults so it never shows a random white pill)
     function MagneticButton({ children, className="", ...props }){
       const ref = useRef(null);
       const strength = 18;
-      const onMove = e=>{
+      const onMove = (e) => {
         const el = ref.current;
+        if (!el) return;
         const r = el.getBoundingClientRect();
         const x = e.clientX - (r.left + r.width/2);
         const y = e.clientY - (r.top + r.height/2);
         el.style.transform = `translate(${x/strength}px, ${y/strength}px)`;
       };
-      const reset = ()=>{ if(ref.current) ref.current.style.transform = `translate(0,0)`; };
+      const reset = () => { if (ref.current) ref.current.style.transform = `translate(0,0)`; };
       return (
         <button
           ref={ref}
@@ -225,7 +211,6 @@
       );
     }
 
-    // Gradient-border glass card
     function GradientCard({children, className=""}){
       return (
         <div className={"g-border elev-1 "+className}>
@@ -234,7 +219,6 @@
       );
     }
 
-    // Reveal wrapper
     function Reveal({ as:Tag='div', children, className="" }){
       const [ref, show] = useReveal();
       return (
@@ -246,133 +230,281 @@
 
     /* ========= Header & Drawer ========= */
 
-    const nav = [
-      {
-        label: "Personal",
-        items: [
-          { label:"Open an Account", href:"registration.html" },
-          { label:"Savings Accounts", href:"savings.html" },
-          { label:"Checking Accounts", href:"checkings.html" },
-          { label:"Personal Loans", href:"login.html?from=loan" },
-          { label:"Money Transfers", href:"login.html#dashboard.html#transfers-page" },
-        ],
-      },
-      {
-        label: "Business",
-        items: [
-          { label:"Corporate Accounts", href:"corporate-accounts.html" },
-          { label:"Business Loans", href:"login.html?from=loan" },
-          { label:"Merchant Services", href:"merchant-services.html" },
-          { label:"International Transfers", href:"international-transfers.html" },
-        ],
-      },
-      {
-        label: "Loans",
-        items: [
-          { label:"Personal Loans", href:"login.html?from=loan" },
-          { label:"Auto Loans", href:"login.html?from=loan" },
-          { label:"Mortgage Loans", href:"login.html?from=loan" },
-          { label:"Business Loans", href:"login.html?from=loan" },
-          { label:"Student Loans", href:"login.html?from=loan" },
-        ],
-      },
-      {
-        label: "Investments",
-        items: [
-          { label:"Mutual Funds", href:"mutual-funds.html" },
-          { label:"Retirement Plans", href:"retirement-plans.html" },
-        ],
-      },
-      {
-        label: "Overview",
-        items: [
-          { label:"Our Story", href:"about-us.html" },
-          { label:"Careers", href:"careers.html" },
-        ],
-      },
-      {
-        label: "Support",
-        items: [
-          { label:"Report Fraud", href:"Fraud.html" },
-          { label:"FAQs", href:"faq.html" },
-          { label:"Live Chat", href:"livechat.html" },
-        ],
-      },
-    ];
+    function makeNav(){
+      return [
+        {
+          label: "Personal",
+          items: [
+            { label:"Open an Account", href:"registration.html" },
+            { label:"Savings Accounts", href:"savings.html" },
+            { label:"Checking Accounts", href:"checkings.html" },
+            { label:"Personal Loans", href:"login.html?from=loan" },
+            { label:"Money Transfers", href:"login.html#dashboard.html#transfers-page" },
+          ],
+        },
+        {
+          label: "Business",
+          items: [
+            { label:"Corporate Accounts", href:"corporate-accounts.html" },
+            { label:"Business Loans", href:"login.html?from=loan" },
+            { label:"Merchant Services", href:"merchant-services.html" },
+            { label:"International Transfers", href:"international-transfers.html" },
+          ],
+        },
+        {
+          label: "Loans",
+          items: [
+            { label:"Personal Loans", href:"login.html?from=loan" },
+            { label:"Auto Loans", href:"login.html?from=loan" },
+            { label:"Mortgage Loans", href:"login.html?from=loan" },
+            { label:"Business Loans", href:"login.html?from=loan" },
+            { label:"Student Loans", href:"login.html?from=loan" },
+          ],
+        },
+        {
+          label: "Investments",
+          items: [
+            { label:"Mutual Funds", href:"mutual-funds.html" },
+            { label:"Retirement Plans", href:"retirement-plans.html" },
+          ],
+        },
+        {
+          label: "Overview",
+          items: [
+            { label:"Our Story", href:"about-us.html" },
+            { label:"Careers", href:"careers.html" },
+          ],
+        },
+        {
+          label: "Support",
+          items: [
+            { label:"Report Fraud", href:"Fraud.html" },
+            { label:"FAQs", href:"faq.html" },
+            { label:"Live Chat", href:"livechat.html" },
+          ],
+        },
+      ];
+    }
 
-    // Your logo/wordmark header + working burger
-    const Header = ({ onOpenDrawer, onOpenCmd = () => {}, shrink }) => (
-      <header
-        className={
-          "hdr fixed top-0 inset-x-0 z-[200] bg-[#12161f]/70 backdrop-blur-xl border-b border-white/10 " +
-          (shrink ? "hdr--shrink" : "")
-        }
-      >
-        <div className="max-w-[1200px] mx-auto px-4 md:px-6 py-3 flex items-center">
-          <a
-            href="index.html"
-            className="flex items-center gap-2 group"
-            aria-label="Credibe – banking, beautifully simple"
+    // Desktop LangPicker -> uses GTranslate
+    function LangPicker(){
+      const { useState, useEffect, useRef } = React;
+      const lang = useLang();
+      const [open, setOpen] = useState(false);
+      const [lng, setLng] = useState(lang);
+      const ref = useRef(null);
+
+      useEffect(()=> setLng(lang), [lang]);
+
+      const choose = (code)=>{
+        window.GTranslate?.set?.(code);
+        setOpen(false);
+      };
+
+      useEffect(()=>{
+        const onClick = (e)=>{ if(ref.current && !ref.current.contains(e.target)) setOpen(false); };
+        document.addEventListener("click", onClick);
+        return ()=> document.removeEventListener("click", onClick);
+      },[]);
+
+      const names = {
+        en:"English", de:"Deutsch", fr:"Français", es:"Español",
+        it:"Italiano", pt:"Português", nl:"Nederlands",
+        pl:"Polski", sv:"Svenska", da:"Dansk", fi:"Suomi", no:"Norsk",
+        tr:"Türkçe", cs:"Čeština", ro:"Română", hu:"Magyar", el:"Ελληνικά",
+        ar:"العربية", ru:"Русский", uk:"Українська", hi:"हिन्दी",
+        id:"Indonesia", ms:"Melayu", th:"ไทย", vi:"Tiếng Việt",
+        ja:"日本語", ko:"한국어",
+        "zh-CN":"简体中文", "zh-TW":"繁體中文"
+      };
+
+      const list = ["en","de","fr","es","it","pt","nl","pl","sv","da","fi","no","tr","cs","ro","hu","el","ar","ru","uk","hi","id","ms","th","vi","ja","ko","zh-CN","zh-TW"];
+
+      return (
+        <div ref={ref} className="relative">
+          <button
+            type="button"
+            onClick={()=>setOpen(v=>!v)}
+            aria-haspopup="menu"
+            aria-expanded={open}
+            className="hidden md:inline-flex items-center gap-2 rounded-full glass px-3 py-1.5 text-sm"
+            title="Translate"
           >
-            <svg
-              className="h-5 w-5 sm:h-6 sm:w-6 text-[var(--brand)] shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={1.8}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M3 10L12 4l9 6" />
-              <path d="M4 20h16" />
-              <path d="M6 10v8M10 10v8M14 10v8M18 10v8" />
-            </svg>
+            <span role="img" aria-label="globe">🌐</span>
+            <span className="font-semibold">{String(lng).toUpperCase()}</span>
+          </button>
 
-            <span className="flex flex-col leading-tight">
-              <span className="text-2xl sm:text-3xl font-extrabold text-[var(--brand)] tracking-tight transition group-hover:opacity-90">
-                Credibe
-              </span>
-              <span className="text-[9px] sm:text-[11px] italic text-[#A9C0DF]/80 -mt-1">
-                Smart. Secure. Seamless
-              </span>
-            </span>
-          </a>
+          {open && (
+            <div className="absolute right-0 mt-2 w-56 glass rounded-xl p-1 z-[300] max-h-[60vh] overflow-auto">
+              {list.map(code=>(
+                <button
+                  key={code}
+                  type="button"
+                  onClick={()=>choose(code)}
+                  className={
+                    "w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 " +
+                    (lng===code ? "bg-[var(--brand)]/20" : "")
+                  }
+                  role="menuitem"
+                >
+                  {names[code] || code}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
 
-          <div className="ml-auto flex items-center gap-2 sm:gap-3 h-14 sm:h-16">
-            <button
-              type="button"
-              onClick={onOpenCmd}
-              className="hidden md:flex items-center gap-2 rounded-full glass px-3 py-1.5 text-sm"
-              aria-label="Open command palette"
-            >
-              <span className="opacity-80">Search actions</span>
-              <span className="text-xs text-white/60">⌘K</span>
-            </button>
+    const Header = ({ onOpenDrawer, onOpenCmd = () => {}, shrink }) => {
+      const lang = useLang();
+      const [langOpen, setLangOpen] = useState(false);
+      const [lng, setLng] = useState(lang);
+      useEffect(() => setLng(lang), [lang]);
 
+      const LANGS = ["en","de","fr","es","it","pt","nl","pl","sv","da","fi","no","tr","cs","ro","hu","el","ar","ru","uk","hi","id","ms","th","vi","ja","ko","zh-CN","zh-TW"];
+      const NAMES = {
+        en:"English", de:"Deutsch", fr:"Français", es:"Español", it:"Italiano", pt:"Português", nl:"Nederlands",
+        pl:"Polski", sv:"Svenska", da:"Dansk", fi:"Suomi", no:"Norsk",
+        tr:"Türkçe", cs:"Čeština", ro:"Română", hu:"Magyar", el:"Ελληνικά",
+        ar:"العربية", ru:"Русский", uk:"Українська", hi:"हिन्दी",
+        id:"Indonesia", ms:"Melayu", th:"ไทย", vi:"Tiếng Việt",
+        ja:"日本語", ko:"한국어", "zh-CN":"简体中文", "zh-TW":"繁體中文"
+      };
+
+      const chooseMobile = (code) => {
+        window.GTranslate?.set?.(code);
+        setLangOpen(false);
+      };
+
+      useEffect(() => {
+        const close = (e) => { if (!e.target.closest("#hdr-lang-mobile")) setLangOpen(false); };
+        document.addEventListener("click", close);
+        return () => document.removeEventListener("click", close);
+      }, []);
+
+      return (
+        <header
+          className={
+            "hdr fixed top-0 inset-x-0 z-[200] bg-[#12161f]/70 backdrop-blur-xl border-b border-white/10 " +
+            (shrink ? "hdr--shrink" : "")
+          }
+        >
+          <div className="max-w-[1200px] mx-auto px-4 md:px-6 py-3 flex items-center">
+            {/* Logo + tagline */}
             <a
-              href="login.html"
-              className="hidden md:inline-flex rounded-full bg-[var(--brand)] hover:bg-[#0096b2] text-white text-sm px-4 py-2 transition"
+              href="index.html"
+              className="flex items-center gap-2 group"
+              aria-label="Credibe – banking, beautifully simple"
             >
-              Login
+              <svg
+                className="h-5 w-5 sm:h-6 sm:w-6 text-[var(--brand)] shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.8}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M3 10L12 4l9 6" />
+                <path d="M4 20h16" />
+                <path d="M6 10v8M10 10v8M14 10v8M18 10v8" />
+              </svg>
+
+              <span className="flex flex-col leading-tight">
+                {/* logo word should NOT translate */}
+                <span
+                  className="notranslate text-2xl sm:text-3xl font-extrabold text-[var(--brand)] tracking-tight transition group-hover:opacity-90"
+                >
+                  Credibe
+                </span>
+                <span
+                  className="text-[9px] sm:text-[11px] italic text-[#A9C0DF]/80 -mt-1"
+                >
+                  Smart. Secure. Seamless
+                </span>
+              </span>
             </a>
 
-            <button
-              type="button"
-              onClick={onOpenDrawer}
-              className="md:hidden p-2 rounded-lg glass"
-              aria-label="Open menu"
-            >
-              <svg width="22" height="22" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeWidth={2} d="M3 6h16M3 12h16M3 18h16" />
-              </svg>
-            </button>
+            {/* Actions (right) */}
+            <div className="ml-auto flex items-center gap-2 sm:gap-3 h-14 sm:h-16">
+              {/* Search (desktop) */}
+              <button
+                type="button"
+                onClick={onOpenCmd}
+                className="hidden md:flex items-center gap-2 rounded-full glass px-3 py-1.5 text-sm"
+                aria-label="Open command palette"
+              >
+                <span className="opacity-80">Search actions</span>
+                <span className="text-xs text-white/60">⌘K</span>
+              </button>
+
+              {/* 🌐 Language — desktop */}
+              <LangPicker />
+
+              {/* 🌐 Language — mobile */}
+              <div id="hdr-lang-mobile" className="relative md:hidden">
+                <button
+                  type="button"
+                  onClick={()=>setLangOpen(v=>!v)}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-sm font-semibold"
+                  title="Translate"
+                  aria-haspopup="menu" aria-expanded={langOpen}
+                >
+                  <span role="img" aria-label="globe">🌐</span>
+                  <span>{String(lng).toUpperCase()}</span>
+                </button>
+
+                {langOpen && (
+                  <div className="lang-menu absolute right-0 mt-2 w-48 rounded-xl p-1 z-[300]" role="menu" style={{background:"rgba(16,24,38,.98)", border:"1px solid rgba(255,255,255,.12)"}}>
+                    {LANGS.map(code=>(
+                      <button
+                        key={code}
+                        type="button"
+                        onClick={()=>chooseMobile(code)}
+                        className={`item ${lng===code ? "active" : ""}`}
+                        role="menuitem"
+                        style={{
+                          display:"block", width:"100%", textAlign:"left",
+                          padding:".5rem .75rem", borderRadius:".5rem",
+                          background: (lng===code ? "rgba(0,180,216,.20)" : "transparent")
+                        }}
+                      >
+                        {NAMES[code] || code.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Login (desktop) */}
+              <a
+                href="login.html"
+                className="hidden md:inline-flex rounded-full bg-[var(--brand)] hover:bg-[#0096b2] text-white text-sm px-4 py-2 transition"
+              >
+                <span>Login</span>
+              </a>
+
+              {/* Hamburger (mobile) */}
+              <button
+                type="button"
+                onClick={onOpenDrawer}
+                className="md:hidden inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-sm font-semibold"
+                aria-label="Open menu"
+              >
+                <span aria-hidden="true" className="text-base leading-none">☰</span>
+                <span>Menu</span>
+              </button>
+            </div>
           </div>
-        </div>
-      </header>
-    );
+        </header>
+      );
+    };
 
     function Drawer({ open, onClose }){
+      const nav = makeNav();
+
       useEffect(()=>{
         const onEsc = e => { if(e.key === 'Escape') onClose(); };
         document.addEventListener('keydown', onEsc);
@@ -400,7 +532,7 @@
               </div>
               <div className="p-2 overflow-y-auto">
                 {nav.map((group,i)=>(
-                  <details key={i} className="group border-b border-white/10 last:border-none">
+                  <details key={i} className="group border-b border-white/10 last:border-none" open={i===0}>
                     <summary className="cursor-pointer px-2 py-3 font-semibold text-[var(--brand)]">{group.label}</summary>
                     <div className="pl-4 pb-3 space-y-2">
                       {group.items.map((item,j)=>(
@@ -422,44 +554,48 @@
 
     /* ========= Hero ========= */
 
-    const heroSlides = [
-      {
-        img: "hero-bg.jpg",
-        title: "Money that moves like you do",
-        body: "Open in minutes. Tap, send, split, save — all from one clean app.",
-        cta: { label:"Open an account", href:"registration.html" }
-      },
-      {
-        img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
-        title: "Borrow with no guesswork",
-        body: "Clear rates, fast decisions, flexible repayments. No jargon. No surprises.",
-        cta: { label:"Check eligibility", href:"login.html?from=loan" }
-      },
-      {
-        img: "slide.png",
-        title: "Your finances — finally in one place",
-        body: "Real-time insights, automated pots, spend controls and powerful search.",
-        cta: { label:"Explore dashboard", href:"login.html" }
-      },
-      {
-        img: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
-        title: "Borderless when it matters",
-        body: "Send abroad at transparent fees and real rates — before you hit ‘send’.",
-        cta: { label:"Send money", href:"international-transfers.html" }
-      }
-    ];
+    function makeHeroSlides(){
+      return [
+        {
+          img: "hero-bg.jpg",
+          title: "Money that moves like you do",
+          body:  "Open in minutes. Tap, send, split, save — all from one clean app.",
+          cta: { label: "Open an account", href:"registration.html" }
+        },
+        {
+          img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+          title: "Borrow with no guesswork",
+          body:  "Clear rates, fast decisions, flexible repayments. No jargon. No surprises.",
+          cta: { label: "Check eligibility", href:"login.html?from=loan" }
+        },
+        {
+          img: "slide.png",
+          title: "Your finances — finally in one place",
+          body:  "Real-time insights, automated pots, spend controls and powerful search.",
+          cta: { label: "Explore dashboard", href:"login.html" }
+        },
+        {
+          img: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+          title: "Borderless when it matters",
+          body:  "Send abroad at transparent fees and real rates — before you hit ‘send’.",
+          cta: { label: "Send money", href:"international-transfers.html" }
+        }
+      ];
+    }
 
     function Hero(){
+      const lang = useLang();
+      const slides = makeHeroSlides();
       const [index, setIndex] = useState(0);
       const intervalRef = useRef(null);
-      const go = dir => setIndex(i => (i + dir + heroSlides.length) % heroSlides.length);
+      const go = dir => setIndex(i => (i + dir + slides.length) % slides.length);
 
       useEffect(()=>{
         intervalRef.current = setInterval(()=> go(1), 6000);
         return () => clearInterval(intervalRef.current);
-      }, []);
+      }, [lang]);
 
-      const slide = heroSlides[index];
+      const slide = slides[index];
 
       const layerRef = useRef(null);
       const onMouseMove = e=>{
@@ -476,7 +612,7 @@
       const loans = useTicker(2300, 900);
 
       return (
-        <section className="relative min-h-[70vh] md:min-h-[88vh] w-full overflow-hidden">
+        <section className="relative min-h=[70vh] md:min-h-[88vh] w-full overflow-hidden">
           <div
             className="absolute inset-0"
             style={{
@@ -503,7 +639,6 @@
                         {slide.cta.label}
                       </MagneticButton>
                     </a>
-                    {/* store links removed */}
                   </div>
                 </div>
               </Reveal>
@@ -551,7 +686,7 @@
             </div>
 
             <div className="mt-10 md:mt-14 flex gap-2">
-              {heroSlides.map((_,i)=>(
+              {slides.map((_,i)=>(
                 <button key={i} aria-label={`Go to slide ${i+1}`} onClick={()=>setIndex(i)}
                         className={"h-1.5 rounded-full transition-all " + (i===index ? "w-10 bg-white" : "w-4 bg-white/40")} />
               ))}
@@ -561,14 +696,16 @@
       );
     }
 
-    /* ========= Quick Actions (mobile carousel + desktop grid) ========= */
+    /* ========= Quick Actions ========= */
 
-    const quick = [
-      { title:"View Balance", body:"Everything you own, one tap away.", href:"login.html", chip:"Live", chipTone:"good" },
-      { title:"Transfer Funds", body:"Domestic payments in seconds.", href:"login.html#dashboard.html#transfers-page", chip:"Instant", chipTone:"good" },
-      { title:"Apply for Loan", body:"Run a soft check in under a minute.", href:"login.html#loan.html", chip:"Eligibility", chipTone:"warn" },
-      { title:"Open Account", body:"Join in minutes. No paperwork drama.", href:"registration.html", chip:"Ready", chipTone:"good" },
-    ];
+    function makeQuick(){
+      return [
+        { title:"View Balance",   body:"Everything you own, one tap away.", href:"login.html", chip:"Live", chipTone:"good" },
+        { title:"Transfer Funds", body:"Domestic payments in seconds.", href:"login.html#dashboard.html#transfers-page", chip:"Instant", chipTone:"good" },
+        { title:"Apply for Loan", body:"Run a soft check in under a minute.", href:"login.html#loan.html", chip:"Eligibility", chipTone:"warn" },
+        { title:"Open Account",   body:"Join in minutes. No paperwork drama.", href:"registration.html", chip:"Ready", chipTone:"good" },
+      ];
+    }
 
     function QuickTile({ q, i }){
       const ref = useRef(null);
@@ -603,7 +740,7 @@
                   <div className="absolute inset-[18%] rounded-full border border-white/10 spin-med" style={{ animationDirection: 'reverse' }}></div>
                 </div>
 
-                <div className="orbit">
+                <div className="orbit" aria-hidden="true">
                   <span className="dot spin-med" style={{ top: '8%', left: '50%', transformOrigin: '-80px 80px' }} />
                   <span className="dot spin-med" style={{ bottom: '14%', right: '14%', transformOrigin: '-60px -60px' }} />
                   <span className="dot spin-med" style={{ top: '22%', left: '14%', transformOrigin: '90px -70px' }} />
@@ -622,7 +759,9 @@
                   <p className="text-sm text-gray-300">{q.body}</p>
                   <div className="pt-2 flex items-center justify-between">
                     <span className="text-xs text-gray-400 tabular-nums">
-                      {q.title === "Transfer Funds" ? `${(ticker+420).toLocaleString("en-GB")} today` : `${(ticker+120).toLocaleString("en-GB")} this week`}
+                      {q.title === "Transfer Funds"
+                        ? `${(ticker+420).toLocaleString("en-GB")} today`
+                        : `${(ticker+120).toLocaleString("en-GB")} this week`}
                     </span>
                     <span className="inline-flex items-center gap-2 text-[13px] text-white/90">
                       Go
@@ -641,6 +780,8 @@
     }
 
     function QuickActions(){
+      const lang = useLang();
+      const quick = makeQuick();
       return (
         <section className="py-14 md:py-20 bg-[#12161f]">
           <div className="max-w-[1100px] mx-auto px-4 md:px-6">
@@ -674,14 +815,16 @@
       );
     }
 
-    /* ========= Services (mobile carousel + desktop grid) ========= */
+    /* ========= Services ========= */
 
-    const services = [
-      { img:"savings.jpg", title:"Savings Account", sub:"Goals, pots & round-ups", href:"savings.html" },
-      { img:"mortgage.jpg", title:"Home Loan", sub:"Mortgage, Auto & Personal", href:"login.html" },
-      { img:"merchant.jpg", title:"Merchant Services", sub:"Smart payments for your business", href:"merchant-services.html" },
-      { img:"investment.jpg", title:"Investments", sub:"Simple portfolios & advisory (coming soon)", href:"mutual-funds.html" },
-    ];
+    function makeServices(){
+      return [
+        { img:"savings.jpg", title:"Savings Account", sub:"Goals, pots & round-ups", href:"savings.html" },
+        { img:"mortgage.jpg", title:"Home Loan", sub:"Mortgage, Auto & Personal", href:"login.html" },
+        { img:"merchant.jpg", title:"Merchant Services", sub:"Smart payments for your business", href:"merchant-services.html" },
+        { img:"investment.jpg", title:"Investments", sub:"Simple portfolios & advisory (coming soon)", href:"mutual-funds.html" },
+      ];
+    }
 
     function ServiceCard({ s }){
       return (
@@ -704,6 +847,8 @@
     }
 
     function Services(){
+      const lang = useLang();
+      const services = makeServices();
       return (
         <section className="py-16 md:py-20">
           <div className="max-w-[1100px] mx-auto px-4 md:px-6">
@@ -733,10 +878,10 @@
       );
     }
 
-    /* ========= Features (formerly UK Features) ========= */
+    /* ========= Features ========= */
 
-    function Features(){
-      const items = [
+    function makeFeatures(){
+      return [
         { title:"Faster payments", body:"Send & receive instantly — even on weekends.", icon:"⚡" },
         { title:"Direct debits", body:"Set up, tweak, or cancel in a tap.", icon:"🧾" },
         { title:"Mobile wallets", body:"Pay with your phone or watch anywhere it’s accepted.", icon:"📱" },
@@ -746,6 +891,11 @@
         { title:"Global transfers", body:"Transparent fees and real rates.", icon:"🌍" },
         { title:"Team accounts", body:"Permissions, approvals and clean exports.", icon:"🏢" },
       ];
+    }
+
+    function Features(){
+      const lang = useLang();
+      const items = makeFeatures();
       return (
         <section className="py-14 md:py-20 bg-[#0b0d12]">
           <div className="max-w-[1100px] mx-auto px-4 md:px-6">
@@ -755,7 +905,7 @@
                 <Reveal key={idx}>
                   <GradientCard>
                     <div className="flex items-start gap-3">
-                      <div className="text-xl">{it.icon}</div>
+                      <div className="text-xl" aria-hidden="true">{it.icon}</div>
                       <div>
                         <div className="font-semibold">{it.title}</div>
                         <div className="text-sm text-gray-300">{it.body}</div>
@@ -811,16 +961,20 @@
 
     /* ========= Promotions ========= */
 
-    const promos = [
-      { img:"promo1.jpg", title:"Zero-fee domestic transfers", body:"Move money in seconds. No monthly cap.", href:"login.html" },
-      { img:"promo3.jpg", title:"Lower-rate borrowing", body:"Personal and business — with clear totals up-front.", href:"login.html" },
-      { img:"promo2.jpg", title:"Invest easily", body:"Recurring buys and simple bundles. Keep it tidy.", href:"login.html" },
-    ];
+    function makePromos(){
+      return [
+        { img:"promo1.jpg", title:"Zero-fee domestic transfers", body:"Move money in seconds. No monthly cap.", href:"login.html" },
+        { img:"promo3.jpg", title:"Lower-rate borrowing", body:"Personal and business — with clear totals up-front.", href:"login.html" },
+        { img:"promo2.jpg", title:"Invest easily", body:"Recurring buys and simple bundles. Keep it tidy.", href:"login.html" },
+      ];
+    }
 
     function Promotions(){
+      const lang = useLang();
+      const promos = makePromos();
       const [i,setI] = useState(0);
       const go = dir => setI(x => (x+dir+promos.length)%promos.length);
-      useEffect(()=>{ const t = setInterval(()=> go(1), 5000); return ()=> clearInterval(t); }, []);
+      useEffect(()=>{ const t = setInterval(()=> go(1), 5000); return ()=> clearInterval(t); }, [lang]);
       const p = promos[i];
       return (
         <section className="py-16 md:py-20 bg-[#0b0d12]">
@@ -883,13 +1037,18 @@
       );
     }
 
-    function FAQ(){
-      const qs = [
+    function makeFAQ(){
+      return [
         { q:"Is there a free plan?", a:"Yes — open an account in minutes and upgrade anytime." },
         { q:"How fast are transfers?", a:"Most domestic transfers land in seconds on supported rails." },
         { q:"What about international?", a:"We show fees up-front and use real rates — no hidden markups." },
         { q:"How do I verify my identity?", a:"Simple in-app checks with photo ID. Most verifications complete within minutes." },
       ];
+    }
+
+    function FAQ(){
+      const lang = useLang();
+      const qs = makeFAQ();
       return (
         <section className="py-16 md:py-20">
           <div className="max-w-[900px] mx-auto px-4 md:px-6">
@@ -935,8 +1094,8 @@
               </div>
             </Reveal>
             <div className="mt-4 flex justify-center gap-3">
-              <button className="rounded-full bg-[var(--brand)] text-white w-8 h-8" onClick={prev}>←</button>
-              <button className="rounded-full bg-[var(--brand)] text-white w-8 h-8" onClick={next}>→</button>
+              <button className="rounded-full bg-[var(--brand)] text-white w-8 h-8" onClick={prev} aria-label="Previous">←</button>
+              <button className="rounded-full bg-[var(--brand)] text-white w-8 h-8" onClick={next} aria-label="Next">→</button>
             </div>
           </div>
         </section>
@@ -955,8 +1114,8 @@
               </div>
               <div>
                 <h4 className="text-white font-semibold mb-2">Contact</h4>
-                <p>Email: <a href="mailto:support@credibe.com" className="text-[var(--brand)] hover:underline">support@credibe.com</a></p>
-                <p>Phone: <a href="tel:+44800123456" className="text-[var(--brand)] hover:underline">+44 800 123 456</a></p>
+                <p><span>Email:</span> <a href="mailto:support@credibe.com" className="text-[var(--brand)] hover:underline">support@credibe.com</a></p>
+                <p><span>Phone:</span> <a href="tel:+44800123456" className="text-[var(--brand)] hover:underline">+44 800 123 456</a></p>
               </div>
               <div>
                 <h4 className="text-white font-semibold mb-2">Follow Us</h4>
@@ -966,7 +1125,9 @@
               </div>
             </div>
             <div className="border-t border-white/10 pt-4 text-xs md:text-sm text-center">
-              © 2025 Credibe. All rights reserved. | <a href="privacy.html" className="text-[var(--brand)] hover:underline">Privacy Policy</a> | <a href="terms.html" className="text-[var(--brand)] hover:underline">Terms</a>
+              © 2025 Credibe. <span>All rights reserved.</span> |
+              <a href="privacy.html" className="text-[var(--brand)] hover:underline">Privacy Policy</a> |
+              <a href="terms.html" className="text-[var(--brand)] hover:underline">Terms</a>
               <div className="text-[10px] text-gray-400 mt-2">Credibe is a financial technology company. Some services may be provided by partner institutions. Eligible deposits may be protected to applicable limits.</div>
             </div>
           </div>
@@ -977,8 +1138,12 @@
     /* ========= App ========= */
 
     function App(){
+      const lang = useLang();
       const [drawerOpen, setDrawerOpen] = useState(false);
+
       useEffect(()=>{ document.body.style.paddingTop = '72px'; },[]);
+      useEffect(()=>{ if (window.reapplyGTranslate) window.reapplyGTranslate(); }, [lang]);
+
       return (
         <>
           <Header
@@ -1004,5 +1169,102 @@
 
     ReactDOM.createRoot(document.getElementById('root')).render(<App />);
   </script>
+
+  <!-- 🧯 Tiny error overlay -->
+  <script>
+    (function(){
+      function showErr(msg){
+        var box = document.getElementById('err-overlay');
+        if(!box){
+          box = document.createElement('div');
+          box.id = 'err-overlay';
+          box.style.cssText = 'position:fixed;inset:auto 0 0 0;background:#111;color:#fff;padding:12px 14px;font:12px/1.4 monospace;z-index:99999;border-top:1px solid #333;max-height:40vh;overflow:auto';
+          document.body.appendChild(box);
+        }
+        var p = document.createElement('div');
+        p.textContent = msg;
+        box.appendChild(p);
+      }
+      window.addEventListener('error',  e => showErr('[Error] ' + (e.message || e)));
+      window.addEventListener('unhandledrejection', e => showErr('[Promise] ' + (e.reason && (e.reason.stack || e.reason.message) || e.reason)));
+      document.documentElement.style.opacity = '1';
+      document.body.style.opacity = '1';
+      var root = document.getElementById('root'); if(root){ root.style.opacity = '1'; root.style.visibility = 'visible'; }
+    })();
+  </script>
+
+  <!-- ===== Google Translate helper (site-wide) ===== -->
+  <script>
+    // Persist language across pages using both cookie + localStorage
+    function setGoogTransCookie(from, to){
+      var pair = "/" + (from || "en") + "/" + to;
+      var d = new Date(); d.setTime(d.getTime() + 365*24*60*60*1000);
+      var expires = "expires=" + d.toUTCString();
+      document.cookie = "googtrans=" + pair + "; " + expires + "; path=/";
+      try {
+        var host = location.hostname;
+        var dot = host.indexOf(".") === 0 ? host : "." + host;
+        document.cookie = "googtrans=" + pair + "; " + expires + "; domain=" + dot + "; path=/";
+      } catch(_) {}
+      try { localStorage.setItem("g_lang", to); } catch(_) {}
+    }
+
+    function applyLanguage(lang){
+      var combo = document.querySelector("select.goog-te-combo");
+      if (!combo) return false;
+      if (combo.value === lang) return true;
+      combo.value = lang;
+      combo.dispatchEvent(new Event("change"));
+      return true;
+    }
+
+    window.GTranslate = {
+      set: function(lang){
+        setGoogTransCookie("en", lang);
+        if (!applyLanguage(lang)) {
+          var tries = 0;
+          var t = setInterval(function(){
+            tries++;
+            if (applyLanguage(lang) || tries > 40) clearInterval(t);
+          }, 250);
+        }
+        // notify app
+        try { window.dispatchEvent(new CustomEvent("gtranslate:change", { detail:{ lang } })); } catch(_) {}
+      },
+      get: function(){
+        try {
+          var v = localStorage.getItem("g_lang");
+          if (v) return v;
+          var m = document.cookie.match(/(?:^|;\s*)googtrans=([^;]+)/);
+          if (m && m[1]) return m[1].split("/").pop() || "en";
+        } catch(_) {}
+        return "en";
+      }
+    };
+
+    window.initGTranslate = function(){
+      new google.translate.TranslateElement({
+        pageLanguage: "en",
+        includedLanguages: [
+          "de","fr","es","it","pt","nl",
+          "pl","sv","da","fi","no","tr","cs","ro","hu","el",
+          "ar","ru","uk","hi","id","ms","th","vi","ja","ko","zh-CN","zh-TW"
+        ].join(","),
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay: false
+      }, "gtranslate_container");
+
+      var saved = window.GTranslate.get();
+      if (saved && saved !== "en") {
+        setTimeout(function(){ window.GTranslate.set(saved); }, 300);
+      }
+    };
+
+    window.reapplyGTranslate = function(){
+      var saved = window.GTranslate.get();
+      if (saved && saved !== "en") setTimeout(function(){ window.GTranslate.set(saved); }, 150);
+    };
+  </script>
+  <script src="//translate.google.com/translate_a/element.js?cb=initGTranslate"></script>
 </body>
 </html>

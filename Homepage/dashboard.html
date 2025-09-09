@@ -21,6 +21,7 @@
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.0/dist/vanilla-tilt.min.js"></script>
   <script src="https://js.stripe.com/v3/"></script>
+   <script defer src="/assets/gtranslate-init.js"></script>
 
   <style>
     /* =====================================================================
@@ -451,13 +452,13 @@
               <div class="flex items-start justify-between">
                 <span class="h-label text-xs sm:text-sm">TOTAL BALANCE</span>
               </div>
-              <p id="totalBalance" class="num num--cyan text-4xl sm:text-5xl mt-2">$0.00</p>
+              <p id="totalBalance" class="num num--cyan text-4xl sm:text-5xl mt-2">€0.00</p>
             </section>
 
             <!-- Savings -->
             <section class="panel p-5 sm:p-6">
               <span class="h-label text-xs sm:text-sm">SAVINGS</span>
-              <p id="savingsAmount" class="num num--cyan text-4xl sm:text-5xl mt-2">$0.00</p>
+              <p id="savingsAmount" class="num num--cyan text-4xl sm:text-5xl mt-2">€0.00</p>
             </section>
 
             <!-- Credit -->
@@ -465,7 +466,7 @@
               <div class="flex items-start justify-between">
                 <h3 class="h-label text-xs sm:text-sm">Credit</h3>
               </div>
-              <p id="creditAmount" class="num num--lav text-4xl sm:text-5xl mt-2">$0.00</p>
+              <p id="creditAmount" class="num num--lav text-4xl sm:text-5xl mt-2">€0.00</p>
             </section>
           </div>
 
@@ -736,7 +737,7 @@
 
       <!-- Amount -->
       <div>
-        <label for="amount" class="block text-sm text-[#e0e0e0]">Amount ($)</label>
+        <label for="amount" class="block text-sm text-[#e0e0e0]">Amount (€)</label>
         <input type="number" id="amount" required step="0.01" min="0.01" class="w-full bg-[#1a1a1a]/50 text-[#e0e0e0] border border-[#444] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="e.g. 2500">
       </div>
 
@@ -900,12 +901,12 @@
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-3 sm:mb-5">
     <div class="bg-card border border-edge rounded-xl p-3 sm:p-4">
       <p class="text-xs text-[var(--muted-ink)] tracking-wider">Total Spent</p>
-      <p id="kpi-total" class="text-xl sm:text-2xl font-bold text-ink mt-1">$8,900</p>
+      <p id="kpi-total" class="text-xl sm:text-2xl font-bold text-ink mt-1">€8,900</p>
       <p id="kpi-total-diff" class="text-xs mt-1 text-green-400">▲ 12% vs prev</p>
     </div>
     <div class="bg-card border border-edge rounded-xl p-3 sm:p-4">
       <p class="text-xs text-[var(--muted-ink)] tracking-wider">Avg Transaction</p>
-      <p id="kpi-avg" class="text-xl sm:text-2xl font-bold text-ink mt-1">$148</p>
+      <p id="kpi-avg" class="text-xl sm:text-2xl font-bold text-ink mt-1">€148</p>
       <p id="kpi-avg-count" class="text-xs mt-1 text-[var(--muted-ink)]">60 txns</p>
     </div>
     <div class="bg-card border border-edge rounded-xl p-3 sm:p-4">
@@ -915,7 +916,7 @@
     </div>
     <div class="bg-card border border-edge rounded-xl p-3 sm:p-4">
       <p class="text-xs text-[var(--muted-ink)] tracking-wider">MoM Change</p>
-      <p id="kpi-mom" class="text-xl sm:text-2xl font-bold text-ink mt-1">+$420</p>
+      <p id="kpi-mom" class="text-xl sm:text-2xl font-bold text-ink mt-1">+€420</p>
       <p class="text-xs mt-1 text-yellow-300">Spend rising</p>
     </div>
   </div>
@@ -1306,9 +1307,9 @@ document.addEventListener('DOMContentLoaded', () => {
     <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Buy Crypto</h1>
     <form id="buy-crypto-form" action="down.html" method="get" class="bg-[#1f2937]/50 backdrop-blur-md p-2 sm:p-6 rounded-lg sm:rounded-2xl drop-shadow-md space-y-4 sm:space-y-6 w-full max-w-xs sm:max-w-md">
         <div class="relative">
-            <label for="crypto-amount" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Amount ($)</label>
+            <label for="crypto-amount" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Amount (€)</label>
             <input type="number" id="crypto-amount" name="amount" step="0.01" min="0.01" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter amount" required>
-            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">$</span>
+            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">€</span>
         </div>
         <div class="relative">
             <label for="crypto-currency" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Currency</label>
@@ -1356,9 +1357,9 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300">📋</span>
         </div>
         <div class="relative">
-            <label for="bill-amount" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Amount ($)</label>
+            <label for="bill-amount" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Amount (€)</label>
             <input type="number" id="bill-amount" name="amount" step="0.01" min="0.01" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter amount" required>
-            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">$</span>
+            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">€</span>
         </div>
         <div class="relative">
             <label for="description" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Description (Optional)</label>
@@ -1433,12 +1434,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 (async () => {
  // Utility function to format dollar amounts
-function formatDollar(amount) {
-  return `$${Number(amount).toLocaleString('en-US', {
+function formatEuro(amount) {
+  return `€${Number(amount).toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   })}`;
 }
+
 // Ensure content starts exactly under the header on every page
 (function fixTopGap(){
   const header = document.querySelector('header');
