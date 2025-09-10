@@ -1,59 +1,58 @@
 const express = require("express");
 const router = express.Router();
-const { verifyToken, verifyUserToken } = require("../middleware/auth");
+const { verifyToken } = require("../middleware/auth");
 const { getUserTransactions } = require("../controllers/user.controller");
 const User = require("../models/User");
 
-// Debug logs
-console.log("verifyToken:", typeof verifyToken, verifyToken);
-console.log("verifyUserToken:", typeof verifyUserToken, verifyUserToken);
-console.log("getUserTransactions:", typeof getUserTransactions, getUserTransactions);
-
-// 🧠 Abstracted response sender
+// 📌 Helper to send JSON
 const handleResponse = (res, data) => res.json(data);
 
-// 👁️ Token test route (use verifyToken temporarily)
+// 🔒 Simple token-check route (optional; good for debugging)
 router.get("/dashboard", verifyToken, (req, res) => {
   handleResponse(res, { message: "Token verified ✅", user: req.user });
 });
 
-// 📊 Test route without middleware
+// 📊 Transactions (kept the same)
 router.get("/transactions/:userId", verifyToken, getUserTransactions);
 
-
-// 🧍‍♂️ Profile route
+// 🧍‍♂️ Profile (now also returns avatarUrl)
 router.get("/profile", verifyToken, async (req, res) => {
   try {
-    const { id } = req.user;
-    const user = await User.findById(id);
+    const user = await User.findById(req.user.id)
+      .select("name email phone avatarUrl");
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    const { name, email, phone } = user;
-    handleResponse(res, { name, email, phone });
+    handleResponse(res, user);
   } catch (err) {
-    console.error("❌ Profile fetch error:", err.message);
+    console.error("❌ Profile fetch error:", err);
     res.status(500).json({ error: "Failed to fetch user profile" });
   }
 });
 
-// 📈 User financial info
+// 👤 Me (returns the fields your dashboard/settings need, incl. avatarUrl)
 router.get("/me", verifyToken, async (req, res) => {
   try {
-    const { id } = req.user;
-    const user = await User.findById(id);
+    const user = await User.findById(req.user.id).select(
+      "name email phone avatarUrl balance savings credits language timezone role createdAt"
+    );
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    const { balance, savings, credits, email, name, phone } = user;
     handleResponse(res, {
-      balance,
-      savings,
-      credits,
-      email,
-      name: name || "Anonymous",
-      phone: phone || ""
+      _id: user._id,
+      name: user.name || "Anonymous",
+      email: user.email,
+      phone: user.phone || "",
+      avatarUrl: user.avatarUrl || null,
+      balance: user.balance ?? 0,
+      savings: user.savings ?? 0,
+      credits: user.credits ?? 0,
+      language: user.language || "en",
+      timezone: user.timezone || "UTC",
+      role: user.role || "user",
+      createdAt: user.createdAt,
     });
   } catch (err) {
-    console.error("❌ Info fetch error:", err.message);
+    console.error("❌ /me fetch error:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
