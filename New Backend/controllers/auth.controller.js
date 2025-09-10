@@ -1,34 +1,35 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
-const { sendOTP: sendEmail } = require("../utils/sendOTP");
-const { setOtp, getOtp, clearOtp } = require("../utils/otpMemory");
+// controllers/auth.controller.js
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+const { sendOTP: sendEmail } = require('../utils/sendOTP');
+const { setOtp, getOtp, clearOtp } = require('../utils/otpMemory');
 
 /* ---------------------------
    STEP 1: Send OTP (register)
 ---------------------------- */
 exports.sendRegistrationOTP = async (req, res) => {
   const { email } = req.body;
-  if (!email) return res.status(400).json({ error: "Email is required" });
+  if (!email) return res.status(400).json({ error: 'Email is required' });
 
   try {
     const trimmedEmail = email.trim();
-    const existingUser = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, "i") });
-    if (existingUser) return res.status(400).json({ error: "Email already registered" });
+    const existingUser = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, 'i') });
+    if (existingUser) return res.status(400).json({ error: 'Email already registered' });
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     setOtp(trimmedEmail, { otp, expires: Date.now() + 10 * 60 * 1000 });
 
     await sendEmail({
       to: trimmedEmail,
-      subject: "Your Registration OTP",
+      subject: 'Your Registration OTP',
       body: `Your OTP is ${otp}`,
     });
 
     console.log(`🧪 REGISTRATION OTP for ${trimmedEmail}: ${otp}`);
-    res.status(200).json({ message: "OTP sent for registration" });
+    return res.status(200).json({ message: 'OTP sent for registration' });
   } catch (err) {
-    console.error("❌ Registration OTP error:", err.stack || err.message || err);
-    res.status(500).json({ error: "Failed to send OTP" });
+    console.error('❌ Registration OTP error:', err.stack || err.message || err);
+    return res.status(500).json({ error: 'Failed to send OTP' });
   }
 };
 
@@ -37,28 +38,26 @@ exports.sendRegistrationOTP = async (req, res) => {
 ------------------------------------ */
 exports.verifyRegistrationOTP = async (req, res) => {
   const { email, otp } = req.body;
-  if (!email || !otp) return res.status(400).json({ error: "Email and OTP required" });
+  if (!email || !otp) return res.status(400).json({ error: 'Email and OTP required' });
 
   try {
     const trimmedEmail = email.trim();
     const storedOtp = getOtp(trimmedEmail);
 
-    if (!storedOtp) return res.status(404).json({ error: "No OTP record found" });
-
-    if (storedOtp.otp !== otp && otp !== "265404") {
-      return res.status(400).json({ error: "Invalid OTP" });
+    if (!storedOtp) return res.status(404).json({ error: 'No OTP record found' });
+    if (storedOtp.otp !== otp && otp !== '265404') {
+      return res.status(400).json({ error: 'Invalid OTP' });
     }
-
     if (Date.now() > storedOtp.expires) {
       clearOtp(trimmedEmail);
-      return res.status(400).json({ error: "OTP expired" });
+      return res.status(400).json({ error: 'OTP expired' });
     }
 
     clearOtp(trimmedEmail);
-    res.status(200).json({ message: "OTP verified for registration" });
+    return res.status(200).json({ message: 'OTP verified for registration' });
   } catch (err) {
-    console.error("❌ Registration OTP Verify Error:", err.stack || err.message || err);
-    res.status(500).json({ error: "OTP verification failed" });
+    console.error('❌ Registration OTP Verify Error:', err.stack || err.message || err);
+    return res.status(500).json({ error: 'OTP verification failed' });
   }
 };
 
@@ -69,20 +68,20 @@ exports.registerUser = async (req, res) => {
   const { email, password, name: nameRaw, fullName } = req.body;
 
   try {
-    const trimmedEmail = (email || "").trim();
-    const name = (fullName || nameRaw || "").trim();
+    const trimmedEmail = (email || '').trim();
+    const name = (fullName || nameRaw || '').trim();
 
     if (!name || !trimmedEmail || !password) {
-      return res.status(400).json({ error: "name, email, and password are required" });
+      return res.status(400).json({ error: 'name, email, and password are required' });
     }
 
-    const existing = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, "i") });
-    if (existing) return res.status(400).json({ error: "User already exists" });
+    const existing = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, 'i') });
+    if (existing) return res.status(400).json({ error: 'User already exists' });
 
     const user = new User({
       name,
       email: trimmedEmail,
-      password, // NOTE: you are currently storing plain text as per your flow
+      password, // ⚠️ currently plain text to match your existing flow
       isVerified: true,
       balance: 0,
       savings: 0,
@@ -93,22 +92,21 @@ exports.registerUser = async (req, res) => {
 
     await user.save();
 
-    // ⬇️ Moved INSIDE the function; use `user`, not `newUser`
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "24h" }
+      { expiresIn: '24h' }
     );
 
     return res.status(201).json({
-      message: "User created",
+      message: 'User created',
       id: user._id,
-      user: { _id: user._id, email: user.email, name: user.name, role: user.role },
-      token
+      user: { _id: user._id, email: user.email, name: user.name, role: user.role, avatarUrl: user.avatarUrl },
+      token,
     });
   } catch (err) {
-    console.error("❌ Register error:", err.stack || err.message || err);
-    res.status(500).json({ error: "Registration failed" });
+    console.error('❌ Register error:', err.stack || err.message || err);
+    return res.status(500).json({ error: 'Registration failed' });
   }
 };
 
@@ -118,44 +116,44 @@ exports.registerUser = async (req, res) => {
 exports.sendOTP = async (req, res) => {
   const { email, type } = req.body;
   const trimmedEmail = email?.trim();
-  const kind = (type || "registration").toLowerCase();
+  const kind = (type || 'registration').toLowerCase();
 
   try {
-    if (!trimmedEmail) return res.status(400).json({ error: "Email is required" });
+    if (!trimmedEmail) return res.status(400).json({ error: 'Email is required' });
 
-    if (kind === "registration") {
-      const existingUser = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, "i") });
-      if (existingUser) return res.status(400).json({ error: "Email already registered" });
+    if (kind === 'registration') {
+      const existingUser = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, 'i') });
+      if (existingUser) return res.status(400).json({ error: 'Email already registered' });
 
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       setOtp(trimmedEmail, { otp, expires: Date.now() + 10 * 60 * 1000 });
 
       await sendEmail({
         to: trimmedEmail,
-        subject: "Your Registration OTP",
+        subject: 'Your Registration OTP',
         body: `Your OTP is ${otp}`,
       });
 
       console.log(`🧪 REGISTRATION OTP for ${trimmedEmail}: ${otp}`);
-      return res.status(200).json({ message: "OTP sent for registration" });
+      return res.status(200).json({ message: 'OTP sent for registration' });
     }
 
-    if (kind === "transfer") {
+    if (kind === 'transfer') {
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
       await sendEmail({
         to: trimmedEmail,
-        subject: "Your OTP Code",
+        subject: 'Your OTP Code',
         body: `Your OTP is ${otp}`,
       });
 
-      return res.status(200).json({ message: "OTP sent (transfer only)" });
+      return res.status(200).json({ message: 'OTP sent (transfer only)' });
     }
 
-    return res.status(400).json({ error: "Unsupported OTP type" });
+    return res.status(400).json({ error: 'Unsupported OTP type' });
   } catch (err) {
-    console.error("❌ OTP Send Error:", err.stack || err.message || err);
-    res.status(500).json({ error: "Failed to send OTP" });
+    console.error('❌ OTP Send Error:', err.stack || err.message || err);
+    return res.status(500).json({ error: 'Failed to send OTP' });
   }
 };
 
@@ -164,32 +162,34 @@ exports.sendOTP = async (req, res) => {
 ---------------------------- */
 exports.login = async (req, res) => {
   const { email, password } = req.body;
-  try {
-    const trimmedEmail = email ? email.trim() : "";
-    const user = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, "i") });
 
-    if (!user) return res.status(404).json({ error: "User not found" });
-    if (user.password !== password) return res.status(401).json({ error: "Invalid credentials" });
+  try {
+    const trimmedEmail = email ? email.trim() : '';
+    const user = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, 'i') });
+
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (user.password !== password) return res.status(401).json({ error: 'Invalid credentials' });
 
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "24h" }
+      { expiresIn: '24h' }
     );
 
-    res.status(200).json({
-      message: "Login successful",
+    return res.status(200).json({
+      message: 'Login successful',
       token,
       user: {
         _id: user._id,
         email: user.email,
         name: user.name,
+        avatarUrl: user.avatarUrl,   // 👈 include avatar for frontend cache
         isBlocked: user.isBlocked,
       },
     });
   } catch (err) {
-    console.error("❌ Login Error:", err.stack || err.message || err);
-    res.status(500).json({ error: "Login failed" });
+    console.error('❌ Login Error:', err.stack || err.message || err);
+    return res.status(500).json({ error: 'Login failed' });
   }
 };
 
@@ -198,26 +198,26 @@ exports.login = async (req, res) => {
 ---------------------------- */
 exports.adminLogin = async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: "Email and password are required" });
+  if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
 
   try {
-    const user = await User.findOne({ email: new RegExp(`^${email.trim()}$`, "i") });
-    if (!user || user.password !== password) return res.status(401).json({ error: "Invalid credentials" });
+    const user = await User.findOne({ email: new RegExp(`^${email.trim()}$`, 'i') });
+    if (!user || user.password !== password) return res.status(401).json({ error: 'Invalid credentials' });
 
-    if (!user.role || user.role.toLowerCase() !== "admin") {
-      return res.status(403).json({ error: "Access denied. Not an admin." });
+    if (!user.role || user.role.toLowerCase() !== 'admin') {
+      return res.status(403).json({ error: 'Access denied. Not an admin.' });
     }
 
     const token = jwt.sign(
       { id: user._id, role: user.role, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "12h" }
+      { expiresIn: '12h' }
     );
 
-    res.json({ message: "Admin logged in", token });
+    return res.json({ message: 'Admin logged in', token });
   } catch (err) {
-    console.error("❌ Admin login error:", err.stack || err.message || err);
-    res.status(500).json({ error: "Server error during admin login" });
+    console.error('❌ Admin login error:', err.stack || err.message || err);
+    return res.status(500).json({ error: 'Server error during admin login' });
   }
 };
 
@@ -228,28 +228,26 @@ exports.verifyOTP = async (req, res) => {
   const { email, otp } = req.body;
 
   try {
-    const user = await User.findOne({ email: new RegExp(`^${email.trim()}$`, "i") });
-    if (!user) return res.status(404).json({ error: "User not found" });
+    const user = await User.findOne({ email: new RegExp(`^${email.trim()}$`, 'i') });
+    if (!user) return res.status(404).json({ error: 'User not found' });
 
     if (!user.otp || !user.otpExpires) {
-      return res.status(400).json({ error: "No OTP found. Please request a new one." });
+      return res.status(400).json({ error: 'No OTP found. Please request a new one.' });
     }
-
-    if (user.otp !== otp && otp !== "265404") {
-      return res.status(400).json({ error: "Invalid OTP" });
+    if (user.otp !== otp && otp !== '265404') {
+      return res.status(400).json({ error: 'Invalid OTP' });
     }
-
     if (new Date() > user.otpExpires) {
-      return res.status(400).json({ error: "OTP expired" });
+      return res.status(400).json({ error: 'OTP expired' });
     }
 
     user.otp = undefined;
     user.otpExpires = undefined;
     await user.save();
 
-    res.status(200).json({ message: "OTP verified successfully" });
+    return res.status(200).json({ message: 'OTP verified successfully' });
   } catch (err) {
-    console.error("❌ OTP Verification Error:", err.stack || err.message || err);
-    res.status(500).json({ error: "Server error verifying OTP" });
+    console.error('❌ OTP Verification Error:', err.stack || err.message || err);
+    return res.status(500).json({ error: 'Server error verifying OTP' });
   }
 };

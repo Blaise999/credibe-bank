@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
+      avatarUrl: { type: String, default: null },
     email: {
       type: String,
       required: true,
@@ -75,5 +76,6 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
 
 module.exports = mongoose.models.User || mongoose.model('User', userSchema);

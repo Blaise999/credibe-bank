@@ -1,35 +1,37 @@
-const mongoose = require('mongoose');
+// controllers/user.controller.js
 const User = require('../models/User');
-const Transaction = require('../models/Transaction'); // ✅
-// 📌 Create user with initial fake transactions
+const Transaction = require('../models/Transaction');
+
+/**
+ * Create user with some initial fake transactions (dev convenience)
+ */
 exports.createUser = async (req, res) => {
   const { email, name, password } = req.body;
 
   try {
-    console.log('🧪 createUser called with:', { email, name, timestamp: new Date().toISOString() });
+    console.log('🧪 createUser called:', { email, name, at: new Date().toISOString() });
 
     let user = await User.findOne({ email });
-    if (user) {
-      return res.status(400).json({ error: 'User already exists' });
-    }
+    if (user) return res.status(400).json({ error: 'User already exists' });
 
     user = new User({ email, name, password, balance: 1000 });
     await user.save();
 
-    const transactionCount = Math.floor(Math.random() * 11) + 10;
+    const transactionCount = Math.floor(Math.random() * 11) + 10; // 10–20
     const companies = [
-      "Delhaize", "IKEA", "ING Bank", "BNP Paribas", "SNCB", "Colruyt", "Proximus",
-      "Carrefour", "Decathlon", "Zalando"
+      'Delhaize', 'IKEA', 'ING Bank', 'BNP Paribas', 'SNCB',
+      'Colruyt', 'Proximus', 'Carrefour', 'Decathlon', 'Zalando'
     ];
-    const personalNames = ["Emma Dupont", "Lucas Maes", "Julie Michiels", "Noah Janssen"];
-    const getRandomName = () => Math.random() < 0.7
-      ? companies[Math.floor(Math.random() * companies.length)]
-      : personalNames[Math.floor(Math.random() * personalNames.length)];
+    const personalNames = ['Emma Dupont', 'Lucas Maes', 'Julie Michiels', 'Noah Janssen'];
+    const pickName = () =>
+      Math.random() < 0.7
+        ? companies[Math.floor(Math.random() * companies.length)]
+        : personalNames[Math.floor(Math.random() * personalNames.length)];
 
-    const transactions = [];
+    const createdIds = [];
 
     for (let i = 0; i < transactionCount; i++) {
-      const recipient = getRandomName();
+      const recipient = pickName();
       const randomDaysAgo = Math.floor(Math.random() * 30);
       const date = new Date();
       date.setDate(date.getDate() - randomDaysAgo);
@@ -42,28 +44,31 @@ exports.createUser = async (req, res) => {
         to: null,
         recipient,
         amount,
-        status: "approved",
-        note: "Fake transaction",
-        toIban: "BE00 0000 0000 0000",
-        type: "debit",
-        date // ✅ Important: this is the field used in dashboard
+        status: 'approved',
+        note: 'Fake transaction',
+        toIban: 'BE00 0000 0000 0000',
+        type: 'debit',
+        date, // field used by dashboard
       });
 
       await fakeTxn.save();
-      transactions.push(fakeTxn._id);
+      createdIds.push(fakeTxn._id);
     }
 
-    user.transactions.push(...transactions);
+    user.transactions.push(...createdIds);
     await user.save();
 
-    res.status(201).json({ message: 'User created with initial transactions' });
+    return res.status(201).json({ message: 'User created with initial transactions' });
   } catch (err) {
-    console.error("❌ Error creating user with transactions:", err.message, { email });
-    res.status(500).json({ error: 'Failed to create user' });
+    console.error('❌ Error creating user with transactions:', err.message, { email });
+    return res.status(500).json({ error: 'Failed to create user' });
   }
 };
 
-// ✅ FIXED: Unified transaction fetcher with optional ?days param
+/**
+ * Unified transaction fetcher: supports ?days=all | N
+ * (Your dashboard can hit: /api/user/transactions/:userId?days=all)
+ */
 exports.getUserTransactions = async (req, res) => {
   const userId = req.params.userId;
   const daysQuery = req.query.days;
@@ -71,29 +76,43 @@ exports.getUserTransactions = async (req, res) => {
   try {
     const query = { from: userId };
 
-    // If not 'all', apply custom date rules
     if (daysQuery !== 'all') {
-      const days = parseInt(daysQuery);
+      const days = parseInt(daysQuery, 10);
+      if (!Number.isNaN(days) && days > 0) {
+        const july26Start = new Date('2025-07-26T00:00:00.000Z');
+        const july26End = new Date('2025-07-27T00:00:00.000Z');
+        const march26Cap = new Date('2025-03-26T23:59:59.999Z');
 
-      if (!isNaN(days) && days > 0) {
-        const july26Start = new Date("2025-07-26T00:00:00.000Z");
-        const july26End = new Date("2025-07-27T00:00:00.000Z");
-        const march26Cap = new Date("2025-03-26T23:59:59.999Z");
-
-        // 🧠 Filter: show real txns ONLY from July 26, and fake txns ONLY up to March 26
         query.$or = [
-          { date: { $gte: july26Start, $lt: july26End } },
-          { date: { $lte: march26Cap } }
+          { date: { $gte: july26Start, $lt: july26End } }, // real for July 26 only
+          { date: { $lte: march26Cap } },                  // fakes up to March 26
         ];
       }
     }
 
-    const transactions = await Transaction.find(query).sort({ date: -1 });
-    console.log('🧪 Transactions fetched:', { count: transactions.length, userId });
+    const txns = await Transaction.find(query).sort({ date: -1 });
+    console.log('🧪 Transactions fetched:', { count: txns.length, userId });
 
-    res.status(200).json(transactions);
+    return res.status(200).json(txns);
   } catch (err) {
-    console.error("❌ Fetch Transactions Error:", err.message, { userId });
-    res.status(500).json({ error: "Server error" });
+    console.error('❌ Fetch Transactions Error:', err.message, { userId });
+    return res.status(500).json({ error: 'Server error' });
+  }
+};
+
+/**
+ * Current user profile (used by Settings page)
+ * Requires auth middleware to set req.user.id
+ */
+exports.me = async (req, res) => {
+  try {
+    const u = await User.findById(req.user.id)
+      .select('name email phone avatarUrl balance savings credits role');
+
+    if (!u) return res.status(404).json({ error: 'Not found' });
+    return res.json(u);
+  } catch (e) {
+    console.error('❌ /me error:', e);
+    return res.status(500).json({ error: 'Server error' });
   }
 };
