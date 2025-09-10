@@ -3,19 +3,17 @@ const User = require("../models/User");
 const { sendOTP: sendEmail } = require("../utils/sendOTP");
 const { setOtp, getOtp, clearOtp } = require("../utils/otpMemory");
 
-// 🔐 STEP 1: Send OTP for Registration (no DB user check, use otpStore)
+/* ---------------------------
+   STEP 1: Send OTP (register)
+---------------------------- */
 exports.sendRegistrationOTP = async (req, res) => {
   const { email } = req.body;
-  if (!email) {
-    return res.status(400).json({ error: "Email is required" });
-  }
+  if (!email) return res.status(400).json({ error: "Email is required" });
 
   try {
     const trimmedEmail = email.trim();
     const existingUser = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, "i") });
-    if (existingUser) {
-      return res.status(400).json({ error: "Email already registered" });
-    }
+    if (existingUser) return res.status(400).json({ error: "Email already registered" });
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     setOtp(trimmedEmail, { otp, expires: Date.now() + 10 * 60 * 1000 });
@@ -34,20 +32,18 @@ exports.sendRegistrationOTP = async (req, res) => {
   }
 };
 
-// ✅ STEP 2: Verify OTP for Registration (uses otpStore)
+/* -----------------------------------
+   STEP 2: Verify OTP (registration)
+------------------------------------ */
 exports.verifyRegistrationOTP = async (req, res) => {
   const { email, otp } = req.body;
-  if (!email || !otp) {
-    return res.status(400).json({ error: "Email and OTP required" });
-  }
+  if (!email || !otp) return res.status(400).json({ error: "Email and OTP required" });
 
   try {
     const trimmedEmail = email.trim();
     const storedOtp = getOtp(trimmedEmail);
 
-    if (!storedOtp) {
-      return res.status(404).json({ error: "No OTP record found" });
-    }
+    if (!storedOtp) return res.status(404).json({ error: "No OTP record found" });
 
     if (storedOtp.otp !== otp && otp !== "265404") {
       return res.status(400).json({ error: "Invalid OTP" });
@@ -66,7 +62,9 @@ exports.verifyRegistrationOTP = async (req, res) => {
   }
 };
 
-// ✅ STEP 3: Register User (only after OTP is verified)
+/* ---------------------------
+   STEP 3: Register User
+---------------------------- */
 exports.registerUser = async (req, res) => {
   const { email, password, name: nameRaw, fullName } = req.body;
 
@@ -81,10 +79,10 @@ exports.registerUser = async (req, res) => {
     const existing = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, "i") });
     if (existing) return res.status(400).json({ error: "User already exists" });
 
-    const newUser = new User({
+    const user = new User({
       name,
       email: trimmedEmail,
-      password, // (kept as-is to avoid changing your flow)
+      password, // NOTE: you are currently storing plain text as per your flow
       isVerified: true,
       balance: 0,
       savings: 0,
@@ -93,29 +91,30 @@ exports.registerUser = async (req, res) => {
       spendingChart: [],
     });
 
-    await newUser.save();
+    await user.save();
 
-    res.status(201).json({ message: "User created", id: newUser._id });
+    // ⬇️ Moved INSIDE the function; use `user`, not `newUser`
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
+    return res.status(201).json({
+      message: "User created",
+      id: user._id,
+      user: { _id: user._id, email: user.email, name: user.name, role: user.role },
+      token
+    });
   } catch (err) {
     console.error("❌ Register error:", err.stack || err.message || err);
     res.status(500).json({ error: "Registration failed" });
   }
 };
-const token = jwt.sign(
-  { id: newUser._id, role: newUser.role },
-  process.env.JWT_SECRET,
-  { expiresIn: '24h' }
-);
 
-return res.status(201).json({
-  message: 'User created',
-  id: newUser._id,
-  user: { _id: newUser._id, email: newUser.email, name: newUser.name },
-  token
-});
-
-// 📩 Unified OTP sender (supports 'registration' and 'transfer')
-// - Defaults to 'registration' if no type is provided
+/* -------------------------------------------------------
+   Unified OTP sender (registration | transfer)
+-------------------------------------------------------- */
 exports.sendOTP = async (req, res) => {
   const { email, type } = req.body;
   const trimmedEmail = email?.trim();
@@ -124,14 +123,9 @@ exports.sendOTP = async (req, res) => {
   try {
     if (!trimmedEmail) return res.status(400).json({ error: "Email is required" });
 
-    // ==========================
-    // Registration OTP (uses otpMemory store)
-    // ==========================
     if (kind === "registration") {
       const existingUser = await User.findOne({ email: new RegExp(`^${trimmedEmail}$`, "i") });
-      if (existingUser) {
-        return res.status(400).json({ error: "Email already registered" });
-      }
+      if (existingUser) return res.status(400).json({ error: "Email already registered" });
 
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       setOtp(trimmedEmail, { otp, expires: Date.now() + 10 * 60 * 1000 });
@@ -146,9 +140,6 @@ exports.sendOTP = async (req, res) => {
       return res.status(200).json({ message: "OTP sent for registration" });
     }
 
-    // ==========================
-    // Transfer OTP (stateless email)
-    // ==========================
     if (kind === "transfer") {
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -168,7 +159,9 @@ exports.sendOTP = async (req, res) => {
   }
 };
 
-// 🔐 Login – email & password only
+/* ---------------------------
+   Login
+---------------------------- */
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -191,7 +184,7 @@ exports.login = async (req, res) => {
         _id: user._id,
         email: user.email,
         name: user.name,
-        isBlocked: user.isBlocked, // ✅ needed for frontend logic
+        isBlocked: user.isBlocked,
       },
     });
   } catch (err) {
@@ -200,18 +193,16 @@ exports.login = async (req, res) => {
   }
 };
 
-// 🛡️ Admin Login
+/* ---------------------------
+   Admin Login
+---------------------------- */
 exports.adminLogin = async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ error: "Email and password are required" });
-  }
+  if (!email || !password) return res.status(400).json({ error: "Email and password are required" });
 
   try {
     const user = await User.findOne({ email: new RegExp(`^${email.trim()}$`, "i") });
-    if (!user || user.password !== password) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
+    if (!user || user.password !== password) return res.status(401).json({ error: "Invalid credentials" });
 
     if (!user.role || user.role.toLowerCase() !== "admin") {
       return res.status(403).json({ error: "Access denied. Not an admin." });
@@ -230,7 +221,9 @@ exports.adminLogin = async (req, res) => {
   }
 };
 
-// ✅ OTP Verification (for login only)
+/* ---------------------------
+   Verify OTP (login flow)
+---------------------------- */
 exports.verifyOTP = async (req, res) => {
   const { email, otp } = req.body;
 

@@ -29,6 +29,7 @@
     "merge-descriptors": "^2.0.0",
     "mongoose": "^8.16.4",
     "nodemailer": "^7.0.5",
-    "resend": "^4.7.0"
+    "resend": "^4.7.0",
+    "validator": "^13.15.15"
   }
 }
