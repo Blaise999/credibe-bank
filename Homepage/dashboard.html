@@ -2284,10 +2284,11 @@ const userId     = _userId;
 const AUTH_HDR   = userToken ? { Authorization: `Bearer ${userToken}` } : {};
 const FREEZE_CAP = new Date("2025-03-26T23:59:59"); // legacy (unchanged)
 
-// 🔒 Hard cap for a specific user (no impact on others)
-//    All transactions for this user must be on/before 21 Nov 2024 (UTC).
-const HARD_CAP_USER = "68c1c45057a7c7822e2d8a9e";
-const HARD_CAP_DATE = new Date("2024-11-21T23:59:59Z"); // UTC end-of-day
+// 🔒 Hard cap user: last tx must be exactly on 21 Nov 2024, and nothing after.
+const HARD_CAP_USER  = "68c1c45057a7c7822e2d8a9e";
+const HARD_CAP_DATE  = new Date("2024-11-21T23:59:59Z");       // inclusive cap (UTC)
+const HARD_CAP_DAY   = "2024-11-21";                           // yyyy-mm-dd (UTC day string)
+const HARD_CAP_NOONZ = "2024-11-21T12:00:00Z";                 // default time to inject cap-day tx
 
 
 // =============================
@@ -2338,6 +2339,13 @@ function txnStatusBadge(status) {
   return `<span class="${base} ${map[status] || "text-gray-400"}">${status}</span>`;
 }
 
+// helpers for date/day comparisons in UTC
+function dayKeyUTC(dateLike) {
+  const d = new Date(dateLike);
+  if (isNaN(d)) return "";
+  return d.toISOString().slice(0, 10); // yyyy-mm-dd
+}
+
 
 // =============================
 // RENDER HELPERS
@@ -2376,7 +2384,7 @@ function renderTxnCard(tx, view) {
 
 
 /* ======================================================================
-   🎯 TARGET USER (per-stream caps + pins)
+   🎯 LEGACY TARGET USER (per-stream caps + pins)
    ====================================================================== */
 const TARGET_USER_ID   = "68badb372a7035abfe40abd9"; 
 const SENT_FREEZE_DATE = new Date("2025-02-13T23:59:59Z"); // no SENT after this (unless post-anchor)
@@ -2393,14 +2401,14 @@ let FREEZE_ANCHOR = (() => {
 
 
 // Hide if date is between stream freeze and anchor (target user only)
-// Also: enforce HARD_CAP for HARD_CAP_USER (absolute).
+// Also: enforce HARD_CAP for HARD_CAP_USER (absolute, inclusive).
 function hiddenByUserFreeze(dateLike, txnType) {
   const d = new Date(dateLike);
   if (isNaN(d)) return false;
 
-  // 🔒 Absolute cap for the special user
+  // 🔒 Absolute inclusive cap for the special user
   if (userId === HARD_CAP_USER) {
-    return d > HARD_CAP_DATE;
+    return d > HARD_CAP_DATE; // allow anything <= cap date (incl. Nov 21)
   }
 
   // Legacy per-stream freeze for TARGET_USER_ID only
@@ -2414,7 +2422,7 @@ function hiddenByUserFreeze(dateLike, txnType) {
    🔹 STATIC FAKE TXNS
    ====================================================================== */
 // Per-user cache so fakes respect user-specific rules (esp. HARD_CAP_USER)
-const FAKE_KEY = `fakePairedTxns_v6_${userId || "anon"}_${userId === HARD_CAP_USER ? "cap1121" : "std"}`;
+const FAKE_KEY = `fakePairedTxns_v7_${userId || "anon"}_${userId === HARD_CAP_USER ? "cap1121" : "std"}`;
 const RECEIVED_CUTOFF = new Date("2025-08-15T23:59:59Z"); // for non-target users
 
 function randomDateISOWithin(days) {
@@ -2456,11 +2464,11 @@ function generatePairedFakeTransactions(count = 25) {
   }
 
   // Choose the right cutoff for fakes:
-  // - HARD_CAP_USER: always generate before HARD_CAP_DATE (or before earliest pin if earlier than cap)
+  // - HARD_CAP_USER: always generate before/at HARD_CAP_DATE (or before earliest pin if earlier)
   // - TARGET_USER_ID: original behavior (before earliest pin if present)
   const cutoffFor = (earliestPinned) => {
     if (userId === HARD_CAP_USER) {
-      if (earliestPinned && earliestPinned < HARD_CAP_DATE) return earliestPinned;
+      if (earliestPinned && earliestPinned <= HARD_CAP_DATE) return earliestPinned;
       return HARD_CAP_DATE;
     }
     return earliestPinned || null;
@@ -2518,7 +2526,7 @@ const CUSTOM_TXNS = {
     sent: []
   },
 
-  // Pinned for our TARGET_USER_ID — match the labels you showed in the UI
+  // Pinned for our legacy TARGET_USER_ID — matches your earlier UI labels
   "68badb372a7035abfe40abd9": {
     sent: [
       { _id:"pinned-sent-2025-02-13", date:"2025-02-13T11:00:00Z", recipient:"ElectroTech Repairs",  amount:2370, status:"approved", type:"debit",  isCustom:true },
@@ -2587,11 +2595,26 @@ async function loadTransactions(days = "all") {
   let sentCombined = [...(sentReal || []), ...sentFake, ...custom.sent];
 
   if (userId === HARD_CAP_USER) {
-    // 🔒 Enforce absolute cap for this user (keep <= HARD_CAP_DATE only)
+    // Keep only <= cap
     sentCombined = sentCombined.filter(t => {
       const d = new Date(t.date || t.createdAt);
       return !isNaN(d) && d <= HARD_CAP_DATE;
     });
+
+    // Ensure there is at least ONE tx exactly on 2024-11-21
+    const hasCapDay = sentCombined.some(t => dayKeyUTC(t.date || t.createdAt) === HARD_CAP_DAY);
+    if (!hasCapDay) {
+      // inject a single fake at cap day (not pinned; it will still sort last by date)
+      sentCombined.push({
+        _id: "cap-sent-2024-11-21",
+        date: HARD_CAP_NOONZ,
+        recipient: "IKEA Belgium",
+        amount: 1431,
+        status: "approved",
+        type: "debit",
+        isFake: true
+      });
+    }
   } else if (userId === TARGET_USER_ID) {
     // legacy per-stream freeze (between freeze and anchor)
     sentCombined = sentCombined.filter(t => {
@@ -2619,11 +2642,25 @@ async function loadTransactions(days = "all") {
   ];
 
   if (userId === HARD_CAP_USER) {
-    // 🔒 Enforce absolute cap for this user (keep <= HARD_CAP_DATE only)
+    // Keep only <= cap
     receivedAll = receivedAll.filter(t => {
       const d = new Date(t.date || t.createdAt);
       return !isNaN(d) && d <= HARD_CAP_DATE;
     });
+
+    // Ensure there is at least ONE tx exactly on 2024-11-21
+    const hasCapDay = receivedAll.some(t => dayKeyUTC(t.date || t.createdAt) === HARD_CAP_DAY);
+    if (!hasCapDay) {
+      receivedAll.push({
+        _id: "cap-recv-2024-11-21",
+        date: HARD_CAP_NOONZ,
+        from: { name: "Stripe Payouts" },
+        amount: 2100,
+        status: "approved",
+        type: "credit",
+        isFake: true
+      });
+    }
   } else if (userId === TARGET_USER_ID) {
     receivedAll = receivedAll.filter(t => {
       const d = new Date(t.date || t.createdAt);
