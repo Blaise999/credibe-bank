@@ -2413,8 +2413,8 @@ function hiddenByUserFreeze(dateLike, txnType) {
 /* ======================================================================
    🔹 STATIC FAKE TXNS
    ====================================================================== */
-// bump the key so old cached fakes are discarded (v5 adds HARD_CAP_USER rules)
-const FAKE_KEY = "fakePairedTxns_v5";
+// Per-user cache so fakes respect user-specific rules (esp. HARD_CAP_USER)
+const FAKE_KEY = `fakePairedTxns_v6_${userId || "anon"}_${userId === HARD_CAP_USER ? "cap1121" : "std"}`;
 const RECEIVED_CUTOFF = new Date("2025-08-15T23:59:59Z"); // for non-target users
 
 function randomDateISOWithin(days) {
@@ -2553,9 +2553,11 @@ function filterTxns(txns, days) {
     // Hide based on per-user freeze/cap rules
     if (hiddenByUserFreeze(rawDate, t.type)) return false;
 
-    // ✅ Pins always show; for TARGET_USER_ID, also let fakes bypass the days filter
+    // ✅ Pins always show
     if (isCustom) return true;
-    if (userId === TARGET_USER_ID && isFake) return true;
+
+    // ✅ Let fakes bypass the days filter for both special users
+    if ((userId === TARGET_USER_ID || userId === HARD_CAP_USER) && isFake) return true;
 
     if (days === "all") return true;
     return (now - d) / 86400000 <= parseInt(days, 10);
