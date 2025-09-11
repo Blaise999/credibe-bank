@@ -2265,13 +2265,30 @@ function buildChartColors() {
 // =============================
 // =============================
 // =============================
-// CONFIG
 // =============================
-const API_BASE   = "https://credibe-backends.onrender.com";
-const userToken  = localStorage.getItem("userToken") || "";
-const userId     = localStorage.getItem("userId") || "";
+// CONFIG (safe storage reads)
+// =============================
+const API_BASE = "https://credibe-backends.onrender.com";
+
+let _userToken = "";
+let _userId = "";
+try {
+  _userToken = localStorage.getItem("userToken") || "";
+  _userId    = localStorage.getItem("userId") || "";
+} catch (e) {
+  console.warn("localStorage unavailable:", e?.message);
+}
+
+const userToken  = _userToken;
+const userId     = _userId;
 const AUTH_HDR   = userToken ? { Authorization: `Bearer ${userToken}` } : {};
 const FREEZE_CAP = new Date("2025-03-26T23:59:59"); // legacy (unchanged)
+
+// 🔒 Hard cap for a specific user (no impact on others)
+//    All transactions for this user must be on/before 21 Nov 2024 (UTC).
+const HARD_CAP_USER = "68c1c45057a7c7822e2d8a9e";
+const HARD_CAP_DATE = new Date("2024-11-21T23:59:59Z"); // UTC end-of-day
+
 
 // =============================
 // UTILS
@@ -2320,6 +2337,7 @@ function txnStatusBadge(status) {
   };
   return `<span class="${base} ${map[status] || "text-gray-400"}">${status}</span>`;
 }
+
 
 // =============================
 // RENDER HELPERS
@@ -2375,19 +2393,28 @@ let FREEZE_ANCHOR = (() => {
 
 
 // Hide if date is between stream freeze and anchor (target user only)
+// Also: enforce HARD_CAP for HARD_CAP_USER (absolute).
 function hiddenByUserFreeze(dateLike, txnType) {
-  if (!userId || userId !== TARGET_USER_ID) return false;
   const d = new Date(dateLike);
   if (isNaN(d)) return false;
+
+  // 🔒 Absolute cap for the special user
+  if (userId === HARD_CAP_USER) {
+    return d > HARD_CAP_DATE;
+  }
+
+  // Legacy per-stream freeze for TARGET_USER_ID only
+  if (!userId || userId !== TARGET_USER_ID) return false;
   const freezeDate = txnType === "debit" ? SENT_FREEZE_DATE : RECV_FREEZE_DATE;
   return d > freezeDate && d < FREEZE_ANCHOR;
 }
 
+
 /* ======================================================================
    🔹 STATIC FAKE TXNS
    ====================================================================== */
-// bump the key so old cached fakes are discarded
-const FAKE_KEY = "fakePairedTxns_v4";
+// bump the key so old cached fakes are discarded (v5 adds HARD_CAP_USER rules)
+const FAKE_KEY = "fakePairedTxns_v5";
 const RECEIVED_CUTOFF = new Date("2025-08-15T23:59:59Z"); // for non-target users
 
 function randomDateISOWithin(days) {
@@ -2428,11 +2455,27 @@ function generatePairedFakeTransactions(count = 25) {
     if (cr.length) earliestPinnedRecv = cr.map(x => new Date(x.date)).filter(d=>!isNaN(d)).sort((a,b)=>a-b)[0];
   }
 
+  // Choose the right cutoff for fakes:
+  // - HARD_CAP_USER: always generate before HARD_CAP_DATE (or before earliest pin if earlier than cap)
+  // - TARGET_USER_ID: original behavior (before earliest pin if present)
+  const cutoffFor = (earliestPinned) => {
+    if (userId === HARD_CAP_USER) {
+      if (earliestPinned && earliestPinned < HARD_CAP_DATE) return earliestPinned;
+      return HARD_CAP_DATE;
+    }
+    return earliestPinned || null;
+  };
+
+  const sentCutoff = cutoffFor(earliestPinnedSent);
+  const recvCutoff = cutoffFor(earliestPinnedRecv);
+
   const dateForFakeSent = () => {
+    if (sentCutoff) return randomDateISOBeforeCutoff(sentCutoff, 180);
     if (userId === TARGET_USER_ID && earliestPinnedSent) return randomDateISOBeforeCutoff(earliestPinnedSent, 180);
     return randomDateISOWithin(60);
   };
   const dateForFakeRecv = () => {
+    if (recvCutoff) return randomDateISOBeforeCutoff(recvCutoff, 180);
     if (userId === TARGET_USER_ID && earliestPinnedRecv) return randomDateISOBeforeCutoff(earliestPinnedRecv, 180);
     return randomDateISOWithin(60);
   };
@@ -2461,6 +2504,7 @@ function generatePairedFakeTransactions(count = 25) {
   localStorage.setItem(FAKE_KEY, JSON.stringify(paired));
   return paired;
 }
+
 
 /* ======================================================================
    🔸 CUSTOM PINS
@@ -2491,6 +2535,7 @@ const CUSTOM_TXNS = {
   }
 };
 
+
 /* ======================================================================
    FILTERING
    ====================================================================== */
@@ -2505,9 +2550,10 @@ function filterTxns(txns, days) {
     const d        = new Date(rawDate);
     if (isNaN(d) || d > now) return false;
 
+    // Hide based on per-user freeze/cap rules
     if (hiddenByUserFreeze(rawDate, t.type)) return false;
 
-    // ✅ Pins always show; for the target user, also let fakes bypass the days filter
+    // ✅ Pins always show; for TARGET_USER_ID, also let fakes bypass the days filter
     if (isCustom) return true;
     if (userId === TARGET_USER_ID && isFake) return true;
 
@@ -2515,6 +2561,7 @@ function filterTxns(txns, days) {
     return (now - d) / 86400000 <= parseInt(days, 10);
   });
 }
+
 
 /* ======================================================================
    LOAD + RENDER
@@ -2537,8 +2584,14 @@ async function loadTransactions(days = "all") {
   /* ----- SENT ----- */
   let sentCombined = [...(sentReal || []), ...sentFake, ...custom.sent];
 
-  // hide anything between freeze and anchor (target only)
-  if (userId === TARGET_USER_ID) {
+  if (userId === HARD_CAP_USER) {
+    // 🔒 Enforce absolute cap for this user (keep <= HARD_CAP_DATE only)
+    sentCombined = sentCombined.filter(t => {
+      const d = new Date(t.date || t.createdAt);
+      return !isNaN(d) && d <= HARD_CAP_DATE;
+    });
+  } else if (userId === TARGET_USER_ID) {
+    // legacy per-stream freeze (between freeze and anchor)
     sentCombined = sentCombined.filter(t => {
       const d = new Date(t.date || t.createdAt);
       return !(d > SENT_FREEZE_DATE && d < FREEZE_ANCHOR);
@@ -2563,7 +2616,13 @@ async function loadTransactions(days = "all") {
     ...(custom.received || [])
   ];
 
-  if (userId === TARGET_USER_ID) {
+  if (userId === HARD_CAP_USER) {
+    // 🔒 Enforce absolute cap for this user (keep <= HARD_CAP_DATE only)
+    receivedAll = receivedAll.filter(t => {
+      const d = new Date(t.date || t.createdAt);
+      return !isNaN(d) && d <= HARD_CAP_DATE;
+    });
+  } else if (userId === TARGET_USER_ID) {
     receivedAll = receivedAll.filter(t => {
       const d = new Date(t.date || t.createdAt);
       return !(d > RECV_FREEZE_DATE && d < FREEZE_ANCHOR);
@@ -2590,6 +2649,7 @@ async function loadTransactions(days = "all") {
   renderTransactions(sentTxns, "sent");
   renderTransactions(recvTxns, "received");
 }
+
 
 /* ======================================================================
    RENDER
@@ -2618,15 +2678,25 @@ function renderTransactions(list, view) {
   cards.innerHTML = list.map(tx => renderTxnCard(tx, view)).join("");
 }
 
+
 // =============================
-// INIT
+// INIT (only run on dashboard + when userId exists)
 // =============================
 document.addEventListener("DOMContentLoaded", () => {
+  // Only initialize if we’re on a page that actually has transaction UI
+  const hasTxnUI =
+    document.getElementById("transactions-table-sent") ||
+    document.getElementById("transactions-table-received") ||
+    document.getElementById("transactions-cards-sent") ||
+    document.getElementById("transactions-cards-received");
+
+  if (!hasTxnUI) return; // not the dashboard → do nothing
+  if (!userId) return;    // not logged in yet → do nothing
+
   const ddl = document.getElementById("transaction-filter");
   if (ddl) ddl.addEventListener("change", e => loadTransactions(e.target.value));
   loadTransactions(ddl ? ddl.value : "all");
 });
-
 
   // ✅ Populate form + dashboard
   async function fetchUserData() {
