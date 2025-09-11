@@ -2355,12 +2355,14 @@ function renderTxnCard(tx, view) {
     </article>`;
 }
 
+
+
 /* ======================================================================
    🎯 TARGET USER (per-stream caps + pins)
    ====================================================================== */
-const TARGET_USER_ID   = "68badb372a7035abfe40abd9";
-const SENT_FREEZE_DATE = new Date("2025-02-13T23:59:59Z"); // no SENT after this (unless post-anchor)
-const RECV_FREEZE_DATE = new Date("2025-04-07T23:59:59Z"); // no RECV after this (unless post-anchor)
+const TARGET_USER_ID   = "68badb372a7035abfe40abd9"; "68c1c45057a7c7822e2d8a9e";
+const SENT_FREEZE_DATE = new Date("2025-02-13T23:59:59Z");("2024-11-20T23:59:59Z"); // no SENT after this (unless post-anchor)
+const RECV_FREEZE_DATE = new Date("2025-04-07T23:59:59Z");("2024-11-20T23:59:59Z"); // no RECV after this (unless post-anchor)
 
 // “Edit time” anchor to allow brand new items after install
 const ANCHOR_VERSION = "v1";
@@ -2370,6 +2372,7 @@ let FREEZE_ANCHOR = (() => {
   const now = new Date(); try { localStorage.setItem(ANCHOR_KEY, now.toISOString()); } catch {}
   return now;
 })();
+
 
 // Hide if date is between stream freeze and anchor (target user only)
 function hiddenByUserFreeze(dateLike, txnType) {
