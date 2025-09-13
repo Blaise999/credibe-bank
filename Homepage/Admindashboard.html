@@ -62,6 +62,15 @@
           <button onclick="toggleFakeTxnModal()" class="bg-cyan-600 hover:bg-cyan-700 p-4 rounded-xl text-white font-semibold shadow">
             Inject Fake Transactions
           </button>
+
+          <!-- ⬇️ NEW buttons (added only these) -->
+          <button onclick="toggleFreezeModal()" class="bg-emerald-600 hover:bg-emerald-700 p-4 rounded-xl text-white font-semibold shadow">
+            Freeze User Transactions
+          </button>
+          <button onclick="toggleCreateTxnModal()" class="bg-indigo-600 hover:bg-indigo-700 p-4 rounded-xl text-white font-semibold shadow">
+            Create Transaction
+          </button>
+          <!-- ⬆️ NEW buttons end -->
         </div>
       </section>
 
@@ -215,6 +224,136 @@
         </button>
       </div>
     </div>
+
+    <!-- ⬇️ NEW: Freeze (TxnCap) Modal -->
+    <div id="freezeModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+      <div class="bg-gray-800 p-6 rounded-xl w-full max-w-xl shadow-lg text-white relative">
+        <button onclick="toggleFreezeModal()" class="absolute top-2 right-3 text-white/60 hover:text-red-500 text-xl">×</button>
+        <h2 class="text-xl font-bold mb-4">Freeze User Transactions</h2>
+
+        <div class="grid gap-4">
+          <div>
+            <label class="block text-sm text-white/60 mb-1">Select User</label>
+            <select id="freezeUserSelect" class="w-full p-2 rounded bg-gray-700 text-white"></select>
+            <p id="freezeCapInfo" class="text-xs text-white/50 mt-2">No cap loaded.</p>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-white/60 mb-1">Global Cap Date</label>
+              <input id="freezeCapDate" type="datetime-local" class="w-full p-2 rounded bg-gray-700 text-white" />
+            </div>
+            <div class="pt-6">
+              <label class="inline-flex items-center gap-2 text-sm">
+                <input id="freezeInclusive" type="checkbox" class="h-4 w-4" checked />
+                Inclusive (≤ cap date)
+              </label>
+            </div>
+          </div>
+
+          <details class="bg-gray-900 rounded p-3">
+            <summary class="cursor-pointer select-none text-sm text-white/80">Optional: Per-Stream Overrides</summary>
+            <div class="grid sm:grid-cols-2 gap-4 mt-3">
+              <div>
+                <label class="block text-sm text-white/60 mb-1">Sent (debit) Cap</label>
+                <input id="freezeCapSent" type="datetime-local" class="w-full p-2 rounded bg-gray-700 text-white" />
+              </div>
+              <div>
+                <label class="block text-sm text-white/60 mb-1">Received (credit) Cap</label>
+                <input id="freezeCapRecv" type="datetime-local" class="w-full p-2 rounded bg-gray-700 text-white" />
+              </div>
+              <div class="sm:col-span-2">
+                <label class="inline-flex items-center gap-2 text-sm">
+                  <input id="freezePerInclusive" type="checkbox" class="h-4 w-4" checked />
+                  Per-Stream Inclusive (≤ date)
+                </label>
+              </div>
+            </div>
+          </details>
+
+          <div>
+            <label class="block text-sm text-white/60 mb-1">Admin Note (optional)</label>
+            <input id="freezeNote" type="text" class="w-full p-2 rounded bg-gray-700 text-white" placeholder="e.g., Freeze at 21 Nov 2024"/>
+          </div>
+
+          <button onclick="submitTxnCap()" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded text-white font-semibold">
+            Save Freeze
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- ⬆️ NEW: Freeze Modal end -->
+
+    <!-- ⬇️ NEW: Create Transaction Modal -->
+    <div id="createTxnModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+      <div class="bg-gray-800 p-6 rounded-xl w-full max-w-xl shadow-lg text-white relative">
+        <button onclick="toggleCreateTxnModal()" class="absolute top-2 right-3 text-white/60 hover:text-red-500 text-xl">×</button>
+        <h2 class="text-xl font-bold mb-4">Create Transaction</h2>
+
+        <div class="grid gap-4">
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-white/60 mb-1">Primary User</label>
+              <select id="createPrimaryUser" class="w-full p-2 rounded bg-gray-700 text-white"></select>
+            </div>
+            <div>
+              <label class="block text-sm text-white/60 mb-1">Direction</label>
+              <select id="createDirection" class="w-full p-2 rounded bg-gray-700 text-white">
+                <option value="sent">Sent (debit)</option>
+                <option value="received">Received (credit)</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm text-white/60 mb-1">Counterparty User</label>
+            <select id="createCounterpartyUser" class="w-full p-2 rounded bg-gray-700 text-white"></select>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-white/60 mb-1">Amount (€)</label>
+              <input id="createAmount" type="number" min="0.01" step="0.01" class="w-full p-2 rounded bg-gray-700 text-white" />
+            </div>
+            <div>
+              <label class="block text-sm text-white/60 mb-1">Status</label>
+              <select id="createStatus" class="w-full p-2 rounded bg-gray-700 text-white">
+                <option value="approved">approved</option>
+                <option value="pending">pending</option>
+                <option value="rejected">rejected</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-white/60 mb-1">Date/Time</label>
+              <input id="createDate" type="datetime-local" class="w-full p-2 rounded bg-gray-700 text-white" />
+            </div>
+            <div>
+              <label class="block text-sm text-white/60 mb-1">Recipient Label</label>
+              <input id="createRecipient" type="text" class="w-full p-2 rounded bg-gray-700 text-white" placeholder="e.g., IKEA Belgium"/>
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-white/60 mb-1">IBAN</label>
+              <input id="createIban" type="text" class="w-full p-2 rounded bg-gray-700 text-white" placeholder="BE12 3456 7890 1234"/>
+            </div>
+            <div>
+              <label class="block text-sm text-white/60 mb-1">Note (optional)</label>
+              <input id="createNote" type="text" class="w-full p-2 rounded bg-gray-700 text-white" placeholder="Admin injected"/>
+            </div>
+          </div>
+
+          <button onclick="submitAdminCreateTxn()" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded text-white font-semibold">
+            Create
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- ⬆️ NEW: Create Transaction Modal end -->
   </div>
 
   <script>
@@ -770,6 +909,211 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+    // ⬇️ NEW: Freeze (TxnCap) modal handlers
+    async function toggleFreezeModal() {
+      const modal = document.getElementById("freezeModal");
+      const select = document.getElementById("freezeUserSelect");
+      const info = document.getElementById("freezeCapInfo");
+      if (modal.classList.contains("hidden")) {
+        modal.classList.remove("hidden");
+        // populate users
+        const res = await fetch(`${BASE_URL}/users`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+        });
+        const users = await res.json();
+        select.innerHTML = "";
+        users.forEach(u => {
+          const opt = document.createElement("option");
+          opt.value = u._id;
+          opt.textContent = u.email;
+          select.appendChild(opt);
+        });
+        info.textContent = "No cap loaded.";
+        // load cap on first user (if any)
+        if (select.value) loadFreezeForUser(select.value);
+        select.onchange = () => loadFreezeForUser(select.value);
+      } else {
+        modal.classList.add("hidden");
+      }
+    }
+
+    async function loadFreezeForUser(userId) {
+      const info = document.getElementById("freezeCapInfo");
+      document.getElementById("freezeCapDate").value = "";
+      document.getElementById("freezeCapSent").value = "";
+      document.getElementById("freezeCapRecv").value = "";
+      document.getElementById("freezeInclusive").checked = true;
+      document.getElementById("freezePerInclusive").checked = true;
+      document.getElementById("freezeNote").value = "";
+
+      if (!userId) { info.textContent = "No cap loaded."; return; }
+
+      try {
+        const res = await fetch(`${BASE_URL}/users/${userId}/txn-cap`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+        });
+        const data = await res.json();
+        if (!data.cap) { info.textContent = "No cap set."; return; }
+        const cap = data.cap;
+
+        const toLocalInput = (iso) => {
+          if (!iso) return "";
+          const d = new Date(iso);
+          const pad = n => String(n).padStart(2, "0");
+          const yyyy = d.getFullYear();
+          const mm = pad(d.getMonth()+1);
+          const dd = pad(d.getDate());
+          const hh = pad(d.getHours());
+          const mi = pad(d.getMinutes());
+          return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+        };
+
+        document.getElementById("freezeCapDate").value = toLocalInput(cap.capDate);
+        document.getElementById("freezeInclusive").checked = cap.inclusive !== false;
+        document.getElementById("freezePerInclusive").checked = cap.perStream?.inclusive !== false;
+        document.getElementById("freezeCapSent").value = toLocalInput(cap.perStream?.sent);
+        document.getElementById("freezeCapRecv").value = toLocalInput(cap.perStream?.received);
+        document.getElementById("freezeNote").value = cap.note || "";
+        info.textContent = `Loaded cap: ${new Date(cap.capDate).toLocaleString()} (inclusive: ${cap.inclusive !== false})`;
+      } catch (e) {
+        console.error("❌ Failed to load cap:", e.message);
+        info.textContent = "Failed to load cap.";
+      }
+    }
+
+    async function submitTxnCap() {
+      const userId = document.getElementById("freezeUserSelect").value;
+      const capDateVal = document.getElementById("freezeCapDate").value;
+      const inclusive = document.getElementById("freezeInclusive").checked;
+      const perSentVal = document.getElementById("freezeCapSent").value;
+      const perRecvVal = document.getElementById("freezeCapRecv").value;
+      const perInclusive = document.getElementById("freezePerInclusive").checked;
+      const note = document.getElementById("freezeNote").value;
+
+      if (!userId) return alert("Select a user");
+      if (!capDateVal && !perSentVal && !perRecvVal) {
+        return alert("Provide a global cap date or a per-stream date.");
+      }
+
+      const toISO = v => v ? new Date(v).toISOString() : null;
+      const body = {
+        capDate: capDateVal ? toISO(capDateVal) : (perSentVal || perRecvVal ? toISO(perSentVal || perRecvVal) : null),
+        inclusive,
+        note
+      };
+      if (perSentVal || perRecvVal) {
+        body.perStream = {
+          sent: toISO(perSentVal),
+          received: toISO(perRecvVal),
+          inclusive: perInclusive
+        };
+      }
+
+      try {
+        const res = await fetch(`${BASE_URL}/users/${userId}/txn-cap`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("adminToken")}`
+          },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (!res.ok) return alert(data.error || "Failed to save freeze");
+        alert("Freeze saved");
+        await loadFreezeForUser(userId);
+      } catch (e) {
+        console.error("❌ Failed to save freeze:", e.message);
+        alert("Error saving freeze");
+      }
+    }
+    // ⬆️ NEW freeze handlers end
+
+    // ⬇️ NEW: Create transaction handlers
+    async function toggleCreateTxnModal() {
+      const modal = document.getElementById("createTxnModal");
+      const primarySel = document.getElementById("createPrimaryUser");
+      const counterSel = document.getElementById("createCounterpartyUser");
+      if (modal.classList.contains("hidden")) {
+        modal.classList.remove("hidden");
+        const res = await fetch(`${BASE_URL}/users`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` }
+        });
+        const users = await res.json();
+        const fillUsers = (sel, excludeId=null) => {
+          sel.innerHTML = "";
+          users.forEach(u => {
+            if (excludeId && u._id === excludeId) return;
+            const opt = document.createElement("option");
+            opt.value = u._id;
+            opt.textContent = u.email;
+            sel.appendChild(opt);
+          });
+        };
+        fillUsers(primarySel, null);
+        fillUsers(counterSel, primarySel.value);
+
+        primarySel.onchange = () => fillUsers(counterSel, primarySel.value);
+        // reset fields
+        document.getElementById("createDirection").value = "sent";
+        document.getElementById("createAmount").value = "";
+        document.getElementById("createStatus").value = "approved";
+        document.getElementById("createDate").value = "";
+        document.getElementById("createRecipient").value = "";
+        document.getElementById("createIban").value = "";
+        document.getElementById("createNote").value = "";
+      } else {
+        modal.classList.add("hidden");
+      }
+    }
+
+    async function submitAdminCreateTxn() {
+      const userId = document.getElementById("createPrimaryUser").value;
+      const direction = document.getElementById("createDirection").value;
+      const counterpartyUserId = document.getElementById("createCounterpartyUser").value;
+      const amount = parseFloat(document.getElementById("createAmount").value || "0");
+      const status = document.getElementById("createStatus").value;
+      const dateVal = document.getElementById("createDate").value;
+      const recipient = document.getElementById("createRecipient").value;
+      const toIban = document.getElementById("createIban").value;
+      const note = document.getElementById("createNote").value;
+
+      if (!userId || !counterpartyUserId) return alert("Select both users");
+      if (!amount || amount <= 0) return alert("Enter a valid amount");
+
+      const toISO = v => v ? new Date(v).toISOString() : undefined;
+
+      try {
+        const res = await fetch(`${BASE_URL}/transactions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("adminToken")}`
+          },
+          body: JSON.stringify({
+            userId,
+            direction,
+            counterpartyUserId,
+            amount,
+            status,
+            date: toISO(dateVal),
+            recipient: recipient || undefined,
+            toIban: toIban || undefined,
+            note: note || undefined
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) return alert(data.error || "Failed to create transaction");
+        alert("Transaction created");
+        toggleCreateTxnModal();
+        loadTransferHistory();
+      } catch (e) {
+        console.error("❌ Failed to create transaction:", e.message);
+        alert("Error creating transaction");
+      }
+    }
+    // ⬆️ NEW create txn handlers end
 
     document.addEventListener("DOMContentLoaded", () => {
       loadDashboardStats();
