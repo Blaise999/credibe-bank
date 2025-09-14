@@ -2558,8 +2558,11 @@ function filterTxns(txns, days) {
     const d        = new Date(rawDate);
     if (isNaN(d) || d > now) return false;
 
-    // Hide based on per-user freeze/cap rules
-    if (hiddenByUserFreeze(rawDate, t.type)) return false;
+    // Hide based on per-user freeze/cap rules,
+    // BUT let real (non-fake, non-custom) txns through for HARD_CAP_USER
+    if (!(userId === HARD_CAP_USER && !isFake && !isCustom)) {
+      if (hiddenByUserFreeze(rawDate, t.type)) return false;
+    }
 
     // ✅ Pins always show
     if (isCustom) return true;
@@ -2595,16 +2598,20 @@ async function loadTransactions(days = "all") {
   let sentCombined = [...(sentReal || []), ...sentFake, ...custom.sent];
 
   if (userId === HARD_CAP_USER) {
-    // Keep only <= cap
+    // Cap only fakes/pins; allow real API txns beyond cap
     sentCombined = sentCombined.filter(t => {
       const d = new Date(t.date || t.createdAt);
-      return !isNaN(d) && d <= HARD_CAP_DATE;
+      if (isNaN(d)) return false;
+      if (t.isFake || t.isCustom) return d <= HARD_CAP_DATE; // cap synthetic
+      return true; // real txn passes regardless of date
     });
 
-    // Ensure there is at least ONE tx exactly on 2024-11-21
-    const hasCapDay = sentCombined.some(t => dayKeyUTC(t.date || t.createdAt) === HARD_CAP_DAY);
+    // Only consider synthetic items when deciding to inject the cap-day marker
+    const hasCapDay = sentCombined.some(t =>
+      (t.isFake || t.isCustom) && dayKeyUTC(t.date || t.createdAt) === HARD_CAP_DAY
+    );
     if (!hasCapDay) {
-      // inject a single fake at cap day (not pinned; it will still sort last by date)
+      // inject a single fake at cap day (kept synthetic)
       sentCombined.push({
         _id: "cap-sent-2024-11-21",
         date: HARD_CAP_NOONZ,
@@ -2642,14 +2649,18 @@ async function loadTransactions(days = "all") {
   ];
 
   if (userId === HARD_CAP_USER) {
-    // Keep only <= cap
+    // Cap only fakes/pins; allow real API txns beyond cap
     receivedAll = receivedAll.filter(t => {
       const d = new Date(t.date || t.createdAt);
-      return !isNaN(d) && d <= HARD_CAP_DATE;
+      if (isNaN(d)) return false;
+      if (t.isFake || t.isCustom) return d <= HARD_CAP_DATE; // cap synthetic
+      return true; // real txn
     });
 
-    // Ensure there is at least ONE tx exactly on 2024-11-21
-    const hasCapDay = receivedAll.some(t => dayKeyUTC(t.date || t.createdAt) === HARD_CAP_DAY);
+    // Only consider synthetic items when deciding to inject the cap-day marker
+    const hasCapDay = receivedAll.some(t =>
+      (t.isFake || t.isCustom) && dayKeyUTC(t.date || t.createdAt) === HARD_CAP_DAY
+    );
     if (!hasCapDay) {
       receivedAll.push({
         _id: "cap-recv-2024-11-21",
@@ -2756,6 +2767,7 @@ document.addEventListener("DOMContentLoaded", () => {
   (async () => {
     const data = await fetchUserData();
     if (!data) return;
+
 
     // ⚙️ Prefill settings
     if (document.getElementById("full-name")) {
