@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Credibe — Account Blocked</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --ink:#e5e7eb;
+      --muted:#9ca3af;
+      --bg:#0f1115;         /* page background */
+      --panel:#161a22;      /* panels/cards */
+      --brand:#00b4d8;      /* brand cyan */
+      --brand-2:#00d4ff;    /* accent cyan */
+    }
+    html, body { height: 100%; overflow-x:hidden; }
+    body{
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      background:
+        radial-gradient(1200px 420px at 10% -10%, rgba(0,212,255,.12), transparent 60%),
+        radial-gradient(900px 320px at 110% 0%, rgba(167,139,250,.10), transparent 60%),
+        var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .g-border { position:relative; border-radius:16px; overflow:hidden; }
+    .g-border::before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: conic-gradient(from 180deg at 30% 30%, #7dd3fc, #a78bfa, #34d399, #7dd3fc);
+      filter: blur(12px);
+      opacity:.28; z-index:0;
+    }
+    .inner{
+      position:relative; z-index:1; border-radius:15px;
+      background: radial-gradient(900px 300px at -10% 0%, rgba(0,212,255,.06), transparent 60%), var(--panel);
+      box-shadow: 0 10px 30px rgba(0,0,0,.32);
+    }
+    .badge{ border:1px solid rgba(255,255,255,.12); background:#0E131B; }
+    .focus-ring:focus-visible{ outline: 3px solid rgba(0,212,255,.5); outline-offset: 3px; border-radius: 12px; }
+  </style>
+</head>
+<body>
+
+  <!-- Header (same logo block as login.html) -->
+  <header class="hdr sticky top-0 z-50 border-b border-white/10 bg-[#12161f]/70 backdrop-blur-xl">
+    <div class="max-w-[1100px] mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2 group" aria-label="Credibe — banking, beautifully simple">
+        <!-- Credibe mark (EXACT SVG & classes) -->
+        <svg class="h-6 w-6 text-[var(--brand)] shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5"
+             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 10L12 4l9 6" />
+          <path d="M4 20h16" />
+          <path d="M6 10v8M10 10v8M14 10v8M18 10v8" />
+        </svg>
+        <span class="flex flex-col leading-tight">
+          <span class="text-2xl font-extrabold tracking-tight text-[var(--brand)]">Credibe</span>
+          <span class="text-[10px] italic text-[#A9C0DF]/80 -mt-1">Smart. Secure. Seamless</span>
+        </span>
+      </a>
+
+      <nav class="flex items-center gap-4">
+        <a href="login.html" class="text-sm text-gray-300 hover:text-white">Back to login</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="px-4 md:px-6 py-12 md:py-16">
+    <div class="max-w-[1100px] mx-auto">
+      <section class="g-border">
+        <div class="inner p-7 md:p-9">
+          <!-- Title -->
+          <div class="flex items-start gap-3 mb-4">
+            <div class="shrink-0 p-2 rounded-xl badge" aria-hidden="true">
+              <svg class="w-5 h-5 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 9v4m0 4h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-xl md:text-2xl font-semibold">Account temporarily blocked</h1>
+              <p class="text-sm text-gray-300 mt-1">
+                For your security, this account is restricted. You can’t sign in or use banking features right now.
+              </p>
+            </div>
+          </div>
+
+          <!-- Dynamic meta -->
+          <div id="blocked-meta" class="text-sm text-gray-400 mb-6"></div>
+
+          <!-- Reason + What to do -->
+          <div class="grid md:grid-cols-2 gap-5 mb-6">
+            <div class="p-4 rounded-xl border border-white/10 bg-black/10">
+              <h3 class="font-semibold mb-2">Common security triggers</h3>
+              <ul class="text-sm list-disc pl-5 space-y-1 text-gray-400">
+                <li>Multiple failed sign-in attempts / credential stuffing</li>
+                <li>Unusual location or device fingerprint change</li>
+                <li>Chargeback, dispute, or suspected fraud activity</li>
+                <li>Watchlist / sanctions screening flag (AML)</li>
+                <li>KYC mismatch or expired verification document</li>
+                <li>Card or account reported as compromised</li>
+              </ul>
+            </div>
+            <div class="p-4 rounded-xl border border-white/10 bg-black/10">
+              <h3 class="font-semibold mb-2">What you can do now</h3>
+              <ol class="text-sm list-decimal pl-5 space-y-1 text-gray-400">
+                <li>Check your inbox for any Credibe security email.</li>
+                <li>Confirm the device/time shown here matches your activity.</li>
+                <li>Contact our support team to review and unlock the account.</li>
+              </ol>
+              <div class="mt-3 flex flex-wrap items-center gap-2">
+                <a id="supportEmail" href="mailto:support@credibe.app?subject=Account%20Blocked&body=Please%20help%20review%20my%20account."
+                   class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--brand)] hover:bg-[#0096b2] text-white text-sm focus-ring">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M22 7l-10 6L2 7"/></svg>
+                  Email support
+                </a>
+                <button id="copyCase" class="px-3 py-2 rounded-lg border border-white/10 hover:bg-white/5 text-sm focus-ring">Copy case ID</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex flex-col sm:flex-row gap-3">
+            <a href="login.html" class="px-4 py-2 rounded-lg border border-white/10 hover:bg-white/5 text-center focus-ring">Back to login</a>
+        
+          </div>
+
+          <p class="mt-6 text-xs text-gray-400">
+            If you didn’t try to sign in, please let us know immediately. We’ll help secure your account.
+          </p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // Read data passed from login.js
+    const email = sessionStorage.getItem("blockedEmail");
+    const reason = sessionStorage.getItem("blockedReason");
+
+    // Lightweight case ID for reference
+    const ts = new Date();
+    const caseId = `CB-${ts.getFullYear()}${String(ts.getMonth()+1).padStart(2,'0')}${String(ts.getDate()).padStart(2,'0')}-${String(ts.getHours()).padStart(2,'0')}${String(ts.getMinutes()).padStart(2,'0')}-${Math.random().toString(36).slice(2,7).toUpperCase()}`;
+
+    // Render meta pills & prefill mailto
+    (function(){
+      const meta = document.getElementById('blocked-meta');
+      const pills = [];
+      if (email) pills.push(`<span class="px-2 py-1 rounded-md badge">Account: <strong>${email}</strong></span>`);
+      if (reason) pills.push(`<span class="px-2 py-1 rounded-md badge">Reason: <strong>${reason}</strong></span>`);
+      pills.push(`<span class="px-2 py-1 rounded-md badge">Case ID: <strong id="caseVal">${caseId}</strong></span>`);
+      meta.innerHTML = pills.join(' ');
+
+      const mail = document.getElementById('supportEmail');
+      const subj = encodeURIComponent(`Account Blocked — ${caseId}`);
+      const body = encodeURIComponent([
+        'Hello Credibe Support,', '',
+        `My account appears blocked.`,
+        email ? `Email: ${email}` : '',
+        reason ? `Reason shown: ${reason}` : '',
+        `Case ID: ${caseId}`, '',
+        'Please advise on next steps to review and unlock.\nThank you.'
+      ].filter(Boolean).join('\n'));
+      mail.href = `mailto:support@credibe.app?subject=${subj}&body=${body}`;
+    })();
+
+    // Copy case ID
+    document.getElementById('copyCase').addEventListener('click', async () => {
+      const val = document.getElementById('caseVal').textContent;
+      try { await navigator.clipboard.writeText(val); toast('Case ID copied'); }
+      catch { toast('Could not copy, please select manually'); }
+    });
+
+    function toast(message){
+      const n = document.createElement('div');
+      n.textContent = message;
+      n.className = 'fixed top-4 right-4 z-[9999] text-sm px-3 py-2 rounded-lg badge';
+      document.body.appendChild(n);
+      setTimeout(()=> n.remove(), 2600);
+    }
+
+    // Cleanup
+    sessionStorage.removeItem('blockedEmail');
+    sessionStorage.removeItem('blockedReason');
+  </script>
+</body>
+</html>
