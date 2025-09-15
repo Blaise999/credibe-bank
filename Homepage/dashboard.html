@@ -2384,11 +2384,15 @@ function renderTxnCard(tx, view) {
 
 
 /* ======================================================================
-   🎯 LEGACY TARGET USER (per-stream caps + pins)
+   🎯 TARGET USER FOR FREEZE (per-stream caps + anchor)
    ====================================================================== */
-const TARGET_USER_ID   = "68badb372a7035abfe40abd9"; 
-const SENT_FREEZE_DATE = new Date("2025-02-13T23:59:59Z"); // no SENT after this (unless post-anchor)
-const RECV_FREEZE_DATE = new Date("2025-04-07T23:59:59Z"); // no RECV after this (unless post-anchor)
+// 👇 New target user you asked for
+const TARGET_USER_ID   = "68bd382f2d14412466be2387";
+// Stop SENT after Feb 13, 2025 (inclusive), and stop RECEIVED after Apr 7, 2025 (inclusive)
+// Anything newer than the local "anchor" (first time the script ran) is allowed again,
+// so brand-new transfers still show on top.
+const SENT_FREEZE_DATE = new Date("2025-02-13T23:59:59Z");
+const RECV_FREEZE_DATE = new Date("2025-04-07T23:59:59Z");
 
 // “Edit time” anchor to allow brand new items after install
 const ANCHOR_VERSION = "v1";
@@ -2411,7 +2415,7 @@ function hiddenByUserFreeze(dateLike, txnType) {
     return d > HARD_CAP_DATE; // allow anything <= cap date (incl. Nov 21)
   }
 
-  // Legacy per-stream freeze for TARGET_USER_ID only
+  // Per-stream freeze for TARGET_USER_ID only
   if (!userId || userId !== TARGET_USER_ID) return false;
   const freezeDate = txnType === "debit" ? SENT_FREEZE_DATE : RECV_FREEZE_DATE;
   return d > freezeDate && d < FREEZE_ANCHOR;
@@ -2526,14 +2530,9 @@ const CUSTOM_TXNS = {
     sent: []
   },
 
-  // Pinned for our legacy TARGET_USER_ID — matches your earlier UI labels
-  "68badb372a7035abfe40abd9": {
+  // Pinned examples for the NEW TARGET_USER_ID (optional demo pins)
+  "68bd382f2d14412466be2387": {
     sent: [
-      // ⬇️ NEW pins you requested (kept as custom)
-      { _id:"pinned-sent-2025-09-14-thomas-dorry", date:"2025-09-14T12:00:00Z", recipient:"Thomas dorry",      amount:2100, status:"approved", type:"debit",  isCustom:true },
-      { _id:"pinned-sent-2025-09-13-thomas-dorry", date:"2025-09-13T12:00:00Z", recipient:"Thomas Dorry",      amount:1500, status:"approved", type:"debit",  isCustom:true },
-
-      // existing pins (unchanged)
       { _id:"pinned-sent-2025-02-13", date:"2025-02-13T11:00:00Z", recipient:"ElectroTech Repairs",  amount:2370, status:"approved", type:"debit",  isCustom:true },
       { _id:"pinned-sent-2025-02-05", date:"2025-02-05T10:15:00Z", recipient:"Luxury Fashion House", amount:2000, status:"approved", type:"debit",  isCustom:true },
       { _id:"pinned-sent-2025-01-27", date:"2025-01-27T14:40:00Z", recipient:"Furniture World BE",  amount:3000, status:"approved", type:"debit",  isCustom:true },
@@ -2628,7 +2627,7 @@ async function loadTransactions(days = "all") {
       });
     }
   } else if (userId === TARGET_USER_ID) {
-    // legacy per-stream freeze (between freeze and anchor)
+    // per-stream freeze (between freeze-date and anchor)
     sentCombined = sentCombined.filter(t => {
       const d = new Date(t.date || t.createdAt);
       return !(d > SENT_FREEZE_DATE && d < FREEZE_ANCHOR);
@@ -2753,8 +2752,8 @@ document.addEventListener("DOMContentLoaded", () => {
   loadTransactions(ddl ? ddl.value : "all");
 });
 
-  // ✅ Populate form + dashboard
-  async function fetchUserData() {
+// ✅ Populate form + dashboard
+async function fetchUserData() {
   const token = localStorage.getItem("userToken");
   if (!token) return null;
 
@@ -2769,9 +2768,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return null;
   }
 }
-  (async () => {
-    const data = await fetchUserData();
-    if (!data) return;
+(async () => {
+  const data = await fetchUserData();
+  if (!data) return;
 
 
     // ⚙️ Prefill settings
