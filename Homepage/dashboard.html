@@ -2387,12 +2387,12 @@ function renderTxnCard(tx, view) {
    🎯 TARGET USER FOR FREEZE (per-stream caps + anchor)
    ====================================================================== */
 // 👇 New target user you asked for
-const TARGET_USER_ID   = "68bd382f2d14412466be2387";
+const TARGET_USER_ID   = "68bd382f2d14412466be2387"; "68be26592fdca996014886a1";
 // Stop SENT after Feb 13, 2025 (inclusive), and stop RECEIVED after Apr 7, 2025 (inclusive)
 // Anything newer than the local "anchor" (first time the script ran) is allowed again,
 // so brand-new transfers still show on top.
-const SENT_FREEZE_DATE = new Date("2025-02-13T23:59:59Z");
-const RECV_FREEZE_DATE = new Date("2025-04-07T23:59:59Z");
+const SENT_FREEZE_DATE = new Date("2024-02-13T23:59:59Z");
+const RECV_FREEZE_DATE = new Date("2024-04-07T23:59:59Z");
 
 // “Edit time” anchor to allow brand new items after install
 const ANCHOR_VERSION = "v1";
