@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const { verifyToken } = require("../middleware/auth");
-const { getUserTransactions } = require("../controllers/user.controller");
+const { getUserTransactions, getMyTxnCap } = require("../controllers/user.controller"); // <-- add getMyTxnCap
 const User = require("../models/User");
-const auth = require('../middleware/auth'); // Your auth middleware
+
 // 📌 Helper to send JSON
 const handleResponse = (res, data) => res.json(data);
 
@@ -12,17 +12,17 @@ router.get("/dashboard", verifyToken, (req, res) => {
   handleResponse(res, { message: "Token verified ✅", user: req.user });
 });
 
-// 📊 Transactions (kept the same)
+// 📊 Transactions
 router.get("/transactions/:userId", verifyToken, getUserTransactions);
 
-router.get('/txn-cap', auth, userController.getMyTxnCap);
-// 🧍‍♂️ Profile (now also returns avatarUrl)
+// 🔒 Current user's freeze (txn-cap) — returns { cap: ... } or { cap: null }
+router.get("/txn-cap", verifyToken, getMyTxnCap);
+
+// 🧍‍♂️ Profile
 router.get("/profile", verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id)
-      .select("name email phone avatarUrl");
+    const user = await User.findById(req.user.id).select("name email phone avatarUrl");
     if (!user) return res.status(404).json({ error: "User not found" });
-
     handleResponse(res, user);
   } catch (err) {
     console.error("❌ Profile fetch error:", err);
@@ -30,7 +30,7 @@ router.get("/profile", verifyToken, async (req, res) => {
   }
 });
 
-// 👤 Me (returns the fields your dashboard/settings need, incl. avatarUrl)
+// 👤 Me
 router.get("/me", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select(
