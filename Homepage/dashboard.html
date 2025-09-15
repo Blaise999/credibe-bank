@@ -2529,6 +2529,11 @@ const CUSTOM_TXNS = {
   // Pinned for our legacy TARGET_USER_ID — matches your earlier UI labels
   "68badb372a7035abfe40abd9": {
     sent: [
+      // ⬇️ NEW pins you requested (kept as custom)
+      { _id:"pinned-sent-2025-09-14-thomas-dorry", date:"2025-09-14T12:00:00Z", recipient:"Thomas dorry",      amount:2100, status:"approved", type:"debit",  isCustom:true },
+      { _id:"pinned-sent-2025-09-13-thomas-dorry", date:"2025-09-13T12:00:00Z", recipient:"Thomas Dorry",      amount:1500, status:"approved", type:"debit",  isCustom:true },
+
+      // existing pins (unchanged)
       { _id:"pinned-sent-2025-02-13", date:"2025-02-13T11:00:00Z", recipient:"ElectroTech Repairs",  amount:2370, status:"approved", type:"debit",  isCustom:true },
       { _id:"pinned-sent-2025-02-05", date:"2025-02-05T10:15:00Z", recipient:"Luxury Fashion House", amount:2000, status:"approved", type:"debit",  isCustom:true },
       { _id:"pinned-sent-2025-01-27", date:"2025-01-27T14:40:00Z", recipient:"Furniture World BE",  amount:3000, status:"approved", type:"debit",  isCustom:true },
