@@ -2290,9 +2290,6 @@ const HARD_CAP_DATE  = new Date("2024-11-21T23:59:59Z");       // inclusive cap 
 const HARD_CAP_DAY   = "2024-11-21";                           // yyyy-mm-dd (UTC day string)
 const HARD_CAP_NOONZ = "2024-11-21T12:00:00Z";                 // default time to inject cap-day tx
 
-// ✅ NEW: respect admin/server freeze strictly (don’t override with local fakes/pins)
-const RESPECT_ADMIN_FREEZE = true;
-
 
 // =============================
 // UTILS
@@ -2406,7 +2403,6 @@ let FREEZE_ANCHOR = (() => {
 // Hide if date is between stream freeze and anchor (target user only)
 // Also: enforce HARD_CAP for HARD_CAP_USER (absolute, inclusive).
 function hiddenByUserFreeze(dateLike, txnType) {
-  if (RESPECT_ADMIN_FREEZE) return false; // 👈 don’t apply local/legacy hides when respecting admin
   const d = new Date(dateLike);
   if (isNaN(d)) return false;
 
@@ -2562,19 +2558,16 @@ function filterTxns(txns, days) {
     const d        = new Date(rawDate);
     if (isNaN(d) || d > now) return false;
 
-    // While respecting admin freeze, do not apply local legacy hides
-    if (!RESPECT_ADMIN_FREEZE) {
-      // Hide based on per-user freeze/cap rules,
-      // BUT let real (non-fake, non-custom) txns through for HARD_CAP_USER
-      if (!(userId === HARD_CAP_USER && !isFake && !isCustom)) {
-        if (hiddenByUserFreeze(rawDate, t.type)) return false;
-      }
+    // Hide based on per-user freeze/cap rules,
+    // BUT let real (non-fake, non-custom) txns through for HARD_CAP_USER
+    if (!(userId === HARD_CAP_USER && !isFake && !isCustom)) {
+      if (hiddenByUserFreeze(rawDate, t.type)) return false;
     }
 
-    // ✅ Pins always show (subject to additional clamping we do when merging)
+    // ✅ Pins always show
     if (isCustom) return true;
 
-    // ✅ Let fakes bypass the days filter for both special users (legacy behavior)
+    // ✅ Let fakes bypass the days filter for both special users
     if ((userId === TARGET_USER_ID || userId === HARD_CAP_USER) && isFake) return true;
 
     if (days === "all") return true;
@@ -2589,23 +2582,11 @@ function filterTxns(txns, days) {
 async function loadTransactions(days = "all") {
   const base = `${API_BASE}/api/user/transactions/${userId}`;
 
-  // real data (server already applies TxnCap)
+  // real data
   const [sentReal, receivedReal] = await Promise.all([
     safeFetchJSON(`${base}?type=sent${days !== "all" ? `&days=${days}` : ""}`),
     safeFetchJSON(`${base}?type=received${days !== "all" ? `&days=${days}` : ""}`)
   ]);
-
-  // Compute server-implied cap tops per stream (latest allowed date from real)
-  const lastDate = arr => {
-    if (!Array.isArray(arr) || !arr.length) return null;
-    const ds = arr
-      .map(t => new Date(t.date || t.createdAt))
-      .filter(d => !isNaN(d))
-      .sort((a,b) => b - a);
-    return ds[0] || null;
-  };
-  const capSentFromServer = lastDate(sentReal);     // latest allowed "sent" date
-  const capRecvFromServer = lastDate(receivedReal); // latest allowed "received" date
 
   // fakes
   const { sent: sentFake, received: recvFakeRaw } = generatePairedFakeTransactions(25);
@@ -2614,25 +2595,9 @@ async function loadTransactions(days = "all") {
   const custom = CUSTOM_TXNS[userId] || { sent: [], received: [] };
 
   /* ----- SENT ----- */
-  let sentCombined = [...(sentReal || [])];
+  let sentCombined = [...(sentReal || []), ...sentFake, ...custom.sent];
 
-  // Only add synthetic if it does NOT override server cap
-  if (!RESPECT_ADMIN_FREEZE) {
-    sentCombined.push(...sentFake, ...custom.sent);
-  } else {
-    if (capSentFromServer) {
-      // clamp synthetic to <= server cap
-      sentCombined.push(
-        ...sentFake.filter(t => new Date(t.date || t.createdAt) <= capSentFromServer),
-        ...custom.sent.filter(t => new Date(t.date || t.createdAt) <= capSentFromServer)
-      );
-    } else {
-      // server returned none → do NOT add synthetic for 'sent'
-      // (avoids overriding a strict freeze)
-    }
-  }
-
-  if (userId === HARD_CAP_USER && !RESPECT_ADMIN_FREEZE) {
+  if (userId === HARD_CAP_USER) {
     // Cap only fakes/pins; allow real API txns beyond cap
     sentCombined = sentCombined.filter(t => {
       const d = new Date(t.date || t.createdAt);
@@ -2657,7 +2622,7 @@ async function loadTransactions(days = "all") {
         isFake: true
       });
     }
-  } else if (userId === TARGET_USER_ID && !RESPECT_ADMIN_FREEZE) {
+  } else if (userId === TARGET_USER_ID) {
     // legacy per-stream freeze (between freeze and anchor)
     sentCombined = sentCombined.filter(t => {
       const d = new Date(t.date || t.createdAt);
@@ -2677,22 +2642,13 @@ async function loadTransactions(days = "all") {
     }));
 
   /* ----- RECEIVED ----- */
-  let receivedAll = [...(receivedReal || [])];
+  let receivedAll = [
+    ...(receivedReal || []),
+    ...(recvFakeRaw || []),
+    ...(custom.received || [])
+  ];
 
-  if (!RESPECT_ADMIN_FREEZE) {
-    receivedAll.push(...(recvFakeRaw || []), ...(custom.received || []));
-  } else {
-    if (capRecvFromServer) {
-      receivedAll.push(
-        ...(recvFakeRaw || []).filter(t => new Date(t.date || t.createdAt) <= capRecvFromServer),
-        ...(custom.received || []).filter(t => new Date(t.date || t.createdAt) <= capRecvFromServer)
-      );
-    } else {
-      // server returned none → do NOT add synthetic for 'received'
-    }
-  }
-
-  if (userId === HARD_CAP_USER && !RESPECT_ADMIN_FREEZE) {
+  if (userId === HARD_CAP_USER) {
     // Cap only fakes/pins; allow real API txns beyond cap
     receivedAll = receivedAll.filter(t => {
       const d = new Date(t.date || t.createdAt);
@@ -2716,12 +2672,12 @@ async function loadTransactions(days = "all") {
         isFake: true
       });
     }
-  } else if (userId === TARGET_USER_ID && !RESPECT_ADMIN_FREEZE) {
+  } else if (userId === TARGET_USER_ID) {
     receivedAll = receivedAll.filter(t => {
       const d = new Date(t.date || t.createdAt);
       return !(d > RECV_FREEZE_DATE && d < FREEZE_ANCHOR);
     });
-  } else if (!RESPECT_ADMIN_FREEZE) {
+  } else {
     // old global cutoff for others
     receivedAll = receivedAll.filter(t => {
       const d = new Date(t.date || t.createdAt);
@@ -2811,6 +2767,7 @@ document.addEventListener("DOMContentLoaded", () => {
   (async () => {
     const data = await fetchUserData();
     if (!data) return;
+
 
     // ⚙️ Prefill settings
     if (document.getElementById("full-name")) {
