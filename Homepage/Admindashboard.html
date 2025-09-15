@@ -236,6 +236,8 @@
             <label class="block text-sm text-white/60 mb-1">Select User</label>
             <select id="freezeUserSelect" class="w-full p-2 rounded bg-gray-700 text-white"></select>
             <p id="freezeCapInfo" class="text-xs text-white/50 mt-2">No cap loaded.</p>
+            <!-- ⭐ NEW: show exceptAfter band -->
+            <p id="freezeExceptInfo" class="text-xs text-emerald-300/80 mt-1"></p>
           </div>
 
           <div class="grid sm:grid-cols-2 gap-4">
@@ -548,7 +550,6 @@
       }
     }
 
-
     function toggleNotifyModal() {
       const modal = document.getElementById("notifyModal");
       const select = document.getElementById("notifyUserSelect");
@@ -579,13 +580,15 @@
       if (!userId || !subject || !message) {
         return alert("Please fill out all fields");
       }
+      // ⭐ NEW: auto-detect HTML vs text
+      const isHtml = /<\/?[a-z][\s\S]*>/i.test(message);
       fetch(`${BASE_URL}/notify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("adminToken")}`
         },
-        body: JSON.stringify({ userId, subject, message })
+        body: JSON.stringify({ userId, subject, message, isHtml })
       })
         .then(res => res.json())
         .then(data => {
@@ -915,6 +918,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const modal = document.getElementById("freezeModal");
       const select = document.getElementById("freezeUserSelect");
       const info = document.getElementById("freezeCapInfo");
+      const exceptInfo = document.getElementById("freezeExceptInfo"); // ⭐ NEW
       if (modal.classList.contains("hidden")) {
         modal.classList.remove("hidden");
         // populate users
@@ -930,6 +934,7 @@ document.addEventListener('DOMContentLoaded', () => {
           select.appendChild(opt);
         });
         info.textContent = "No cap loaded.";
+        exceptInfo.textContent = ""; // ⭐ NEW
         // load cap on first user (if any)
         if (select.value) loadFreezeForUser(select.value);
         select.onchange = () => loadFreezeForUser(select.value);
@@ -940,12 +945,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadFreezeForUser(userId) {
       const info = document.getElementById("freezeCapInfo");
+      const exceptInfo = document.getElementById("freezeExceptInfo"); // ⭐ NEW
       document.getElementById("freezeCapDate").value = "";
       document.getElementById("freezeCapSent").value = "";
       document.getElementById("freezeCapRecv").value = "";
       document.getElementById("freezeInclusive").checked = true;
       document.getElementById("freezePerInclusive").checked = true;
       document.getElementById("freezeNote").value = "";
+      exceptInfo.textContent = ""; // ⭐ NEW
 
       if (!userId) { info.textContent = "No cap loaded."; return; }
 
@@ -975,6 +982,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById("freezeCapSent").value = toLocalInput(cap.perStream?.sent);
         document.getElementById("freezeCapRecv").value = toLocalInput(cap.perStream?.received);
         document.getElementById("freezeNote").value = cap.note || "";
+
+        // ⭐ NEW: show exceptAfter window if present
+        const exSent = cap?.perStream?.exceptAfter?.sent;
+        const exRecv = cap?.perStream?.exceptAfter?.received;
+        const pretty = (iso) => iso ? new Date(iso).toLocaleString() : '';
+        const chunks = [];
+        if (exSent) chunks.push(`Sent resumes after: ${pretty(exSent)}`);
+        if (exRecv) chunks.push(`Received resumes after: ${pretty(exRecv)}`);
+        exceptInfo.textContent = chunks.join(' • ');
+
         info.textContent = `Loaded cap: ${new Date(cap.capDate).toLocaleString()} (inclusive: ${cap.inclusive !== false})`;
       } catch (e) {
         console.error("❌ Failed to load cap:", e.message);
