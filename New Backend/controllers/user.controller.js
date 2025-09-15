@@ -465,3 +465,16 @@ exports.me = async (req, res) => {
     return res.status(500).json({ error: 'Server error' });
   }
 };
+
+// ✅ Add this to user.controller.js
+exports.getMyTxnCap = async (req, res) => {
+  const userId = req.user.id; // From auth middleware
+  try {
+    const cap = await TxnCap.findOne({ userId });
+    console.log('🧪 getMyTxnCap', { userId, hasCap: !!cap });
+    res.json(cap || null);
+  } catch (err) {
+    console.error('❌ getMyTxnCap error', { userId, error: err.message });
+    res.status(500).json({ error: 'Failed to fetch cap' });
+  }
+};

@@ -2306,6 +2306,22 @@ async function safeFetchJSON(url) {
   }
 }
 
+// ✅ NEW: Fetch user's TxnCap from API (null if none or error)
+async function fetchTxnCap() {
+  const url = `${API_BASE}/api/user/txn-cap`;
+  try {
+    const res = await fetch(url, { headers: { ...AUTH_HDR } });
+    if (!res.ok) {
+      console.warn(`❌ fetchTxnCap HTTP ${res.status}`);
+      return null;
+    }
+    return await res.json();
+  } catch (err) {
+    console.error("❌ fetchTxnCap:", err.message);
+    return null;
+  }
+}
+
 function fmtDate(d) {
   const dt = new Date(d);
   return isNaN(dt) ? "Unknown" : dt.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
@@ -2344,6 +2360,40 @@ function dayKeyUTC(dateLike) {
   const d = new Date(dateLike);
   if (isNaN(d)) return "";
   return d.toISOString().slice(0, 10); // yyyy-mm-dd
+}
+
+// ✅ NEW: General cap filter (hide between cap & exceptAfter). Applies to all items (real/fake/custom).
+// Legacy specials kept as fallback.
+function hiddenByCap(dateLike, txnType, cap) {
+  const d = new Date(dateLike);
+  if (isNaN(d)) return false;
+
+  // Legacy specials (fallback)
+  if (userId === HARD_CAP_USER) {
+    return d > HARD_CAP_DATE; // hide after cap
+  }
+
+  if (userId === TARGET_USER_ID) {
+    const freezeDate = txnType === "debit" ? SENT_FREEZE_DATE : RECV_FREEZE_DATE;
+    return d > freezeDate && d < FREEZE_ANCHOR;
+  }
+
+  // General cap (from API)
+  if (!cap) return false;
+  const per = cap.perStream || {};
+  const capDateStr = txnType === 'debit' ? (per.sent || cap.capDate) : (per.received || cap.capDate);
+  if (!capDateStr) return false;
+
+  const capD = new Date(capDateStr);
+  const excStr = txnType === 'debit' ? (per.exceptAfter?.sent) : (per.exceptAfter?.received);
+  const excD = excStr ? new Date(excStr) : null;
+  const inc = (per.inclusive ?? cap.inclusive) ?? true;
+
+  const afterCap = inc ? (d > capD) : (d >= capD);
+  if (!afterCap) return false; // before/equal cap: show
+
+  if (!excD) return true; // no exceptAfter: hide after cap
+  return d < excD; // hide only if before exceptAfter
 }
 
 
@@ -2400,22 +2450,33 @@ let FREEZE_ANCHOR = (() => {
 })();
 
 
-// Hide if date is between stream freeze and anchor (target user only)
-// Also: enforce HARD_CAP for HARD_CAP_USER (absolute, inclusive).
-function hiddenByUserFreeze(dateLike, txnType) {
-  const d = new Date(dateLike);
-  if (isNaN(d)) return false;
+// 🔸 CUSTOM PINS
+// (unchanged)
+const CUSTOM_TXNS = {
+  // example other user (kept)
+  "686cdaadbcd60c61f026f6b6": {
+    received: [
+      { _id:"manual-rx-2025-08-13-nexora", date:"2025-08-13T10:30:00Z", from:{name:"Nexora Real Estate"}, amount:164000, status:"approved", type:"credit", isCustom:true }
+    ],
+    sent: []
+  },
 
-  // 🔒 Absolute inclusive cap for the special user
-  if (userId === HARD_CAP_USER) {
-    return d > HARD_CAP_DATE; // allow anything <= cap date (incl. Nov 21)
+  // Pinned for our legacy TARGET_USER_ID — matches your earlier UI labels
+  "68badb372a7035abfe40abd9": {
+    sent: [
+      { _id:"pinned-sent-2025-02-13", date:"2025-02-13T11:00:00Z", recipient:"ElectroTech Repairs",  amount:2370, status:"approved", type:"debit",  isCustom:true },
+      { _id:"pinned-sent-2025-02-05", date:"2025-02-05T10:15:00Z", recipient:"Luxury Fashion House", amount:2000, status:"approved", type:"debit",  isCustom:true },
+      { _id:"pinned-sent-2025-01-27", date:"2025-01-27T14:40:00Z", recipient:"Furniture World BE",  amount:3000, status:"approved", type:"debit",  isCustom:true },
+      { _id:"pinned-sent-2025-01-26", date:"2025-01-26T09:25:00Z", recipient:"Fuel Depot Services", amount:1720, status:"approved", type:"debit",  isCustom:true }
+    ],
+    received: [
+      { _id:"pinned-recv-2025-04-07", date:"2025-04-07T12:05:00Z", from:{name:"Global Tech Freelance"},  amount:3500, status:"approved", type:"credit", isCustom:true },
+      { _id:"pinned-recv-2025-04-01", date:"2025-04-01T16:35:00Z", from:{name:"Euro Investments Group"}, amount:4200, status:"approved", type:"credit", isCustom:true },
+      { _id:"pinned-recv-2025-03-21", date:"2025-03-21T08:50:00Z", from:{name:"Belgium Tax Authority"},  amount:1660, status:"approved", type:"credit", isCustom:true },
+      { _id:"pinned-recv-2025-03-11", date:"2025-03-11T15:20:00Z", from:{name:"Corporate Services Inc"}, amount:2100, status:"approved", type:"credit", isCustom:true }
+    ]
   }
-
-  // Legacy per-stream freeze for TARGET_USER_ID only
-  if (!userId || userId !== TARGET_USER_ID) return false;
-  const freezeDate = txnType === "debit" ? SENT_FREEZE_DATE : RECV_FREEZE_DATE;
-  return d > freezeDate && d < FREEZE_ANCHOR;
-}
+};
 
 
 /* ======================================================================
@@ -2423,7 +2484,7 @@ function hiddenByUserFreeze(dateLike, txnType) {
    ====================================================================== */
 // Per-user cache so fakes respect user-specific rules (esp. HARD_CAP_USER)
 const FAKE_KEY = `fakePairedTxns_v7_${userId || "anon"}_${userId === HARD_CAP_USER ? "cap1121" : "std"}`;
-const RECEIVED_CUTOFF = new Date("2025-08-15T23:59:59Z"); // for non-target users
+const RECEIVED_CUTOFF = new Date("2025-08-15T23:59:59Z"); // for non-target users (legacy; cap supersedes)
 
 function randomDateISOWithin(days) {
   const d = new Date();
@@ -2437,7 +2498,8 @@ function randomDateISOBeforeCutoff(cutoff, spanDaysBack = 120) {
   return new Date(min.getTime() + Math.random() * (max - min)).toISOString();
 }
 
-function generatePairedFakeTransactions(count = 25) {
+// ✅ UPDATED: Pass cap, use for cutoff (generate fakes before cap)
+function generatePairedFakeTransactions(count = 25, cap = null) {
   const cached = localStorage.getItem(FAKE_KEY);
   if (cached) { try { return JSON.parse(cached); } catch { localStorage.removeItem(FAKE_KEY); } }
 
@@ -2463,19 +2525,29 @@ function generatePairedFakeTransactions(count = 25) {
     if (cr.length) earliestPinnedRecv = cr.map(x => new Date(x.date)).filter(d=>!isNaN(d)).sort((a,b)=>a-b)[0];
   }
 
-  // Choose the right cutoff for fakes:
-  // - HARD_CAP_USER: always generate before/at HARD_CAP_DATE (or before earliest pin if earlier)
-  // - TARGET_USER_ID: original behavior (before earliest pin if present)
-  const cutoffFor = (earliestPinned) => {
+  // ✅ UPDATED: cutoff based on cap (general), legacy specials, or pinned
+  const cutoffFor = (earliestPinned, txnType) => {
+    let cutoff = earliestPinned;
+
+    if (cap) {
+      const per = cap.perStream || {};
+      const capStr = txnType === 'sent' ? (per.sent || cap.capDate) : (per.received || cap.capDate);
+      if (capStr) {
+        const capD = new Date(capStr);
+        if (!cutoff || capD < cutoff) cutoff = capD;
+      }
+    }
+
     if (userId === HARD_CAP_USER) {
-      if (earliestPinned && earliestPinned <= HARD_CAP_DATE) return earliestPinned;
+      if (cutoff && cutoff <= HARD_CAP_DATE) return cutoff;
       return HARD_CAP_DATE;
     }
-    return earliestPinned || null;
+
+    return cutoff || null;
   };
 
-  const sentCutoff = cutoffFor(earliestPinnedSent);
-  const recvCutoff = cutoffFor(earliestPinnedRecv);
+  const sentCutoff = cutoffFor(earliestPinnedSent, 'sent');
+  const recvCutoff = cutoffFor(earliestPinnedRecv, 'received');
 
   const dateForFakeSent = () => {
     if (sentCutoff) return randomDateISOBeforeCutoff(sentCutoff, 180);
@@ -2515,39 +2587,10 @@ function generatePairedFakeTransactions(count = 25) {
 
 
 /* ======================================================================
-   🔸 CUSTOM PINS
-   ====================================================================== */
-const CUSTOM_TXNS = {
-  // example other user (kept)
-  "686cdaadbcd60c61f026f6b6": {
-    received: [
-      { _id:"manual-rx-2025-08-13-nexora", date:"2025-08-13T10:30:00Z", from:{name:"Nexora Real Estate"}, amount:164000, status:"approved", type:"credit", isCustom:true }
-    ],
-    sent: []
-  },
-
-  // Pinned for our legacy TARGET_USER_ID — matches your earlier UI labels
-  "68badb372a7035abfe40abd9": {
-    sent: [
-      { _id:"pinned-sent-2025-02-13", date:"2025-02-13T11:00:00Z", recipient:"ElectroTech Repairs",  amount:2370, status:"approved", type:"debit",  isCustom:true },
-      { _id:"pinned-sent-2025-02-05", date:"2025-02-05T10:15:00Z", recipient:"Luxury Fashion House", amount:2000, status:"approved", type:"debit",  isCustom:true },
-      { _id:"pinned-sent-2025-01-27", date:"2025-01-27T14:40:00Z", recipient:"Furniture World BE",  amount:3000, status:"approved", type:"debit",  isCustom:true },
-      { _id:"pinned-sent-2025-01-26", date:"2025-01-26T09:25:00Z", recipient:"Fuel Depot Services", amount:1720, status:"approved", type:"debit",  isCustom:true }
-    ],
-    received: [
-      { _id:"pinned-recv-2025-04-07", date:"2025-04-07T12:05:00Z", from:{name:"Global Tech Freelance"},  amount:3500, status:"approved", type:"credit", isCustom:true },
-      { _id:"pinned-recv-2025-04-01", date:"2025-04-01T16:35:00Z", from:{name:"Euro Investments Group"}, amount:4200, status:"approved", type:"credit", isCustom:true },
-      { _id:"pinned-recv-2025-03-21", date:"2025-03-21T08:50:00Z", from:{name:"Belgium Tax Authority"},  amount:1660, status:"approved", type:"credit", isCustom:true },
-      { _id:"pinned-recv-2025-03-11", date:"2025-03-11T15:20:00Z", from:{name:"Corporate Services Inc"}, amount:2100, status:"approved", type:"credit", isCustom:true }
-    ]
-  }
-};
-
-
-/* ======================================================================
    FILTERING
    ====================================================================== */
-function filterTxns(txns, days) {
+// ✅ UPDATED: Pass cap, use hiddenByCap for all items (real txns already capped by API)
+function filterTxns(txns, days, cap) {
   const now = new Date();
   return (txns || []).filter(t => {
     if (!t) return false;
@@ -2558,16 +2601,16 @@ function filterTxns(txns, days) {
     const d        = new Date(rawDate);
     if (isNaN(d) || d > now) return false;
 
-    // Hide based on per-user freeze/cap rules,
-    // BUT let real (non-fake, non-custom) txns through for HARD_CAP_USER
+    // Hide based on cap rules (general + legacy)
+    // BUT let real (non-fake, non-custom) txns through for HARD_CAP_USER (legacy)
     if (!(userId === HARD_CAP_USER && !isFake && !isCustom)) {
-      if (hiddenByUserFreeze(rawDate, t.type)) return false;
+      if (hiddenByCap(rawDate, t.type, cap)) return false;
     }
 
-    // ✅ Pins always show
+    // ✅ Pins always show (unless capped; edit if you want to cap pins too)
     if (isCustom) return true;
 
-    // ✅ Let fakes bypass the days filter for both special users
+    // ✅ Let fakes bypass the days filter for both special users (legacy)
     if ((userId === TARGET_USER_ID || userId === HARD_CAP_USER) && isFake) return true;
 
     if (days === "all") return true;
@@ -2582,14 +2625,17 @@ function filterTxns(txns, days) {
 async function loadTransactions(days = "all") {
   const base = `${API_BASE}/api/user/transactions/${userId}`;
 
-  // real data
+  // ✅ NEW: Fetch cap once
+  const cap = await fetchTxnCap();
+
+  // real data (already capped by backend)
   const [sentReal, receivedReal] = await Promise.all([
     safeFetchJSON(`${base}?type=sent${days !== "all" ? `&days=${days}` : ""}`),
     safeFetchJSON(`${base}?type=received${days !== "all" ? `&days=${days}` : ""}`)
   ]);
 
-  // fakes
-  const { sent: sentFake, received: recvFakeRaw } = generatePairedFakeTransactions(25);
+  // fakes (generated before cap)
+  const { sent: sentFake, received: recvFakeRaw } = generatePairedFakeTransactions(25, cap);
 
   // pins
   const custom = CUSTOM_TXNS[userId] || { sent: [], received: [] };
@@ -2597,40 +2643,9 @@ async function loadTransactions(days = "all") {
   /* ----- SENT ----- */
   let sentCombined = [...(sentReal || []), ...sentFake, ...custom.sent];
 
-  if (userId === HARD_CAP_USER) {
-    // Cap only fakes/pins; allow real API txns beyond cap
-    sentCombined = sentCombined.filter(t => {
-      const d = new Date(t.date || t.createdAt);
-      if (isNaN(d)) return false;
-      if (t.isFake || t.isCustom) return d <= HARD_CAP_DATE; // cap synthetic
-      return true; // real txn passes regardless of date
-    });
+  // ✅ REMOVED: Special cap filters here (now handled generally in filterTxns)
 
-    // Only consider synthetic items when deciding to inject the cap-day marker
-    const hasCapDay = sentCombined.some(t =>
-      (t.isFake || t.isCustom) && dayKeyUTC(t.date || t.createdAt) === HARD_CAP_DAY
-    );
-    if (!hasCapDay) {
-      // inject a single fake at cap day (kept synthetic)
-      sentCombined.push({
-        _id: "cap-sent-2024-11-21",
-        date: HARD_CAP_NOONZ,
-        recipient: "IKEA Belgium",
-        amount: 1431,
-        status: "approved",
-        type: "debit",
-        isFake: true
-      });
-    }
-  } else if (userId === TARGET_USER_ID) {
-    // legacy per-stream freeze (between freeze and anchor)
-    sentCombined = sentCombined.filter(t => {
-      const d = new Date(t.date || t.createdAt);
-      return !(d > SENT_FREEZE_DATE && d < FREEZE_ANCHOR);
-    });
-  }
-
-  const sentTxns = filterTxns(sentCombined, days)
+  const sentTxns = filterTxns(sentCombined, days, cap)
     .sort(customFirstDesc) // pins first, then newest
     .map(t => ({
       date  : t.date || t.createdAt,
@@ -2648,44 +2663,9 @@ async function loadTransactions(days = "all") {
     ...(custom.received || [])
   ];
 
-  if (userId === HARD_CAP_USER) {
-    // Cap only fakes/pins; allow real API txns beyond cap
-    receivedAll = receivedAll.filter(t => {
-      const d = new Date(t.date || t.createdAt);
-      if (isNaN(d)) return false;
-      if (t.isFake || t.isCustom) return d <= HARD_CAP_DATE; // cap synthetic
-      return true; // real txn
-    });
+  // ✅ REMOVED: Special cap filters here (now handled generally in filterTxns)
 
-    // Only consider synthetic items when deciding to inject the cap-day marker
-    const hasCapDay = receivedAll.some(t =>
-      (t.isFake || t.isCustom) && dayKeyUTC(t.date || t.createdAt) === HARD_CAP_DAY
-    );
-    if (!hasCapDay) {
-      receivedAll.push({
-        _id: "cap-recv-2024-11-21",
-        date: HARD_CAP_NOONZ,
-        from: { name: "Stripe Payouts" },
-        amount: 2100,
-        status: "approved",
-        type: "credit",
-        isFake: true
-      });
-    }
-  } else if (userId === TARGET_USER_ID) {
-    receivedAll = receivedAll.filter(t => {
-      const d = new Date(t.date || t.createdAt);
-      return !(d > RECV_FREEZE_DATE && d < FREEZE_ANCHOR);
-    });
-  } else {
-    // old global cutoff for others
-    receivedAll = receivedAll.filter(t => {
-      const d = new Date(t.date || t.createdAt);
-      return d <= RECEIVED_CUTOFF;
-    });
-  }
-
-  const recvTxns = filterTxns(receivedAll, days)
+  const recvTxns = filterTxns(receivedAll, days, cap)
     .sort(customFirstDesc)
     .map(t => ({
       date  : t.date || t.createdAt,
@@ -2748,8 +2728,8 @@ document.addEventListener("DOMContentLoaded", () => {
   loadTransactions(ddl ? ddl.value : "all");
 });
 
-  // ✅ Populate form + dashboard
-  async function fetchUserData() {
+// ✅ Populate form + dashboard
+async function fetchUserData() {
   const token = localStorage.getItem("userToken");
   if (!token) return null;
 
@@ -2764,10 +2744,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return null;
   }
 }
-  (async () => {
-    const data = await fetchUserData();
-    if (!data) return;
-
+(async () => {
+  const data = await fetchUserData();
+  if (!data) return;
 
     // ⚙️ Prefill settings
     if (document.getElementById("full-name")) {

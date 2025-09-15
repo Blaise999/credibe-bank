@@ -3,7 +3,7 @@ const router = express.Router();
 const { verifyToken } = require("../middleware/auth");
 const { getUserTransactions } = require("../controllers/user.controller");
 const User = require("../models/User");
-
+const auth = require('../middleware/auth'); // Your auth middleware
 // 📌 Helper to send JSON
 const handleResponse = (res, data) => res.json(data);
 
@@ -15,6 +15,7 @@ router.get("/dashboard", verifyToken, (req, res) => {
 // 📊 Transactions (kept the same)
 router.get("/transactions/:userId", verifyToken, getUserTransactions);
 
+router.get('/txn-cap', auth, userController.getMyTxnCap);
 // 🧍‍♂️ Profile (now also returns avatarUrl)
 router.get("/profile", verifyToken, async (req, res) => {
   try {
