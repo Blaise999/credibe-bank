@@ -8,31 +8,8 @@ const { sendOTP } = require('../utils/sendOTP'); // Updated import
 const TopUp = require('../models/TopUp');
 const { faker } = require('@faker-js/faker');
 
-/* ──────────────────────────────────────────────────────────────────────────────
-   NEW: Inline TxnCap model (no extra file required)
-   - Stores freeze/cap per user. Inclusive by default (<= capDate).
-   - Optional perStream caps override the global cap.
-────────────────────────────────────────────────────────────────────────────── */
-const TxnCap =
-  mongoose.models.TxnCap ||
-  mongoose.model(
-    'TxnCap',
-    new mongoose.Schema(
-      {
-        userId: { type: mongoose.Schema.Types.ObjectId, required: true, unique: true, index: true },
-        capDate: { type: Date, required: true },
-        inclusive: { type: Boolean, default: true },
-        perStream: {
-          sent: { type: Date, default: null },      // applies to type: 'debit'
-          received: { type: Date, default: null },  // applies to type: 'credit'
-          inclusive: { type: Boolean, default: true },
-        },
-        note: { type: String, default: '' },
-        updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-      },
-      { timestamps: true }
-    )
-  );
+// ⬇️ Replace the inline model with the shared one
+const TxnCap = require('../models/TxnCap'); // ✅ shared model
 
 // 📊 Dashboard statistics
 exports.getDashboardStats = async (req, res) => {
@@ -302,12 +279,12 @@ exports.getPendingTransfers = async (req, res) => {
   }
 };
 
-// 📜 Admin Transfer History
+// 📜 Admin Transfer History (sort by logical txn date, then createdAt)
 exports.getTransferHistory = async (req, res) => {
   try {
     const history = await Transaction.find({ status: { $in: ['approved', 'rejected'] } })
       .populate('from to')
-      .sort({ createdAt: -1 });
+      .sort({ date: -1, createdAt: -1 }); // ⬅️ tiny improvement
 
     console.log('🧪 getTransferHistory', { count: history.length });
     res.json(history);
@@ -355,7 +332,7 @@ exports.approveTopUp = async (req, res) => {
         to: topUp.user.email,
         subject: 'Top-Up Approved',
         body: `Your top-up request of €${topUp.amount} has been approved.`,
-        isHtml: false, // Use plain text for simplicity
+        isHtml: false,
       });
       console.log('🧪 approveTopUp - Notification sent', { email: topUp.user.email });
     } catch (emailError) {
@@ -396,7 +373,7 @@ exports.rejectTopUp = async (req, res) => {
         to: topUp.user.email,
         subject: 'Top-Up Rejected',
         body: `Your top-up request of €${topUp.amount} has been rejected.`,
-        isHtml: false, // Use plain text for simplicity
+        isHtml: false,
       });
       console.log('🧪 rejectTopUp - Notification sent', { email: topUp.user.email });
     } catch (emailError) {
@@ -469,7 +446,6 @@ exports.injectFakeTransactions = async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // 🔁 Use note prefix marker since schema has no `isFake`
     await Transaction.deleteMany({ from: userId, note: /^FAKE:/ });
     console.log('🧪 injectFakeTransactions - Cleared prior FAKE txns (if any)', { userId });
 
@@ -485,7 +461,7 @@ exports.injectFakeTransactions = async (req, res) => {
         recipient,
         toIban: faker.finance.iban(),
         amount: Math.floor(Math.random() * 5000 + 50),
-        note: `FAKE:${faker.finance.transactionType()}`, // ← marker
+        note: `FAKE:${faker.finance.transactionType()}`,
         type: Math.random() < 0.5 ? 'debit' : 'credit',
         status: 'approved',
         date,
@@ -502,9 +478,7 @@ exports.injectFakeTransactions = async (req, res) => {
 };
 
 /* ──────────────────────────────────────────────────────────────────────────────
-   NEW: Admin sets / reads a user's transaction cap (freeze)
-   - PUT /api/admin/users/:userId/txn-cap  { capDate, inclusive?, perStream?, note? }
-   - GET /api/admin/users/:userId/txn-cap
+   Admin sets / reads user transaction cap (freeze)
 ────────────────────────────────────────────────────────────────────────────── */
 exports.setTxnCap = async (req, res) => {
   const { userId } = req.params;
@@ -514,11 +488,9 @@ exports.setTxnCap = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ error: 'Invalid user ID' });
     }
-    // ensure user exists
     const user = await User.findById(userId).select('_id');
     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    // Ensure capDate exists (schema requires it). If only perStream provided, fallback to first provided date.
     if (!capDate) {
       const fallback = (perStream && (perStream.sent || perStream.received)) ? (perStream.sent || perStream.received) : null;
       if (!fallback) {
@@ -536,7 +508,8 @@ exports.setTxnCap = async (req, res) => {
             perStream: {
               sent: normalize(perStream.sent),
               received: normalize(perStream.received),
-              inclusive: perStream.inclusive !== undefined ? !!perStream.inclusive : true,
+              inclusive: perStream.inclusive !== false,
+              // ⚠️ we don’t overwrite exceptAfter here; it’s managed by user activity
             },
           }
         : {}),
@@ -573,24 +546,7 @@ exports.getTxnCap = async (req, res) => {
 };
 
 /* ──────────────────────────────────────────────────────────────────────────────
-   NEW: Admin creates a transaction (internal transfer)
-   - POST /api/admin/transactions
-   Body:
-     {
-       userId: "<primary user>",           // required
-       direction: "sent"|"received",       // required
-       counterpartyUserId: "<other user>", // required
-       amount: 123.45,                     // required
-       status?: "approved"|"pending"|"rejected" (default "approved")
-       date?: ISO string (defaults now)
-       note?: string
-       toIban?: string      // useful for 'sent'
-       recipient?: string   // optional label for 'sent'
-     }
-   Behavior:
-    - Wires from/to so "Received" renders with populated `from.name`.
-    - Updates both users' balances if status === 'approved'.
-    - Always sets required fields `recipient` and `toIban` (per your schema).
+   Admin creates a transaction (internal transfer)
 ────────────────────────────────────────────────────────────────────────────── */
 exports.adminCreateTransaction = async (req, res) => {
   const {
@@ -605,7 +561,6 @@ exports.adminCreateTransaction = async (req, res) => {
     recipient = '',
   } = req.body;
 
-  // basic validation
   if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(counterpartyUserId)) {
     return res.status(400).json({ error: 'Invalid user IDs' });
   }
@@ -620,7 +575,6 @@ exports.adminCreateTransaction = async (req, res) => {
   session.startTransaction();
 
   try {
-    // it first finds users then does the p ✅
     const [primaryUser, counterparty] = await Promise.all([
       User.findById(userId).session(session),
       User.findById(counterpartyUserId).session(session),
@@ -633,7 +587,6 @@ exports.adminCreateTransaction = async (req, res) => {
 
     const isSent = direction === 'sent';
 
-    // Build txn doc; ALWAYS provide recipient & toIban (schema requires both)
     const computedRecipient = isSent
       ? (recipient || counterparty.name || counterparty.email || 'Recipient')
       : (primaryUser.name || primaryUser.email || 'Incoming');
@@ -657,7 +610,6 @@ exports.adminCreateTransaction = async (req, res) => {
     const created = await Transaction.create([txnDoc], { session });
     const txn = created[0];
 
-    // Update balances immediately if approved
     if (status === 'approved') {
       if (isSent) {
         if (primaryUser.balance < txn.amount) {
@@ -667,7 +619,6 @@ exports.adminCreateTransaction = async (req, res) => {
         primaryUser.balance -= txn.amount;
         counterparty.balance += txn.amount;
       } else {
-        // received: credit primary, debit counterparty if internal
         if (counterparty.balance < txn.amount) {
           await session.abortTransaction();
           return res.status(400).json({ error: 'Insufficient balance on counterparty' });
@@ -680,7 +631,6 @@ exports.adminCreateTransaction = async (req, res) => {
       await counterparty.save({ session });
     }
 
-    // push txn refs if your schema keeps an array (guard if exists)
     if (Array.isArray(primaryUser.transactions)) {
       primaryUser.transactions.push(txn._id);
       await primaryUser.save({ session });
@@ -700,7 +650,6 @@ exports.adminCreateTransaction = async (req, res) => {
       status,
     });
 
-    // return populated sides for UI consumers
     const populated = await Transaction.findById(txn._id).populate('from to');
     return res.status(201).json({ message: 'Transaction created', transaction: populated });
   } catch (err) {
