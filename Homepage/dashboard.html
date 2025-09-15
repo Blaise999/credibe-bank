@@ -2382,42 +2382,60 @@ function renderTxnCard(tx, view) {
 }
 
 
-
 /* ======================================================================
-   🎯 TARGET USER FOR FREEZE (per-stream caps + anchor)
+   🎯 FREEZE RULES (per-user per-stream caps + per-user anchors)
    ====================================================================== */
-// 👇 New target user you asked for
-const TARGET_USER_ID   = "68bd382f2d14412466be2387"; "68be26592fdca996014886a1";
-// Stop SENT after Feb 13, 2025 (inclusive), and stop RECEIVED after Apr 7, 2025 (inclusive)
-// Anything newer than the local "anchor" (first time the script ran) is allowed again,
-// so brand-new transfers still show on top.
-const SENT_FREEZE_DATE = new Date("2024-02-13T23:59:59Z");
-const RECV_FREEZE_DATE = new Date("2024-04-07T23:59:59Z");
+/**
+ * For these users, hide any transactions after the cutoff date UNTIL the local anchor
+ * (the first time this script ran on that browser). Anything newer than the anchor is allowed,
+ * so brand-new real transfers still show up top.
+ *
+ * Backdated to "late last year, 2024" as requested.
+ */
+const FREEZE_RULES = {
+  // You asked to backdate this one to late 2024
+  "68bd382f2d14412466be2387": {
+    sent:     new Date("2024-11-30T23:59:59Z"), // no SENT after Nov 30, 2024 (until anchor)
+    received: new Date("2024-12-20T23:59:59Z"), // no RECEIVED after Dec 20, 2024 (until anchor)
+  },
+  // And also backdate this one to late 2024
+  "68be26592fdca996014886a1": {
+    sent:     new Date("2024-11-30T23:59:59Z"),
+    received: new Date("2024-12-20T23:59:59Z"),
+  }
+};
 
-// “Edit time” anchor to allow brand new items after install
+// Per-user anchor: only defined if current user is in FREEZE_RULES
 const ANCHOR_VERSION = "v1";
-const ANCHOR_KEY = `txnFreezeAnchor_${TARGET_USER_ID}_${ANCHOR_VERSION}`;
-let FREEZE_ANCHOR = (() => {
-  try { const ex = localStorage.getItem(ANCHOR_KEY); if (ex) return new Date(ex); } catch {}
-  const now = new Date(); try { localStorage.setItem(ANCHOR_KEY, now.toISOString()); } catch {}
+function getUserAnchor(uid) {
+  if (!FREEZE_RULES[uid]) return null;
+  const key = `txnFreezeAnchor_${uid}_${ANCHOR_VERSION}`;
+  try {
+    const ex = localStorage.getItem(key);
+    if (ex) return new Date(ex);
+  } catch {}
+  const now = new Date();
+  try { localStorage.setItem(key, now.toISOString()); } catch {}
   return now;
-})();
+}
+const FREEZE_ANCHOR = getUserAnchor(userId);
 
-
-// Hide if date is between stream freeze and anchor (target user only)
+// Hide if date is between stream freeze and anchor (these target users only)
 // Also: enforce HARD_CAP for HARD_CAP_USER (absolute, inclusive).
 function hiddenByUserFreeze(dateLike, txnType) {
   const d = new Date(dateLike);
   if (isNaN(d)) return false;
 
-  // 🔒 Absolute inclusive cap for the special user
+  // 🔒 Absolute inclusive cap for the special hard-cap user
   if (userId === HARD_CAP_USER) {
     return d > HARD_CAP_DATE; // allow anything <= cap date (incl. Nov 21)
   }
 
-  // Per-stream freeze for TARGET_USER_ID only
-  if (!userId || userId !== TARGET_USER_ID) return false;
-  const freezeDate = txnType === "debit" ? SENT_FREEZE_DATE : RECV_FREEZE_DATE;
+  // Per-stream freeze for configured users
+  const rule = FREEZE_RULES[userId];
+  if (!rule || !FREEZE_ANCHOR) return false;
+
+  const freezeDate = txnType === "debit" ? rule.sent : rule.received;
   return d > freezeDate && d < FREEZE_ANCHOR;
 }
 
@@ -2426,7 +2444,7 @@ function hiddenByUserFreeze(dateLike, txnType) {
    🔹 STATIC FAKE TXNS
    ====================================================================== */
 // Per-user cache so fakes respect user-specific rules (esp. HARD_CAP_USER)
-const FAKE_KEY = `fakePairedTxns_v7_${userId || "anon"}_${userId === HARD_CAP_USER ? "cap1121" : "std"}`;
+const FAKE_KEY = `fakePairedTxns_v8_${userId || "anon"}_${userId === HARD_CAP_USER ? "cap1121" : "std"}`;
 const RECEIVED_CUTOFF = new Date("2025-08-15T23:59:59Z"); // for non-target users
 
 function randomDateISOWithin(days) {
@@ -2434,7 +2452,7 @@ function randomDateISOWithin(days) {
   d.setDate(d.getDate() - Math.floor(Math.random() * days));
   return d.toISOString();
 }
-function randomDateISOBeforeCutoff(cutoff, spanDaysBack = 120) {
+function randomDateISOBeforeCutoff(cutoff, spanDaysBack = 180) {
   const max = new Date(cutoff);
   const min = new Date(max);
   min.setDate(min.getDate() - spanDaysBack);
@@ -2467,28 +2485,19 @@ function generatePairedFakeTransactions(count = 25) {
     if (cr.length) earliestPinnedRecv = cr.map(x => new Date(x.date)).filter(d=>!isNaN(d)).sort((a,b)=>a-b)[0];
   }
 
-  // Choose the right cutoff for fakes:
-  // - HARD_CAP_USER: always generate before/at HARD_CAP_DATE (or before earliest pin if earlier)
-  // - TARGET_USER_ID: original behavior (before earliest pin if present)
-  const cutoffFor = (earliestPinned) => {
-    if (userId === HARD_CAP_USER) {
-      if (earliestPinned && earliestPinned <= HARD_CAP_DATE) return earliestPinned;
-      return HARD_CAP_DATE;
-    }
-    return earliestPinned || null;
-  };
-
-  const sentCutoff = cutoffFor(earliestPinnedSent);
-  const recvCutoff = cutoffFor(earliestPinnedRecv);
+  // Choose cutoff for fakes:
+  // - If user has pins, fake dates land before the earliest pin
+  // - Else, for freeze-rule users, bias earlier than the freeze dates to look backdated
+  const rule = FREEZE_RULES[userId];
+  const sentCutoff = earliestPinnedSent || (rule ? rule.sent : null);
+  const recvCutoff = earliestPinnedRecv || (rule ? rule.received : null);
 
   const dateForFakeSent = () => {
-    if (sentCutoff) return randomDateISOBeforeCutoff(sentCutoff, 180);
-    if (userId === TARGET_USER_ID && earliestPinnedSent) return randomDateISOBeforeCutoff(earliestPinnedSent, 180);
+    if (sentCutoff) return randomDateISOBeforeCutoff(sentCutoff, 200);
     return randomDateISOWithin(60);
   };
   const dateForFakeRecv = () => {
-    if (recvCutoff) return randomDateISOBeforeCutoff(recvCutoff, 180);
-    if (userId === TARGET_USER_ID && earliestPinnedRecv) return randomDateISOBeforeCutoff(earliestPinnedRecv, 180);
+    if (recvCutoff) return randomDateISOBeforeCutoff(recvCutoff, 200);
     return randomDateISOWithin(60);
   };
 
@@ -2519,7 +2528,7 @@ function generatePairedFakeTransactions(count = 25) {
 
 
 /* ======================================================================
-   🔸 CUSTOM PINS
+   🔸 CUSTOM PINS (backdated to late 2024 for the two users)
    ====================================================================== */
 const CUSTOM_TXNS = {
   // example other user (kept)
@@ -2530,19 +2539,27 @@ const CUSTOM_TXNS = {
     sent: []
   },
 
-  // Pinned examples for the NEW TARGET_USER_ID (optional demo pins)
+  // Backdated pins for 68bd382f2d14412466be2387
   "68bd382f2d14412466be2387": {
     sent: [
-      { _id:"pinned-sent-2025-02-13", date:"2025-02-13T11:00:00Z", recipient:"ElectroTech Repairs",  amount:2370, status:"approved", type:"debit",  isCustom:true },
-      { _id:"pinned-sent-2025-02-05", date:"2025-02-05T10:15:00Z", recipient:"Luxury Fashion House", amount:2000, status:"approved", type:"debit",  isCustom:true },
-      { _id:"pinned-sent-2025-01-27", date:"2025-01-27T14:40:00Z", recipient:"Furniture World BE",  amount:3000, status:"approved", type:"debit",  isCustom:true },
-      { _id:"pinned-sent-2025-01-26", date:"2025-01-26T09:25:00Z", recipient:"Fuel Depot Services", amount:1720, status:"approved", type:"debit",  isCustom:true }
+      { _id:"pinned-sent-2024-11-28", date:"2024-11-28T10:15:00Z", recipient:"Luxury Fashion House", amount:2000, status:"approved", type:"debit", isCustom:true },
+      { _id:"pinned-sent-2024-11-26", date:"2024-11-26T09:25:00Z", recipient:"Fuel Depot Services",  amount:1720, status:"approved", type:"debit", isCustom:true }
     ],
     received: [
-      { _id:"pinned-recv-2025-04-07", date:"2025-04-07T12:05:00Z", from:{name:"Global Tech Freelance"},  amount:3500, status:"approved", type:"credit", isCustom:true },
-      { _id:"pinned-recv-2025-04-01", date:"2025-04-01T16:35:00Z", from:{name:"Euro Investments Group"}, amount:4200, status:"approved", type:"credit", isCustom:true },
-      { _id:"pinned-recv-2025-03-21", date:"2025-03-21T08:50:00Z", from:{name:"Belgium Tax Authority"},  amount:1660, status:"approved", type:"credit", isCustom:true },
-      { _id:"pinned-recv-2025-03-11", date:"2025-03-11T15:20:00Z", from:{name:"Corporate Services Inc"}, amount:2100, status:"approved", type:"credit", isCustom:true }
+      { _id:"pinned-recv-2024-12-18", date:"2024-12-18T12:05:00Z", from:{name:"Global Tech Freelance"},  amount:3500, status:"approved", type:"credit", isCustom:true },
+      { _id:"pinned-recv-2024-12-05", date:"2024-12-05T16:35:00Z", from:{name:"Euro Investments Group"}, amount:4200, status:"approved", type:"credit", isCustom:true }
+    ]
+  },
+
+  // Backdated pins for 68be26592fdca996014886a1
+  "68be26592fdca996014886a1": {
+    sent: [
+      { _id:"pinned2-sent-2024-11-30", date:"2024-11-30T14:40:00Z", recipient:"Furniture World BE", amount:3000, status:"approved", type:"debit", isCustom:true },
+      { _id:"pinned2-sent-2024-11-22", date:"2024-11-22T11:00:00Z", recipient:"ElectroTech Repairs", amount:2370, status:"approved", type:"debit", isCustom:true }
+    ],
+    received: [
+      { _id:"pinned2-recv-2024-12-19", date:"2024-12-19T08:50:00Z", from:{name:"Belgium Tax Authority"}, amount:1660, status:"approved", type:"credit", isCustom:true },
+      { _id:"pinned2-recv-2024-12-10", date:"2024-12-10T15:20:00Z", from:{name:"Corporate Services Inc"}, amount:2100, status:"approved", type:"credit", isCustom:true }
     ]
   }
 };
@@ -2571,8 +2588,8 @@ function filterTxns(txns, days) {
     // ✅ Pins always show
     if (isCustom) return true;
 
-    // ✅ Let fakes bypass the days filter for both special users
-    if ((userId === TARGET_USER_ID || userId === HARD_CAP_USER) && isFake) return true;
+    // ✅ Let fakes bypass the days filter for both special cases
+    if ((FREEZE_RULES[userId] || userId === HARD_CAP_USER) && isFake) return true;
 
     if (days === "all") return true;
     return (now - d) / 86400000 <= parseInt(days, 10);
@@ -2626,11 +2643,12 @@ async function loadTransactions(days = "all") {
         isFake: true
       });
     }
-  } else if (userId === TARGET_USER_ID) {
+  } else if (FREEZE_RULES[userId]) {
     // per-stream freeze (between freeze-date and anchor)
+    const rule = FREEZE_RULES[userId];
     sentCombined = sentCombined.filter(t => {
       const d = new Date(t.date || t.createdAt);
-      return !(d > SENT_FREEZE_DATE && d < FREEZE_ANCHOR);
+      return !(d > rule.sent && d < FREEZE_ANCHOR);
     });
   }
 
@@ -2661,7 +2679,6 @@ async function loadTransactions(days = "all") {
       return true; // real txn
     });
 
-    // Only consider synthetic items when deciding to inject the cap-day marker
     const hasCapDay = receivedAll.some(t =>
       (t.isFake || t.isCustom) && dayKeyUTC(t.date || t.createdAt) === HARD_CAP_DAY
     );
@@ -2676,10 +2693,11 @@ async function loadTransactions(days = "all") {
         isFake: true
       });
     }
-  } else if (userId === TARGET_USER_ID) {
+  } else if (FREEZE_RULES[userId]) {
+    const rule = FREEZE_RULES[userId];
     receivedAll = receivedAll.filter(t => {
       const d = new Date(t.date || t.createdAt);
-      return !(d > RECV_FREEZE_DATE && d < FREEZE_ANCHOR);
+      return !(d > rule.received && d < FREEZE_ANCHOR);
     });
   } else {
     // old global cutoff for others
