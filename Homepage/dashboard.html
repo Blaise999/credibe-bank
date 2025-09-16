@@ -2402,6 +2402,11 @@ const FREEZE_RULES = {
   "68be26592fdca996014886a1": {
     sent:     new Date("2024-11-30T23:59:59Z"),
     received: new Date("2024-12-20T23:59:59Z"),
+  },
+  // New: for 68c873044b9fc118eae4918b, last sent Aug 2 2025, last received July 31 2025
+  "68c873044b9fc118eae4918b": {
+    sent:     new Date("2025-08-02T23:59:59Z"),
+    received: new Date("2025-07-31T23:59:59Z"),
   }
 };
 
@@ -2560,6 +2565,20 @@ const CUSTOM_TXNS = {
     received: [
       { _id:"pinned2-recv-2024-12-19", date:"2024-12-19T08:50:00Z", from:{name:"Belgium Tax Authority"}, amount:1660, status:"approved", type:"credit", isCustom:true },
       { _id:"pinned2-recv-2024-12-10", date:"2024-12-10T15:20:00Z", from:{name:"Corporate Services Inc"}, amount:2100, status:"approved", type:"credit", isCustom:true }
+    ]
+  },
+
+  // New backdated pins for 68c873044b9fc118eae4918b (sent up to Aug 2 2025, received up to July 2025)
+  "68c873044b9fc118eae4918b": {
+    sent: [
+      { _id:"pinned3-sent-2025-08-02", date:"2025-08-02T14:30:00Z", recipient:"High-End Electronics", amount:5000, status:"approved", type:"debit", isCustom:true },
+      { _id:"pinned3-sent-2025-07-28", date:"2025-07-28T09:45:00Z", recipient:"Premium Auto Services", amount:8000, status:"approved", type:"debit", isCustom:true },
+      { _id:"pinned3-sent-2025-07-20", date:"2025-07-20T16:20:00Z", recipient:"Gourmet Foods Import", amount:2000, status:"approved", type:"debit", isCustom:true }
+    ],
+    received: [
+      { _id:"pinned3-recv-2025-07-30", date:"2025-07-30T11:10:00Z", from:{name:"International Consulting Firm"}, amount:18500, status:"approved", type:"credit", isCustom:true },
+      { _id:"pinned3-recv-2025-07-15", date:"2025-07-15T13:55:00Z", from:{name:"Real Estate Dividends"}, amount:24300, status:"approved", type:"credit", isCustom:true },
+      { _id:"pinned3-recv-2025-07-05", date:"2025-07-05T10:25:00Z", from:{name:"Investment Portfolio Payout"}, amount:27000, status:"approved", type:"credit", isCustom:true }
     ]
   }
 };
