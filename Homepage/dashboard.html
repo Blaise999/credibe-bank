@@ -885,7 +885,7 @@
   </div>
 </div>
 
-           <!-- Analytics Page -->
+  <!-- Analytics Page -->
 <div id="analytics-page" class="page hidden">
   <!-- Header + Range -->
   <div class="flex items-center justify-between mb-3 sm:mb-5">
@@ -918,7 +918,7 @@
     <div class="bg-card border border-edge rounded-xl p-3 sm:p-4">
       <p class="text-xs text-[var(--muted-ink)] tracking-wider">MoM Change</p>
       <p id="kpi-mom" class="text-xl sm:text-2xl font-bold text-ink mt-1">+€420</p>
-      <p class="text-xs mt-1 text-yellow-300">Spend rising</p>
+      <p id="kpi-mom-desc" class="text-xs mt-1 text-yellow-300">Spend rising</p>
     </div>
   </div>
 
@@ -928,7 +928,7 @@
     <div class="bg-card border border-edge rounded-2xl p-3 sm:p-4">
       <div class="flex items-center justify-between mb-2 sm:mb-3">
         <h2 class="text-lg sm:text-xl font-semibold text-ink">Monthly Spending</h2>
-        <span class="text-xs text-[var(--muted-ink)]">USD</span>
+        <span class="text-xs text-[var(--muted-ink)]">EUR</span>
       </div>
       <div class="w-full h-44 sm:h-64 md:h-72">
         <canvas id="monthly-spending-chart"></canvas>
@@ -1772,6 +1772,8 @@ function formatEuro(amount) {
       }
     });
   });
+  
+
 /// =============================
 /// Credibe UI JS (renovated)
 /// =============================
@@ -3169,7 +3171,209 @@ document.getElementById("buy-crypto-form")?.addEventListener("submit", async (e)
   }
 });
 </script>
+
 <script>
+  // CONFIG (safe storage reads)
+// =============================
+const API_BASE = "https://credibe-backends.onrender.com";
+
+let _userToken = "";
+let _userId = "";
+try {
+  _userToken = localStorage.getItem("userToken") || "";
+  _userId    = localStorage.getItem("userId") || "";
+} catch (e) {
+  console.warn("localStorage unavailable:", e?.message);
+}
+
+const userToken  = _userToken;
+const userId     = _userId;
+const AUTH_HDR   = userToken ? { Authorization: `Bearer ${userToken}` } : {};
+
+// =============================
+// UTILS
+// =============================
+function fmtAmount(n, sign = "") {
+  const num = Number(n);
+  if (!isFinite(num)) return "€0";
+  const f = new Intl.NumberFormat("en-GB").format(Math.abs(num));
+  if (sign === "-") return `-€${f}`;
+  if (sign === "+") return `+€${f}`;
+  return `€${f}`;
+}
+
+function getMonthLabels(count) {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const now = new Date(2025, 8, 16); // Sep 16, 2025
+  const labels = [];
+  for (let i = count - 1; i >= 0; i--) {
+    const monthIndex = (now.getMonth() - i + 12) % 12;
+    labels.push(months[monthIndex]);
+  }
+  return labels;
+}
+
+// =============================
+// DATA
+// =============================
+const SPECIAL_USER = "68c873044b9fc118eae4918b";
+
+const categories = [
+  { name: "Groceries", share: 32, id: "cat-gro", color: "#FF6384" },
+  { name: "Bills", share: 24, id: "cat-bil", color: "#36A2EB" },
+  { name: "Entertainment", share: 18, id: "cat-ent", color: "#FFCE56" },
+  { name: "Travel", share: 15, id: "cat-tra", color: "#4BC0C0" },
+  { name: "Other", share: 11, id: "cat-oth", color: "#9966FF" }
+];
+
+function getMonthlyData() {
+  if (userId === SPECIAL_USER) {
+    return [
+      65000, 66000, 67000, 68000, 69000, 70000, // prev 6m sum ~405k
+      160000, 165000, 175000, // months 7-9 sum 500k
+      100000, 100000, 100000 // last 3m sum 300k
+    ]; // last 6m 800k, total ~1.205m
+  } else {
+    return [
+      600, 700, 800, 900, 1000, 1100,
+      1200, 1300, 1400, 1500, 1600, 1700
+    ]; // last 6m 8700, total 13800
+  }
+}
+
+// =============================
+// CHARTS
+// =============================
+let monthlySpendingChart;
+let categorySpendingChart;
+
+// =============================
+// LOAD + RENDER
+// =============================
+function loadAnalytics(range = "6m") {
+  const rangeMap = { "3m": 3, "6m": 6, "12m": 12 };
+  const n = rangeMap[range] || 6;
+
+  const allMonthly = getMonthlyData();
+  const monthly = allMonthly.slice(-n);
+  const labels = getMonthLabels(n);
+
+  const total = monthly.reduce((a, b) => a + b, 0);
+  const txnCount = n * 10;
+  const avg = Math.round(total / txnCount);
+
+  // MoM
+  const lastMonth = monthly[monthly.length - 1];
+  const prevMonth = monthly[monthly.length - 2] || 0;
+  const mom = lastMonth - prevMonth;
+  const momSign = mom > 0 ? "+" : mom < 0 ? "-" : "";
+  const momClass = mom > 0 ? "text-yellow-300" : "text-green-400";
+  const momDesc = mom > 0 ? "Spend rising" : mom < 0 ? "Spend falling" : "Spend stable";
+
+  // Total diff vs prev period
+  const prevMonthly = allMonthly.slice(-n * 2, -n);
+  const prevTotal = prevMonthly.reduce((a, b) => a + b, 0) || total;
+  const diffPct = prevTotal ? Math.round((total - prevTotal) / prevTotal * 100) : 0;
+  const diffSign = diffPct > 0 ? "▲" : diffPct < 0 ? "▼" : "—";
+  const diffAbs = Math.abs(diffPct);
+  const diffClass = diffPct > 0 ? "text-green-400" : "text-red-400";
+
+  // Update KPIs
+  document.getElementById("kpi-total").textContent = fmtAmount(total);
+  const totalDiffEl = document.getElementById("kpi-total-diff");
+  totalDiffEl.textContent = `${diffSign} ${diffAbs}% vs prev`;
+  totalDiffEl.className = `text-xs mt-1 ${diffClass}`;
+
+  document.getElementById("kpi-avg").textContent = fmtAmount(avg);
+  document.getElementById("kpi-avg-count").textContent = `${txnCount} txns`;
+
+  document.getElementById("kpi-topcat").textContent = "Groceries";
+  document.getElementById("kpi-topcat-share").textContent = "32% of spend";
+
+  const momEl = document.getElementById("kpi-mom");
+  momEl.textContent = fmtAmount(Math.abs(mom), momSign);
+  momEl.className = `text-xl sm:text-2xl font-bold text-ink mt-1 ${momClass}`;
+
+  const momDescEl = document.getElementById("kpi-mom-desc");
+  momDescEl.textContent = momDesc;
+  momDescEl.className = `text-xs mt-1 ${momClass}`;
+
+  // Update category list (shares fixed)
+  categories.forEach((c) => {
+    document.getElementById(c.id).textContent = `${c.share}%`;
+  });
+
+  // Monthly Chart
+  const maxY = Math.max(...monthly);
+  const yTickFormat = maxY > 100000 
+    ? (value) => `€${(value / 1000).toFixed(0)}k`
+    : (value) => `€${value}`;
+
+  if (monthlySpendingChart) monthlySpendingChart.destroy();
+  monthlySpendingChart = new Chart(document.getElementById("monthly-spending-chart"), {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Spent",
+        data: monthly,
+        backgroundColor: "#3B82F6",
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { callback: yTickFormat },
+        },
+      },
+    },
+  });
+
+  // Category Chart
+  if (categorySpendingChart) categorySpendingChart.destroy();
+  categorySpendingChart = new Chart(document.getElementById("category-spending-chart"), {
+    type: "pie",
+    data: {
+      labels: categories.map((c) => c.name),
+      datasets: [{
+        data: categories.map((c) => c.share),
+        backgroundColor: categories.map((c) => c.color),
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => `${ctx.label}: ${ctx.raw}%`,
+          },
+        },
+      },
+    },
+  });
+}
+
+// =============================
+// INIT
+// =============================
+document.addEventListener("DOMContentLoaded", () => {
+  if (!document.getElementById("analytics-page")) return;
+  if (!userId) return;
+
+  const select = document.getElementById("analytics-range");
+  if (select) {
+    select.addEventListener("change", (e) => loadAnalytics(e.target.value));
+    loadAnalytics(select.value);
+  } else {
+    loadAnalytics("6m");
+  }
+});
+
 document.getElementById("pay-bills-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const token = localStorage.getItem("userToken");
