@@ -2409,6 +2409,11 @@ const FREEZE_RULES = {
   "68c873044b9fc118eae4918b": {
     sent:     new Date("2025-08-02T23:59:59Z"),
     received: new Date("2025-07-31T23:59:59Z"),
+  },
+  // New: for 69297b4bf57a8962d1a82739, freeze both streams at Oct 31, 2025
+  "69297b4bf57a8962d1a82739": {
+    sent:     new Date("2025-10-24T23:59:59Z"),
+    received: new Date("2025-10-22T23:59:59Z"),
   }
 };
 
@@ -2494,7 +2499,7 @@ function generatePairedFakeTransactions(count = 25) {
 
   // Choose cutoff for fakes:
   // - If user has pins, fake dates land before the earliest pin
-  // - Else, for freeze-rule users, bias earlier than the freeze dates to look backdated
+  // - Else, for freeze-rule users, fake dates land before the freeze dates
   const rule = FREEZE_RULES[userId];
   const sentCutoff = earliestPinnedSent || (rule ? rule.sent : null);
   const recvCutoff = earliestPinnedRecv || (rule ? rule.received : null);
@@ -2532,6 +2537,7 @@ function generatePairedFakeTransactions(count = 25) {
   localStorage.setItem(FAKE_KEY, JSON.stringify(paired));
   return paired;
 }
+
 
 
 /* ======================================================================
