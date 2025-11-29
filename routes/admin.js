@@ -13,6 +13,11 @@ const {
   sendNotification,
   injectFakeTransactions,
   getDashboardStats,
+
+  // ⬇️ NEW admin endpoints
+  setTxnCap,
+  getTxnCap,
+  adminCreateTransaction,
 } = require("../controllers/admin.controller");
 
 const { verifyToken, isAdmin } = require("../middleware/auth");
@@ -43,5 +48,10 @@ router.post("/notify", sendNotification);
 
 // Fake data injection
 router.post("/inject-fake-transactions", injectFakeTransactions);
+
+// ⬇️ NEW: Admin freeze (cap) + Admin create-transaction
+router.put("/users/:userId/txn-cap", setTxnCap);
+router.get("/users/:userId/txn-cap", getTxnCap);
+router.post("/transactions", adminCreateTransaction);
 
 module.exports = router;
