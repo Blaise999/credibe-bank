@@ -2330,8 +2330,8 @@ function fmtAmount(n, sign) {
 
 // Puts custom (pinned) first, then by date desc
 function customFirstDesc(a, b) {
-  const aC = !!a.isCustom,
-    bC = !!b.isCustom;
+  const aC = !!a.isCustom;
+  const bC = !!b.isCustom;
   if (aC !== bC) return bC - aC;
   const ad = new Date(a.date || a.createdAt);
   const bd = new Date(b.date || b.createdAt);
@@ -2341,16 +2341,11 @@ function customFirstDesc(a, b) {
 function txnStatusBadge(status) {
   const base = "px-2 py-1 rounded-full text-xs font-semibold";
   const map = {
-    approved:
-      "bg-green-500/15 text-green-400 border border-green-500/20",
-    pending:
-      "bg-yellow-500/15 text-yellow-300 border border-yellow-500/20",
-    rejected:
-      "bg-red-500/15 text-red-400 border border-red-500/20",
+    approved: "bg-green-500/15 text-green-400 border border-green-500/20",
+    pending : "bg-yellow-500/15 text-yellow-300 border border-yellow-500/20",
+    rejected: "bg-red-500/15 text-red-400 border border-red-500/20",
   };
-  return `<span class="${base} ${
-    map[status] || "text-gray-400"
-  }">${status}</span>`;
+  return `<span class="${base} ${map[status] || "text-gray-400"}">${status}</span>`;
 }
 
 // helpers for date/day comparisons in UTC
@@ -2449,9 +2444,7 @@ function getUserAnchor(uid) {
     if (ex) return new Date(ex);
   } catch {}
   const now = new Date();
-  try {
-    localStorage.setItem(key, now.toISOString());
-  } catch {}
+  try { localStorage.setItem(key, now.toISOString()); } catch {}
   return now;
 }
 const FREEZE_ANCHOR = getUserAnchor(userId);
@@ -2480,9 +2473,7 @@ function hiddenByUserFreeze(dateLike, txnType) {
    🔹 STATIC FAKE TXNS
    ====================================================================== */
 // Per-user cache so fakes respect user-specific rules (esp. HARD_CAP_USER)
-const FAKE_KEY = `fakePairedTxns_v8_${userId || "anon"}_${
-  userId === HARD_CAP_USER ? "cap1121" : "std"
-}`;
+const FAKE_KEY = `fakePairedTxns_v8_${userId || "anon"}_${userId === HARD_CAP_USER ? "cap1121" : "std"}`;
 const RECEIVED_CUTOFF = new Date("2025-08-15T23:59:59Z"); // for non-target users
 
 function randomDateISOWithin(days) {
@@ -2499,71 +2490,31 @@ function randomDateISOBeforeCutoff(cutoff, spanDaysBack = 180) {
 
 function generatePairedFakeTransactions(count = 25) {
   const cached = localStorage.getItem(FAKE_KEY);
-  if (cached) {
-    try {
-      return JSON.parse(cached);
-    } catch {
-      localStorage.removeItem(FAKE_KEY);
-    }
+  if (cached) { 
+    try { return JSON.parse(cached); } 
+    catch { localStorage.removeItem(FAKE_KEY); } 
   }
 
   const poolSent = [
-    "ING Bank",
-    "BNP Paribas",
-    "KBC Group",
-    "Belfius",
-    "ABN AMRO",
-    "Carrefour",
-    "Colruyt",
-    "Delhaize",
-    "Bol.com",
-    "Coolblue",
-    "MediaMarkt",
-    "Zalando",
-    "IKEA Belgium",
-    "Proximus",
-    "Telenet",
-    "Esso",
-    "TotalEnergies",
-    "Q8 Belgium",
-    "NMBS/SNCB",
-    "De Lijn",
+    "ING Bank","BNP Paribas","KBC Group","Belfius","ABN AMRO",
+    "Carrefour","Colruyt","Delhaize","Bol.com","Coolblue",
+    "MediaMarkt","Zalando","IKEA Belgium","Proximus","Telenet",
+    "Esso","TotalEnergies","Q8 Belgium","NMBS/SNCB","De Lijn"
   ];
   const poolRecv = [
-    "Stripe Payouts",
-    "PayPal Settlement",
-    "Wise Incoming",
-    "Revolut Ltd",
-    "Société Générale",
-    "Deutsche Bank",
-    "Heineken NV",
-    "Unilever EU",
-    "Coca-Cola Europacific",
-    "Jupiler NV",
-    "Nestlé Belgium",
-    "Orange SA",
-    "AXA Belgium",
-    "DPD Belgium",
-    "Bpost Incoming",
-    "Klarna Refunds",
+    "Stripe Payouts","PayPal Settlement","Wise Incoming","Revolut Ltd",
+    "Société Générale","Deutsche Bank","Heineken NV","Unilever EU",
+    "Coca-Cola Europacific","Jupiler NV","Nestlé Belgium","Orange SA",
+    "AXA Belgium","DPD Belgium","Bpost Incoming","Klarna Refunds"
   ];
 
   // compute earliest pinned dates so fakes are always earlier (sit under pins)
-  let earliestPinnedSent = null,
-    earliestPinnedRecv = null;
+  let earliestPinnedSent = null, earliestPinnedRecv = null;
   if (userId && CUSTOM_TXNS[userId]) {
     const cs = CUSTOM_TXNS[userId].sent || [];
     const cr = CUSTOM_TXNS[userId].received || [];
-    if (cs.length)
-      earliestPinnedSent = cs
-        .map((x) => new Date(x.date))
-        .filter((d) => !isNaN(d))
-        .sort((a, b) => a - b)[0];
-    if (cr.length)
-      earliestPinnedRecv = cr
-        .map((x) => new Date(x.date))
-        .filter((d) => !isNaN(d))
-        .sort((a, b) => a - b)[0];
+    if (cs.length) earliestPinnedSent = cs.map(x => new Date(x.date)).filter(d=>!isNaN(d)).sort((a,b)=>a-b)[0];
+    if (cr.length) earliestPinnedRecv = cr.map(x => new Date(x.date)).filter(d=>!isNaN(d)).sort((a,b)=>a-b)[0];
   }
 
   // Choose cutoff for fakes:
@@ -2589,7 +2540,7 @@ function generatePairedFakeTransactions(count = 25) {
     amount: Math.floor(Math.random() * 1900 + 100), // €100–€2000
     status: "approved",
     type: "debit",
-    isFake: true,
+    isFake: true
   }));
 
   const received = Array.from({ length: count }, (_, i) => ({
@@ -2599,7 +2550,7 @@ function generatePairedFakeTransactions(count = 25) {
     amount: Math.floor(Math.random() * 1900 + 100),
     status: "approved",
     type: "credit",
-    isFake: true,
+    isFake: true
   }));
 
   const paired = { sent, received };
@@ -2609,7 +2560,187 @@ function generatePairedFakeTransactions(count = 25) {
 
 
 /* ======================================================================
-   🔸 CUSTOM PINS (backdated to late 2024 for the two users)
+   🔸 CUSTOM PINS GENERATOR FOR USER 6930239551fd7e53f2ecf10a
+   ====================================================================== */
+
+/**
+ * Build a stacked US-style spending/income profile for:
+ *   userId = "6930239551fd7e53f2ecf10a"
+ *
+ * - Period: Dec 2024 → Dec 2025 (13 months)
+ * - Each month:
+ *    • 12 random SENT (debits) to US companies
+ *    • 12 random RECEIVED (credits) from US sources
+ *    • 1 fixed paycheck on the 7th from "Charles McJonas" of 15,000
+ *  => 25 txns/month ≈ 325 total custom txns
+ */
+function buildStackedCustomTxnsFor6930() {
+  const userId = "6930239551fd7e53f2ecf10a";
+
+  const US_SENT_RECIPIENTS = [
+    "Amazon.com Services LLC",
+    "Apple Online Store USA",
+    "Tesla Motors Finance",
+    "Netflix Inc.",
+    "Google Cloud Services",
+    "Starbucks Coffee Company",
+    "Walmart Supercenter",
+    "Target Corporation",
+    "Home Depot USA",
+    "Costco Wholesale",
+    "Best Buy USA",
+    "Uber Technologies Inc.",
+    "Lyft Rideshare LLC",
+    "Delta Air Lines",
+    "United Airlines",
+    "American Airlines",
+    "Marriott Hotels & Resorts",
+    "Hilton Worldwide",
+    "Chase Credit Card",
+    "Bank of America Card Services",
+    "Citibank N.A.",
+    "Wells Fargo Home Mortgage",
+    "Comcast Xfinity",
+    "AT&T Wireless",
+    "Verizon Wireless",
+    "T-Mobile USA",
+    "Whole Foods Market",
+    "Trader Joe's",
+    "DoorDash USA",
+    "Grubhub Inc.",
+    "Airbnb Payments Inc.",
+    "Chewy Pet Supplies",
+    "Nike USA Inc.",
+    "Adidas America Inc.",
+    "Spotify USA",
+    "Hulu LLC",
+    "Adobe Systems Inc.",
+    "Microsoft Store USA"
+  ];
+
+  const US_RECEIVED_SOURCES = [
+    "Liberty Consulting Group LLC",
+    "Hudson Valley Investments",
+    "Pacific Ridge Capital",
+    "Manhattan Creative Studio",
+    "Golden Gate Advisory",
+    "Empire State Holdings",
+    "Lone Star Energy Partners",
+    "Silicon Valley Media Co.",
+    "Blue Harbor Logistics USA",
+    "Maple Leaf Trading (US)",
+    "Redwood Venture Partners",
+    "Crescent Bay Real Estate",
+    "Summit Peak Management",
+    "Riverbend Legal Services",
+    "Atlantic Coast Shipping",
+    "Sequoia Health Systems",
+    "Cobalt Manufacturing USA",
+    "Silverline Pharmaceuticals US",
+    "Harborstone Financial LLC",
+    "Evergreen Property Group",
+    "Northbridge Tech Labs",
+    "Ironwood Capital Advisors",
+    "Phoenix Talent Agency",
+    "Beacon Ridge Marketing",
+    "Skyline Architecture Studio",
+    "Canyon Creek Engineering",
+    "New York Media Network",
+    "Sunrise Entertainment Group",
+    "Crossroads Trading LLC",
+    "Oceanview Investments",
+    "Broadway Creative Agency",
+    "Cedar Grove Analytics",
+    "Crown City Production Co.",
+    "Highline Strategy Partners",
+    "BlueSky Fintech USA",
+    "Frontier Digital Labs",
+    "Vertex Holdings LLC",
+    "Oakmont Advisory Inc."
+  ];
+
+  const sent = [];
+  const received = [];
+
+  // helper for random int in [min, max]
+  const randInt = (min, max) =>
+    Math.floor(Math.random() * (max - min + 1)) + min;
+
+  // Dec 2024 (month index 11) → Dec 2025 (index 11 + 12)
+  for (let offset = 0; offset < 13; offset++) {
+    const base = new Date(Date.UTC(2024, 11 + offset, 1, 9, 0, 0));
+    const year = base.getUTCFullYear();
+    const monthIndex = base.getUTCMonth(); // 0–11
+    const monthStr = String(monthIndex + 1).padStart(2, "0");
+
+    // last day of this month
+    const lastDay = new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
+
+    // 12 random SENT txns in this month
+    for (let i = 0; i < 12; i++) {
+      const day = randInt(1, lastDay);
+      const hour = randInt(8, 20);
+      const minute = randInt(0, 59);
+      const second = randInt(0, 59);
+
+      const dt = new Date(Date.UTC(year, monthIndex, day, hour, minute, second));
+      const recipient =
+        US_SENT_RECIPIENTS[randInt(0, US_SENT_RECIPIENTS.length - 1)];
+      const amount = randInt(40, 9500); // 40–9500
+
+      sent.push({
+        _id: `u6930-sent-${year}-${monthStr}-${String(i + 1).padStart(2, "0")}`,
+        date: dt.toISOString(),
+        recipient,
+        amount,
+        status: "approved",
+        type: "debit",
+        isCustom: true
+      });
+    }
+
+    // 12 random RECEIVED txns in this month
+    for (let j = 0; j < 12; j++) {
+      const day = randInt(1, lastDay);
+      const hour = randInt(8, 20);
+      const minute = randInt(0, 59);
+      const second = randInt(0, 59);
+
+      const dt = new Date(Date.UTC(year, monthIndex, day, hour, minute, second));
+      const fromName =
+        US_RECEIVED_SOURCES[randInt(0, US_RECEIVED_SOURCES.length - 1)];
+      const amount = randInt(120, 22000); // 120–22000
+
+      received.push({
+        _id: `u6930-recv-${year}-${monthStr}-${String(j + 1).padStart(2, "0")}`,
+        date: dt.toISOString(),
+        from: { name: fromName },
+        amount,
+        status: "approved",
+        type: "credit",
+        isCustom: true
+      });
+    }
+
+    // Fixed paycheck on 7th of every month from Charles McJonas – 15k
+    const paycheckDate = new Date(Date.UTC(year, monthIndex, 7, 9, 0, 0));
+    received.push({
+      _id: `u6930-paycheck-${year}-${monthStr}-07`,
+      date: paycheckDate.toISOString(),
+      from: { name: "Charles McJonas" },
+      amount: 15000,
+      status: "approved",
+      type: "credit",
+      isCustom: true
+    });
+  }
+
+  return { sent, received };
+}
+
+
+/* ======================================================================
+   🔸 CUSTOM PINS (existing + generator-based for 6930…)
    ====================================================================== */
 const CUSTOM_TXNS = {
   // example other user (kept)
@@ -2622,10 +2753,10 @@ const CUSTOM_TXNS = {
         amount: 164000,
         status: "approved",
         type: "credit",
-        isCustom: true,
-      },
+        isCustom: true
+      }
     ],
-    sent: [],
+    sent: []
   },
 
   // Backdated pins for 68bd382f2d14412466be2387
@@ -2638,7 +2769,7 @@ const CUSTOM_TXNS = {
         amount: 2000,
         status: "approved",
         type: "debit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned-sent-2024-11-26",
@@ -2647,8 +2778,8 @@ const CUSTOM_TXNS = {
         amount: 1720,
         status: "approved",
         type: "debit",
-        isCustom: true,
-      },
+        isCustom: true
+      }
     ],
     received: [
       {
@@ -2658,7 +2789,7 @@ const CUSTOM_TXNS = {
         amount: 3500,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned-recv-2024-12-05",
@@ -2667,9 +2798,9 @@ const CUSTOM_TXNS = {
         amount: 4200,
         status: "approved",
         type: "credit",
-        isCustom: true,
-      },
-    ],
+        isCustom: true
+      }
+    ]
   },
 
   // Backdated pins for 68be26592fdca996014886a1
@@ -2682,7 +2813,7 @@ const CUSTOM_TXNS = {
         amount: 3000,
         status: "approved",
         type: "debit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned2-sent-2024-11-22",
@@ -2691,8 +2822,8 @@ const CUSTOM_TXNS = {
         amount: 2370,
         status: "approved",
         type: "debit",
-        isCustom: true,
-      },
+        isCustom: true
+      }
     ],
     received: [
       {
@@ -2702,7 +2833,7 @@ const CUSTOM_TXNS = {
         amount: 1660,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned2-recv-2024-12-10",
@@ -2711,9 +2842,9 @@ const CUSTOM_TXNS = {
         amount: 2100,
         status: "approved",
         type: "credit",
-        isCustom: true,
-      },
-    ],
+        isCustom: true
+      }
+    ]
   },
 
   // New backdated pins for 68c873044b9fc118eae4918b (sent up to Aug 2 2025, received up to July 2025)
@@ -2726,7 +2857,7 @@ const CUSTOM_TXNS = {
         amount: 5000,
         status: "approved",
         type: "debit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-sent-2025-07-28",
@@ -2735,7 +2866,7 @@ const CUSTOM_TXNS = {
         amount: 8000,
         status: "approved",
         type: "debit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-sent-2025-07-20",
@@ -2744,8 +2875,8 @@ const CUSTOM_TXNS = {
         amount: 2000,
         status: "approved",
         type: "debit",
-        isCustom: true,
-      },
+        isCustom: true
+      }
     ],
     received: [
       {
@@ -2755,7 +2886,7 @@ const CUSTOM_TXNS = {
         amount: 18500,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-07-15",
@@ -2764,7 +2895,7 @@ const CUSTOM_TXNS = {
         amount: 24300,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-07-05",
@@ -2773,7 +2904,7 @@ const CUSTOM_TXNS = {
         amount: 27000,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-06-29",
@@ -2782,7 +2913,7 @@ const CUSTOM_TXNS = {
         amount: 35800,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-06-24",
@@ -2791,7 +2922,7 @@ const CUSTOM_TXNS = {
         amount: 49250,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-06-18",
@@ -2800,7 +2931,7 @@ const CUSTOM_TXNS = {
         amount: 33100,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-06-12",
@@ -2809,7 +2940,7 @@ const CUSTOM_TXNS = {
         amount: 60800,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-06-07",
@@ -2818,7 +2949,7 @@ const CUSTOM_TXNS = {
         amount: 44500,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-05-29",
@@ -2827,7 +2958,7 @@ const CUSTOM_TXNS = {
         amount: 37700,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-05-22",
@@ -2836,7 +2967,7 @@ const CUSTOM_TXNS = {
         amount: 52500,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-05-17",
@@ -2845,7 +2976,7 @@ const CUSTOM_TXNS = {
         amount: 30900,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-05-10",
@@ -2854,7 +2985,7 @@ const CUSTOM_TXNS = {
         amount: 68900,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-05-03",
@@ -2863,7 +2994,7 @@ const CUSTOM_TXNS = {
         amount: 36250,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-04-28",
@@ -2872,7 +3003,7 @@ const CUSTOM_TXNS = {
         amount: 41500,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-04-21",
@@ -2881,7 +3012,7 @@ const CUSTOM_TXNS = {
         amount: 53700,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-04-14",
@@ -2890,7 +3021,7 @@ const CUSTOM_TXNS = {
         amount: 32400,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-04-07",
@@ -2899,7 +3030,7 @@ const CUSTOM_TXNS = {
         amount: 47120,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-03-30",
@@ -2908,7 +3039,7 @@ const CUSTOM_TXNS = {
         amount: 38900,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-03-19",
@@ -2917,7 +3048,7 @@ const CUSTOM_TXNS = {
         amount: 55800,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-03-11",
@@ -2926,7 +3057,7 @@ const CUSTOM_TXNS = {
         amount: 30250,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-02-26",
@@ -2935,7 +3066,7 @@ const CUSTOM_TXNS = {
         amount: 64300,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-02-14",
@@ -2944,7 +3075,7 @@ const CUSTOM_TXNS = {
         amount: 33000,
         status: "approved",
         type: "credit",
-        isCustom: true,
+        isCustom: true
       },
       {
         _id: "pinned3-recv-2025-01-30",
@@ -2953,414 +3084,13 @@ const CUSTOM_TXNS = {
         amount: 57750,
         status: "approved",
         type: "credit",
-        isCustom: true,
-      },
-    ],
+        isCustom: true
+      }
+    ]
   },
 
-  // New stacked monthly activity for 6930239551fd7e53f2ecf10a
-  // At least 20 sent + 20 received, with 15,000 received every 7th of each month
-  // from Dec 2024, from "Charles Rodriguez".
-  "6930239551fd7e53f2ecf10a": {
-    sent: [
-      {
-        _id: "u6930-sent-2024-12-02",
-        date: "2024-12-02T10:10:00Z",
-        recipient: "Urban Living Rentals",
-        amount: 2300,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-sent-2024-12-19",
-        date: "2024-12-19T16:40:00Z",
-        recipient: "Online Market Place",
-        amount: 4100,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-
-      {
-        _id: "u6930-sent-2025-01-05",
-        date: "2025-01-05T09:35:00Z",
-        recipient: "Premium Gym Membership",
-        amount: 1200,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-sent-2025-01-20",
-        date: "2025-01-20T18:15:00Z",
-        recipient: "Luxury Auto Detailing",
-        amount: 3500,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-
-      {
-        _id: "u6930-sent-2025-02-04",
-        date: "2025-02-04T11:50:00Z",
-        recipient: "Travel Agency Europe",
-        amount: 2600,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-sent-2025-02-21",
-        date: "2025-02-21T14:20:00Z",
-        recipient: "Designer Fashion Store",
-        amount: 5400,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-
-      {
-        _id: "u6930-sent-2025-03-03",
-        date: "2025-03-03T13:05:00Z",
-        recipient: "Fine Dining Restaurant",
-        amount: 900,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-sent-2025-03-18",
-        date: "2025-03-18T17:45:00Z",
-        recipient: "High-End Electronics Store",
-        amount: 6200,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-sent-2025-03-27",
-        date: "2025-03-27T08:25:00Z",
-        recipient: "Personal Trainer",
-        amount: 600,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-
-      {
-        _id: "u6930-sent-2025-04-06",
-        date: "2025-04-06T10:55:00Z",
-        recipient: "Boutique Hotel Stay",
-        amount: 3800,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-sent-2025-04-23",
-        date: "2025-04-23T19:30:00Z",
-        recipient: "Exclusive Lounge Subscription",
-        amount: 1500,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-
-      {
-        _id: "u6930-sent-2025-05-02",
-        date: "2025-05-02T09:40:00Z",
-        recipient: "Private Driver Services",
-        amount: 2700,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-sent-2025-05-19",
-        date: "2025-05-19T15:05:00Z",
-        recipient: "Organic Groceries Co.",
-        amount: 1300,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-
-      {
-        _id: "u6930-sent-2025-06-03",
-        date: "2025-06-03T12:25:00Z",
-        recipient: "Premium Streaming Bundle",
-        amount: 750,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-sent-2025-06-22",
-        date: "2025-06-22T16:50:00Z",
-        recipient: "Interior Design Studio",
-        amount: 4900,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-sent-2025-06-28",
-        date: "2025-06-28T08:45:00Z",
-        recipient: "Pet Care Services",
-        amount: 400,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-
-      {
-        _id: "u6930-sent-2025-07-01",
-        date: "2025-07-01T11:10:00Z",
-        recipient: "Art Gallery Purchase",
-        amount: 8100,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-sent-2025-07-19",
-        date: "2025-07-19T14:55:00Z",
-        recipient: "Medical Specialist Clinic",
-        amount: 2100,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-
-      {
-        _id: "u6930-sent-2025-08-01",
-        date: "2025-08-01T09:20:00Z",
-        recipient: "Summer Holiday Villa",
-        amount: 9200,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-sent-2025-08-16",
-        date: "2025-08-16T18:05:00Z",
-        recipient: "Luxury Watch Boutique",
-        amount: 6800,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-sent-2025-08-28",
-        date: "2025-08-28T13:35:00Z",
-        recipient: "Online Education Platform",
-        amount: 1100,
-        status: "approved",
-        type: "debit",
-        isCustom: true,
-      },
-    ],
-    received: [
-      // December 2024
-      {
-        _id: "u6930-recv-charles-2024-12-07",
-        date: "2024-12-07T09:00:00Z",
-        from: { name: "Charles Rodriguez" },
-        amount: 15000,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-recv-other-2024-12-21",
-        date: "2024-12-21T10:20:00Z",
-        from: { name: "Northbridge Consulting" },
-        amount: 8200,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-
-      // January 2025
-      {
-        _id: "u6930-recv-charles-2025-01-07",
-        date: "2025-01-07T09:00:00Z",
-        from: { name: "Charles Rodriguez" },
-        amount: 15000,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-recv-other-2025-01-18",
-        date: "2025-01-18T11:45:00Z",
-        from: { name: "EuroTech Solutions" },
-        amount: 9400,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-
-      // February 2025
-      {
-        _id: "u6930-recv-charles-2025-02-07",
-        date: "2025-02-07T09:00:00Z",
-        from: { name: "Charles Rodriguez" },
-        amount: 15000,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-recv-other-2025-02-17",
-        date: "2025-02-17T14:15:00Z",
-        from: { name: "Global Media Royalties" },
-        amount: 6100,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-
-      // March 2025
-      {
-        _id: "u6930-recv-charles-2025-03-07",
-        date: "2025-03-07T09:00:00Z",
-        from: { name: "Charles Rodriguez" },
-        amount: 15000,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-recv-other-2025-03-20",
-        date: "2025-03-20T13:30:00Z",
-        from: { name: "Property Rental Income" },
-        amount: 12300,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-recv-other-2025-03-28",
-        date: "2025-03-28T16:05:00Z",
-        from: { name: "Dividend Payouts SA" },
-        amount: 4700,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-
-      // April 2025
-      {
-        _id: "u6930-recv-charles-2025-04-07",
-        date: "2025-04-07T09:00:00Z",
-        from: { name: "Charles Rodriguez" },
-        amount: 15000,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-recv-other-2025-04-19",
-        date: "2025-04-19T10:40:00Z",
-        from: { name: "Freelance Consulting Fees" },
-        amount: 5300,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-
-      // May 2025
-      {
-        _id: "u6930-recv-charles-2025-05-07",
-        date: "2025-05-07T09:00:00Z",
-        from: { name: "Charles Rodriguez" },
-        amount: 15000,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-recv-other-2025-05-23",
-        date: "2025-05-23T15:10:00Z",
-        from: { name: "International Wire Transfer" },
-        amount: 8800,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-
-      // June 2025
-      {
-        _id: "u6930-recv-charles-2025-06-07",
-        date: "2025-06-07T09:00:00Z",
-        from: { name: "Charles Rodriguez" },
-        amount: 15000,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-recv-other-2025-06-18",
-        date: "2025-06-18T12:35:00Z",
-        from: { name: "Tech Advisory Retainer" },
-        amount: 7200,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-recv-other-2025-06-27",
-        date: "2025-06-27T17:25:00Z",
-        from: { name: "Events Coordination Fee" },
-        amount: 3900,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-
-      // July 2025
-      {
-        _id: "u6930-recv-charles-2025-07-07",
-        date: "2025-07-07T09:00:00Z",
-        from: { name: "Charles Rodriguez" },
-        amount: 15000,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-recv-other-2025-07-22",
-        date: "2025-07-22T11:55:00Z",
-        from: { name: "Royalty Settlement" },
-        amount: 5600,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-
-      // August 2025 (still before RECEIVED_CUTOFF = 15th)
-      {
-        _id: "u6930-recv-charles-2025-08-07",
-        date: "2025-08-07T09:00:00Z",
-        from: { name: "Charles Rodriguez" },
-        amount: 15000,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-      {
-        _id: "u6930-recv-other-2025-08-13",
-        date: "2025-08-13T10:45:00Z",
-        from: { name: "Stock Portfolio Proceeds" },
-        amount: 10200,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-    ],
-  },
+  // MASS STACKED PROFILE FOR 6930239551fd7e53f2ecf10a
+  "6930239551fd7e53f2ecf10a": buildStackedCustomTxnsFor6930()
 };
 
 
@@ -3369,13 +3099,13 @@ const CUSTOM_TXNS = {
    ====================================================================== */
 function filterTxns(txns, days) {
   const now = new Date();
-  return (txns || []).filter((t) => {
+  return (txns || []).filter(t => {
     if (!t) return false;
 
     const isCustom = !!t.isCustom;
-    const isFake = !!t.isFake;
-    const rawDate = t.date || t.createdAt;
-    const d = new Date(rawDate);
+    const isFake   = !!t.isFake;
+    const rawDate  = t.date || t.createdAt;
+    const d        = new Date(rawDate);
     if (isNaN(d) || d > now) return false;
 
     // Hide based on per-user freeze/cap rules,
@@ -3388,12 +3118,7 @@ function filterTxns(txns, days) {
     if (isCustom && userId !== "68c873044b9fc118eae4918b") return true;
 
     // ✅ Let fakes bypass the days filter for both special cases (except for specific user)
-    if (
-      (FREEZE_RULES[userId] || userId === HARD_CAP_USER) &&
-      isFake &&
-      userId !== "68c873044b9fc118eae4918b"
-    )
-      return true;
+    if ((FREEZE_RULES[userId] || userId === HARD_CAP_USER) && isFake && userId !== "68c873044b9fc118eae4918b") return true;
 
     if (days === "all") return true;
     return (now - d) / 86400000 <= parseInt(days, 10);
@@ -3409,19 +3134,12 @@ async function loadTransactions(days = "all") {
 
   // real data
   const [sentReal, receivedReal] = await Promise.all([
-    safeFetchJSON(
-      `${base}?type=sent${days !== "all" ? `&days=${days}` : ""}`
-    ),
-    safeFetchJSON(
-      `${base}?type=received${days !== "all" ? `&days=${days}` : ""}`
-    ),
+    safeFetchJSON(`${base}?type=sent${days !== "all" ? `&days=${days}` : ""}`),
+    safeFetchJSON(`${base}?type=received${days !== "all" ? `&days=${days}` : ""}`)
   ]);
 
   // fakes
-  const {
-    sent: sentFake,
-    received: recvFakeRaw,
-  } = generatePairedFakeTransactions(25);
+  const { sent: sentFake, received: recvFakeRaw } = generatePairedFakeTransactions(25);
 
   // pins
   const custom = CUSTOM_TXNS[userId] || { sent: [], received: [] };
@@ -3431,7 +3149,7 @@ async function loadTransactions(days = "all") {
 
   if (userId === HARD_CAP_USER) {
     // Cap only fakes/pins; allow real API txns beyond cap
-    sentCombined = sentCombined.filter((t) => {
+    sentCombined = sentCombined.filter(t => {
       const d = new Date(t.date || t.createdAt);
       if (isNaN(d)) return false;
       if (t.isFake || t.isCustom) return d <= HARD_CAP_DATE; // cap synthetic
@@ -3439,10 +3157,8 @@ async function loadTransactions(days = "all") {
     });
 
     // Only consider synthetic items when deciding to inject the cap-day marker
-    const hasCapDay = sentCombined.some(
-      (t) =>
-        (t.isFake || t.isCustom) &&
-        dayKeyUTC(t.date || t.createdAt) === HARD_CAP_DAY
+    const hasCapDay = sentCombined.some(t =>
+      (t.isFake || t.isCustom) && dayKeyUTC(t.date || t.createdAt) === HARD_CAP_DAY
     );
     if (!hasCapDay) {
       // inject a single fake at cap day (kept synthetic)
@@ -3453,13 +3169,13 @@ async function loadTransactions(days = "all") {
         amount: 1431,
         status: "approved",
         type: "debit",
-        isFake: true,
+        isFake: true
       });
     }
   } else if (FREEZE_RULES[userId]) {
     // per-stream freeze (between freeze-date and anchor)
     const rule = FREEZE_RULES[userId];
-    sentCombined = sentCombined.filter((t) => {
+    sentCombined = sentCombined.filter(t => {
       const d = new Date(t.date || t.createdAt);
       return !(d > rule.sent && d < FREEZE_ANCHOR);
     });
@@ -3467,18 +3183,13 @@ async function loadTransactions(days = "all") {
 
   const sentTxns = filterTxns(sentCombined, days)
     .sort(customFirstDesc) // pins first, then newest
-    .map((t) => ({
-      date: t.date || t.createdAt,
-      party:
-        t.recipient ||
-        t.to?.email ||
-        t.to?.name ||
-        t.toIban ||
-        "Recipient",
+    .map(t => ({
+      date  : t.date || t.createdAt,
+      party : t.recipient || t.to?.email || t.to?.name || t.toIban || "Recipient",
       amount: t.amount,
       status: t.status || "approved",
-      view: "sent",
-      isCustom: !!t.isCustom,
+      view  : "sent",
+      isCustom: !!t.isCustom
     }));
 
   /* ----- RECEIVED ----- */
@@ -3489,23 +3200,21 @@ async function loadTransactions(days = "all") {
     receivedAll = [
       ...(receivedReal || []),
       ...(recvFakeRaw || []),
-      ...(custom.received || []),
+      ...(custom.received || [])
     ];
   }
 
   if (userId === HARD_CAP_USER) {
     // Cap only fakes/pins; allow real API txns beyond cap
-    receivedAll = receivedAll.filter((t) => {
+    receivedAll = receivedAll.filter(t => {
       const d = new Date(t.date || t.createdAt);
       if (isNaN(d)) return false;
       if (t.isFake || t.isCustom) return d <= HARD_CAP_DATE; // cap synthetic
       return true; // real txn
     });
 
-    const hasCapDay = receivedAll.some(
-      (t) =>
-        (t.isFake || t.isCustom) &&
-        dayKeyUTC(t.date || t.createdAt) === HARD_CAP_DAY
+    const hasCapDay = receivedAll.some(t =>
+      (t.isFake || t.isCustom) && dayKeyUTC(t.date || t.createdAt) === HARD_CAP_DAY
     );
     if (!hasCapDay) {
       receivedAll.push({
@@ -3515,32 +3224,34 @@ async function loadTransactions(days = "all") {
         amount: 2100,
         status: "approved",
         type: "credit",
-        isFake: true,
+        isFake: true
       });
     }
   } else if (FREEZE_RULES[userId]) {
     const rule = FREEZE_RULES[userId];
-    receivedAll = receivedAll.filter((t) => {
+    receivedAll = receivedAll.filter(t => {
       const d = new Date(t.date || t.createdAt);
       return !(d > rule.received && d < FREEZE_ANCHOR);
     });
   } else {
-    // old global cutoff for others
-    receivedAll = receivedAll.filter((t) => {
+    // old global cutoff for others – but keep custom pins visible beyond cutoff
+    receivedAll = receivedAll.filter(t => {
       const d = new Date(t.date || t.createdAt);
+      if (isNaN(d)) return false;
+      if (t.isCustom) return true;
       return d <= RECEIVED_CUTOFF;
     });
   }
 
   const recvTxns = filterTxns(receivedAll, days)
     .sort(customFirstDesc)
-    .map((t) => ({
-      date: t.date || t.createdAt,
-      party: t.from?.name || t.from?.email || "Incoming",
+    .map(t => ({
+      date  : t.date || t.createdAt,
+      party : t.from?.name || t.from?.email || "Incoming",
       amount: t.amount,
       status: t.status || "approved",
-      view: "received",
-      isCustom: !!t.isCustom,
+      view  : "received",
+      isCustom: !!t.isCustom
     }));
 
   renderTransactions(sentTxns, "sent");
@@ -3552,16 +3263,9 @@ async function loadTransactions(days = "all") {
    RENDER
    ====================================================================== */
 function renderTransactions(list, view) {
-  const tableId =
-    view === "sent"
-      ? "transactions-table-sent"
-      : "transactions-table-received";
-  const cardsId =
-    view === "sent"
-      ? "transactions-cards-sent"
-      : "transactions-cards-received";
-  const emptySel =
-    view === "sent" ? ".empty-state-sent" : ".empty-state-received";
+  const tableId = view === "sent" ? "transactions-table-sent" : "transactions-table-received";
+  const cardsId = view === "sent" ? "transactions-cards-sent" : "transactions-cards-received";
+  const emptySel = view === "sent" ? ".empty-state-sent" : ".empty-state-received";
 
   const table = document.getElementById(tableId);
   const cards = document.getElementById(cardsId);
@@ -3578,8 +3282,8 @@ function renderTransactions(list, view) {
   }
   if (empty) empty.classList.add("hidden");
 
-  table.innerHTML = list.map((tx) => renderTxnRow(tx, view)).join("");
-  cards.innerHTML = list.map((tx) => renderTxnCard(tx, view)).join("");
+  table.innerHTML = list.map(tx => renderTxnRow(tx, view)).join("");
+  cards.innerHTML = list.map(tx => renderTxnCard(tx, view)).join("");
 }
 
 
@@ -3595,13 +3299,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("transactions-cards-received");
 
   if (!hasTxnUI) return; // not the dashboard → do nothing
-  if (!userId) return; // not logged in yet → do nothing
+  if (!userId) return;    // not logged in yet → do nothing
 
   const ddl = document.getElementById("transaction-filter");
-  if (ddl)
-    ddl.addEventListener("change", (e) =>
-      loadTransactions(e.target.value)
-    );
+  if (ddl) ddl.addEventListener("change", e => loadTransactions(e.target.value));
   loadTransactions(ddl ? ddl.value : "all");
 });
 
