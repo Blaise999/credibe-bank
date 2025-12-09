@@ -2958,13 +2958,213 @@ const CUSTOM_TXNS = {
     ],
   },
 
-  // New monthly income pins for 6930239551fd7e53f2ecf10a
-  // 15,000 received from Charles Rodriguez on the 7th of every month from Dec 2024
+  // New stacked monthly activity for 6930239551fd7e53f2ecf10a
+  // At least 20 sent + 20 received, with 15,000 received every 7th of each month
+  // from Dec 2024, from "Charles Rodriguez".
   "6930239551fd7e53f2ecf10a": {
-    sent: [],
-    received: [
+    sent: [
       {
-        _id: "pinned-cr-2024-12-07",
+        _id: "u6930-sent-2024-12-02",
+        date: "2024-12-02T10:10:00Z",
+        recipient: "Urban Living Rentals",
+        amount: 2300,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+      {
+        _id: "u6930-sent-2024-12-19",
+        date: "2024-12-19T16:40:00Z",
+        recipient: "Online Market Place",
+        amount: 4100,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+
+      {
+        _id: "u6930-sent-2025-01-05",
+        date: "2025-01-05T09:35:00Z",
+        recipient: "Premium Gym Membership",
+        amount: 1200,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+      {
+        _id: "u6930-sent-2025-01-20",
+        date: "2025-01-20T18:15:00Z",
+        recipient: "Luxury Auto Detailing",
+        amount: 3500,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+
+      {
+        _id: "u6930-sent-2025-02-04",
+        date: "2025-02-04T11:50:00Z",
+        recipient: "Travel Agency Europe",
+        amount: 2600,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+      {
+        _id: "u6930-sent-2025-02-21",
+        date: "2025-02-21T14:20:00Z",
+        recipient: "Designer Fashion Store",
+        amount: 5400,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+
+      {
+        _id: "u6930-sent-2025-03-03",
+        date: "2025-03-03T13:05:00Z",
+        recipient: "Fine Dining Restaurant",
+        amount: 900,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+      {
+        _id: "u6930-sent-2025-03-18",
+        date: "2025-03-18T17:45:00Z",
+        recipient: "High-End Electronics Store",
+        amount: 6200,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+      {
+        _id: "u6930-sent-2025-03-27",
+        date: "2025-03-27T08:25:00Z",
+        recipient: "Personal Trainer",
+        amount: 600,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+
+      {
+        _id: "u6930-sent-2025-04-06",
+        date: "2025-04-06T10:55:00Z",
+        recipient: "Boutique Hotel Stay",
+        amount: 3800,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+      {
+        _id: "u6930-sent-2025-04-23",
+        date: "2025-04-23T19:30:00Z",
+        recipient: "Exclusive Lounge Subscription",
+        amount: 1500,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+
+      {
+        _id: "u6930-sent-2025-05-02",
+        date: "2025-05-02T09:40:00Z",
+        recipient: "Private Driver Services",
+        amount: 2700,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+      {
+        _id: "u6930-sent-2025-05-19",
+        date: "2025-05-19T15:05:00Z",
+        recipient: "Organic Groceries Co.",
+        amount: 1300,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+
+      {
+        _id: "u6930-sent-2025-06-03",
+        date: "2025-06-03T12:25:00Z",
+        recipient: "Premium Streaming Bundle",
+        amount: 750,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+      {
+        _id: "u6930-sent-2025-06-22",
+        date: "2025-06-22T16:50:00Z",
+        recipient: "Interior Design Studio",
+        amount: 4900,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+      {
+        _id: "u6930-sent-2025-06-28",
+        date: "2025-06-28T08:45:00Z",
+        recipient: "Pet Care Services",
+        amount: 400,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+
+      {
+        _id: "u6930-sent-2025-07-01",
+        date: "2025-07-01T11:10:00Z",
+        recipient: "Art Gallery Purchase",
+        amount: 8100,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+      {
+        _id: "u6930-sent-2025-07-19",
+        date: "2025-07-19T14:55:00Z",
+        recipient: "Medical Specialist Clinic",
+        amount: 2100,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+
+      {
+        _id: "u6930-sent-2025-08-01",
+        date: "2025-08-01T09:20:00Z",
+        recipient: "Summer Holiday Villa",
+        amount: 9200,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+      {
+        _id: "u6930-sent-2025-08-16",
+        date: "2025-08-16T18:05:00Z",
+        recipient: "Luxury Watch Boutique",
+        amount: 6800,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+      {
+        _id: "u6930-sent-2025-08-28",
+        date: "2025-08-28T13:35:00Z",
+        recipient: "Online Education Platform",
+        amount: 1100,
+        status: "approved",
+        type: "debit",
+        isCustom: true,
+      },
+    ],
+    received: [
+      // December 2024
+      {
+        _id: "u6930-recv-charles-2024-12-07",
         date: "2024-12-07T09:00:00Z",
         from: { name: "Charles Rodriguez" },
         amount: 15000,
@@ -2973,7 +3173,18 @@ const CUSTOM_TXNS = {
         isCustom: true,
       },
       {
-        _id: "pinned-cr-2025-01-07",
+        _id: "u6930-recv-other-2024-12-21",
+        date: "2024-12-21T10:20:00Z",
+        from: { name: "Northbridge Consulting" },
+        amount: 8200,
+        status: "approved",
+        type: "credit",
+        isCustom: true,
+      },
+
+      // January 2025
+      {
+        _id: "u6930-recv-charles-2025-01-07",
         date: "2025-01-07T09:00:00Z",
         from: { name: "Charles Rodriguez" },
         amount: 15000,
@@ -2982,7 +3193,18 @@ const CUSTOM_TXNS = {
         isCustom: true,
       },
       {
-        _id: "pinned-cr-2025-02-07",
+        _id: "u6930-recv-other-2025-01-18",
+        date: "2025-01-18T11:45:00Z",
+        from: { name: "EuroTech Solutions" },
+        amount: 9400,
+        status: "approved",
+        type: "credit",
+        isCustom: true,
+      },
+
+      // February 2025
+      {
+        _id: "u6930-recv-charles-2025-02-07",
         date: "2025-02-07T09:00:00Z",
         from: { name: "Charles Rodriguez" },
         amount: 15000,
@@ -2991,7 +3213,18 @@ const CUSTOM_TXNS = {
         isCustom: true,
       },
       {
-        _id: "pinned-cr-2025-03-07",
+        _id: "u6930-recv-other-2025-02-17",
+        date: "2025-02-17T14:15:00Z",
+        from: { name: "Global Media Royalties" },
+        amount: 6100,
+        status: "approved",
+        type: "credit",
+        isCustom: true,
+      },
+
+      // March 2025
+      {
+        _id: "u6930-recv-charles-2025-03-07",
         date: "2025-03-07T09:00:00Z",
         from: { name: "Charles Rodriguez" },
         amount: 15000,
@@ -3000,7 +3233,27 @@ const CUSTOM_TXNS = {
         isCustom: true,
       },
       {
-        _id: "pinned-cr-2025-04-07",
+        _id: "u6930-recv-other-2025-03-20",
+        date: "2025-03-20T13:30:00Z",
+        from: { name: "Property Rental Income" },
+        amount: 12300,
+        status: "approved",
+        type: "credit",
+        isCustom: true,
+      },
+      {
+        _id: "u6930-recv-other-2025-03-28",
+        date: "2025-03-28T16:05:00Z",
+        from: { name: "Dividend Payouts SA" },
+        amount: 4700,
+        status: "approved",
+        type: "credit",
+        isCustom: true,
+      },
+
+      // April 2025
+      {
+        _id: "u6930-recv-charles-2025-04-07",
         date: "2025-04-07T09:00:00Z",
         from: { name: "Charles Rodriguez" },
         amount: 15000,
@@ -3009,7 +3262,18 @@ const CUSTOM_TXNS = {
         isCustom: true,
       },
       {
-        _id: "pinned-cr-2025-05-07",
+        _id: "u6930-recv-other-2025-04-19",
+        date: "2025-04-19T10:40:00Z",
+        from: { name: "Freelance Consulting Fees" },
+        amount: 5300,
+        status: "approved",
+        type: "credit",
+        isCustom: true,
+      },
+
+      // May 2025
+      {
+        _id: "u6930-recv-charles-2025-05-07",
         date: "2025-05-07T09:00:00Z",
         from: { name: "Charles Rodriguez" },
         amount: 15000,
@@ -3018,7 +3282,18 @@ const CUSTOM_TXNS = {
         isCustom: true,
       },
       {
-        _id: "pinned-cr-2025-06-07",
+        _id: "u6930-recv-other-2025-05-23",
+        date: "2025-05-23T15:10:00Z",
+        from: { name: "International Wire Transfer" },
+        amount: 8800,
+        status: "approved",
+        type: "credit",
+        isCustom: true,
+      },
+
+      // June 2025
+      {
+        _id: "u6930-recv-charles-2025-06-07",
         date: "2025-06-07T09:00:00Z",
         from: { name: "Charles Rodriguez" },
         amount: 15000,
@@ -3027,7 +3302,27 @@ const CUSTOM_TXNS = {
         isCustom: true,
       },
       {
-        _id: "pinned-cr-2025-07-07",
+        _id: "u6930-recv-other-2025-06-18",
+        date: "2025-06-18T12:35:00Z",
+        from: { name: "Tech Advisory Retainer" },
+        amount: 7200,
+        status: "approved",
+        type: "credit",
+        isCustom: true,
+      },
+      {
+        _id: "u6930-recv-other-2025-06-27",
+        date: "2025-06-27T17:25:00Z",
+        from: { name: "Events Coordination Fee" },
+        amount: 3900,
+        status: "approved",
+        type: "credit",
+        isCustom: true,
+      },
+
+      // July 2025
+      {
+        _id: "u6930-recv-charles-2025-07-07",
         date: "2025-07-07T09:00:00Z",
         from: { name: "Charles Rodriguez" },
         amount: 15000,
@@ -3036,7 +3331,18 @@ const CUSTOM_TXNS = {
         isCustom: true,
       },
       {
-        _id: "pinned-cr-2025-08-07",
+        _id: "u6930-recv-other-2025-07-22",
+        date: "2025-07-22T11:55:00Z",
+        from: { name: "Royalty Settlement" },
+        amount: 5600,
+        status: "approved",
+        type: "credit",
+        isCustom: true,
+      },
+
+      // August 2025 (still before RECEIVED_CUTOFF = 15th)
+      {
+        _id: "u6930-recv-charles-2025-08-07",
         date: "2025-08-07T09:00:00Z",
         from: { name: "Charles Rodriguez" },
         amount: 15000,
@@ -3045,37 +3351,10 @@ const CUSTOM_TXNS = {
         isCustom: true,
       },
       {
-        _id: "pinned-cr-2025-09-07",
-        date: "2025-09-07T09:00:00Z",
-        from: { name: "Charles Rodriguez" },
-        amount: 15000,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-      {
-        _id: "pinned-cr-2025-10-07",
-        date: "2025-10-07T09:00:00Z",
-        from: { name: "Charles Rodriguez" },
-        amount: 15000,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-      {
-        _id: "pinned-cr-2025-11-07",
-        date: "2025-11-07T09:00:00Z",
-        from: { name: "Charles Rodriguez" },
-        amount: 15000,
-        status: "approved",
-        type: "credit",
-        isCustom: true,
-      },
-      {
-        _id: "pinned-cr-2025-12-07",
-        date: "2025-12-07T09:00:00Z",
-        from: { name: "Charles Rodriguez" },
-        amount: 15000,
+        _id: "u6930-recv-other-2025-08-13",
+        date: "2025-08-13T10:45:00Z",
+        from: { name: "Stock Portfolio Proceeds" },
+        amount: 10200,
         status: "approved",
         type: "credit",
         isCustom: true,
