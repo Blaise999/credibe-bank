@@ -39,7 +39,7 @@
         </div>
         <div class="bg-white/10 p-4 rounded-xl shadow-md backdrop-blur-md">
           <h2 class="text-sm font-semibold text-white/70">Total Balance</h2>
-          <p id="totalBalance" class="text-2xl font-bold text-white mt-2">€0.00</p>
+          <p id="totalBalance" class="text-2xl font-bold text-white mt-2">$0.00</p>
         </div>
         <div class="bg-white/10 p-4 rounded-xl shadow-md backdrop-blur-md">
           <h2 class="text-sm font-semibold text-white/70">Blocked Users</h2>
@@ -314,7 +314,7 @@
 
           <div class="grid sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm text-white/60 mb-1">Amount (€)</label>
+              <label class="block text-sm text-white/60 mb-1">Amount ($)</label>
               <input id="createAmount" type="number" min="0.01" step="0.01" class="w-full p-2 rounded bg-gray-700 text-white" />
             </div>
             <div>
@@ -370,7 +370,7 @@
         if (res.ok) {
           document.getElementById("totalUsers").textContent = data.totalUsers || 0;
           document.getElementById("totalTxns").textContent = data.totalTxns || 0;
-          document.getElementById("totalBalance").textContent = `€${(data.totalBalance || 0).toFixed(2)}`;
+          document.getElementById("totalBalance").textContent = `$${(data.totalBalance || 0).toFixed(2)}`;
           document.getElementById("blockedUsers").textContent = data.blockedUsers || 0;
         } else {
           console.error("❌ Failed to load stats:", data.error);
@@ -396,7 +396,7 @@
           const row = document.createElement("tr");
           row.innerHTML = `
             <td class="p-3 border">${user.email || "N/A"}</td>
-            <td class="p-3 border">€${(user.balance || 0).toFixed(2)}</td>
+            <td class="p-3 border">$${(user.balance || 0).toFixed(2)}</td>
             <td class="p-3 border">${user.iban || "N/A"}</td>
             <td class="p-3 border">
               <span class="px-2 py-1 rounded ${user.isBlocked ? "bg-red-200 text-red-800" : "bg-green-200 text-green-800"}">
@@ -429,7 +429,7 @@
             <td class="p-2 border">${new Date(txn.createdAt).toLocaleString()}</td>
             <td class="p-2 border">${txn.from?.email || "N/A"}</td>
             <td class="p-2 border">${txn.to?.email || txn.recipient || "N/A"}</td>
-            <td class="p-2 border">€${(txn.amount || 0).toFixed(2)}</td>
+            <td class="p-2 border">$${(txn.amount || 0).toFixed(2)}</td>
             <td class="p-2 border">
               <span class="px-2 py-1 rounded ${txn.status === "approved" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}">
                 ${txn.status}
@@ -460,7 +460,7 @@
           row.innerHTML = `
             <td class="p-3 border">${transfer.from?.email || "N/A"}</td>
             <td class="p-3 border">${transfer.to?.email || transfer.recipient || "N/A"}</td>
-            <td class="p-3 border">€${(transfer.amount || 0).toFixed(2)}</td>
+            <td class="p-3 border">$${(transfer.amount || 0).toFixed(2)}</td>
             <td class="p-3 border">
               <button onclick="handleTransfer('${transfer._id}', 'approve')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs mr-2">Approve</button>
               <button onclick="handleTransfer('${transfer._id}', 'reject')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">Reject</button>
@@ -517,7 +517,7 @@
           const row = document.createElement("tr");
           row.innerHTML = `
             <td class="p-3 border">${topup.user?.email || "Unknown"}</td>
-            <td class="p-3 border">€${(topup.amount || 0).toFixed(2)}</td>
+            <td class="p-3 border">$${(topup.amount || 0).toFixed(2)}</td>
             <td class="p-3 border">${date}</td>
             <td class="p-3 border">
               <button onclick="handleTopUp('${topup._id}', 'approve')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs mr-2">Approve</button>

@@ -56,8 +56,8 @@ function renderTransactions(transactions) {
     const status = txn.status;
 
     const amountDisplay = status === "approved"
-      ? `<span class="text-${txn.type === "credit" ? "green" : "red"}-500">€${amount.toFixed(2)}</span>`
-      : `<span class="text-yellow-400">€${amount.toFixed(2)}</span>`;
+      ? `<span class="text-${txn.type === "credit" ? "green" : "red"}-500">$${amount.toFixed(2)}</span>`
+      : `<span class="text-yellow-400">$${amount.toFixed(2)}</span>`;
 
     const statusBadge = status === "approved"
       ? `<span class="bg-green-500/20 text-green-400 px-1 py-0.5 rounded text-xs sm:text-sm">Completed</span>`

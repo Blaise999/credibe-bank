@@ -97,12 +97,12 @@
                     <p id="biller-id-error" class="error-message">Please enter a valid biller ID.</p>
                 </div>
                 <div>
-                    <label for="amount" class="block text-[#e0e0e0] mb-1 text-sm font-medium">Amount (€)</label>
+                    <label for="amount" class="block text-[#e0e0e0] mb-1 text-sm font-medium">Amount ($)</label>
                     <div class="relative">
                         <input type="number" id="amount" name="amount" step="0.01" min="0.01" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-4 py-2.5 text-sm input-focus pr-10" placeholder="0.00" required>
-                        <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#00b4d8] text-sm">€</span>
+                        <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#00b4d8] text-sm">$</span>
                     </div>
-                    <p id="amount-error" class="error-message">Please enter a valid amount (minimum €0.01).</p>
+                    <p id="amount-error" class="error-message">Please enter a valid amount (minimum $0.01).</p>
                 </div>
                 <div>
                     <label for="description" class="block text-[#e0e0e0] mb-1 text-sm font-medium">Description (Optional)</label>
@@ -217,7 +217,7 @@
                 localStorage.setItem('pendingAction', JSON.stringify(pendingAction));
 
                 // Show confirmation
-                document.getElementById('confirmation-details').textContent = `Biller: ${billerName}, Amount: €${amount.toFixed(2)}`;
+                document.getElementById('confirmation-details').textContent = `Biller: ${billerName}, Amount: $${amount.toFixed(2)}`;
                 document.getElementById('pay-bills-form').classList.add('hidden');
                 document.getElementById('confirmation').classList.remove('hidden');
             } catch (err) {

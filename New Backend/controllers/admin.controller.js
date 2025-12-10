@@ -184,7 +184,7 @@ exports.handleTransaction = async (req, res) => {
           <p style="font-size:15px; margin:1rem 0;">Hi {{name}},</p>
           <p style="font-size:14px; line-height:1.6;">Your <strong>local transfer</strong> has been successfully approved by Credibe.</p>
           <div style="margin:1.5rem 0; padding:1rem; background:#1f1f1f; border-radius:8px; border:1px solid #444;">
-            <p><strong>💳 Amount:</strong> €{{amount}}</p>
+            <p><strong>💳 Amount:</strong> ${{amount}}</p>
             <p><strong>📨 Recipient:</strong> {{recipient}}</p>
             <p><strong>🏦 IBAN:</strong> {{iban}}</p>
             <p><strong>📝 Note:</strong> {{note}}</p>
@@ -206,7 +206,7 @@ exports.handleTransaction = async (req, res) => {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
           <h2 style="color: #c0392b;">Transfer Rejected</h2>
           <p style="font-size: 16px; color: #34495e;">Dear {{name}},</p>
-          <p style="font-size: 16px; color: #34495e;">We regret to inform you that your transfer of <strong>€{{amount}}</strong> has been rejected.</p>
+          <p style="font-size: 16px; color: #34495e;">We regret to inform you that your transfer of <strong>${{amount}}</strong> has been rejected.</p>
           <p style="font-size: 16px; color: #34495e;">Transaction ID: {{transactionId}}</p>
           <p style="font-size: 14px; color: #7f8c8d;">If you believe this is an error or need further assistance, please contact our support team.</p>
           <p style="font-size: 14px; color: #7f8c8d;">Best regards,<br>The Transaction Team</p>
@@ -331,7 +331,7 @@ exports.approveTopUp = async (req, res) => {
       await sendOTP({
         to: topUp.user.email,
         subject: 'Top-Up Approved',
-        body: `Your top-up request of €${topUp.amount} has been approved.`,
+        body: `Your top-up request of $${topUp.amount} has been approved.`,
         isHtml: false,
       });
       console.log('🧪 approveTopUp - Notification sent', { email: topUp.user.email });
@@ -372,7 +372,7 @@ exports.rejectTopUp = async (req, res) => {
       await sendOTP({
         to: topUp.user.email,
         subject: 'Top-Up Rejected',
-        body: `Your top-up request of €${topUp.amount} has been rejected.`,
+        body: `Your top-up request of $${topUp.amount} has been rejected.`,
         isHtml: false,
       });
       console.log('🧪 rejectTopUp - Notification sent', { email: topUp.user.email });

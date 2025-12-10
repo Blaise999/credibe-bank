@@ -102,7 +102,7 @@
 
             document.getElementById('recipient-name').textContent = pendingTransfer.recipientName || 'N/A';
             document.getElementById('recipient-iban').textContent = pendingTransfer.recipientIban || 'N/A';
-            document.getElementById('amount').textContent = `€${parseFloat(pendingTransfer.amount || 0).toFixed(2)}`;
+            document.getElementById('amount').textContent = `$${parseFloat(pendingTransfer.amount || 0).toFixed(2)}`;
             document.getElementById('purpose').textContent = pendingTransfer.purpose || 'Transfer';
             document.getElementById('reference').textContent = pendingTransfer.reference || 'None';
             document.getElementById('transfer-id').textContent = pendingTransfer.transferId || 'N/A';

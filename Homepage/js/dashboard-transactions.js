@@ -61,11 +61,11 @@ function fmtDate(d) {
 
 function fmtAmount(n, sign) {
   const num = Number(n);
-  if (!isFinite(num)) return "€0";
+  if (!isFinite(num)) return "$0";
   const f = new Intl.NumberFormat("en-GB").format(num);
-  if (sign === "-") return `-€${f}`;
-  if (sign === "+") return `+€${f}`;
-  return `€${f}`;
+  if (sign === "-") return `-$${f}`;
+  if (sign === "+") return `+$${f}`;
+  return `$${f}`;
 }
 
 // Puts custom (pinned) first, then by date desc
@@ -320,7 +320,7 @@ function generatePairedFakeTransactions(count = 25) {
     _id: `fake-sent-${i}`,
     date: dateForFakeSent(),
     recipient: poolSent[i % poolSent.length],
-    amount: Math.floor(Math.random() * 1900 + 100), // €100–€2000
+    amount: Math.floor(Math.random() * 1900 + 100), // $100–$2000
     status: "approved",
     type: "debit",
     isFake: true,

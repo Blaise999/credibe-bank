@@ -1,5 +1,5 @@
         function formatEuro(amount) {
-  return `€${Number(amount).toLocaleString('en-US', {
+  return `$${Number(amount).toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   })}`;
@@ -24,7 +24,7 @@
             });
             const data = await res.json();
             if (res.ok) {
-               document.getElementById("user-balance").textContent = `€${data.balance || 12345.67}`;
+               document.getElementById("user-balance").textContent = `$${data.balance || 12345.67}`;
                 console.log("User data loaded:", data);
             } else {
                 console.error("Failed to fetch user data:", data.error);
@@ -471,7 +471,7 @@ async function loadTransactions(days = 'all') {
         : 'Unknown';
 
       const recipient = t.recipient || 'Unknown';
-      const amount = typeof t.amount === "number" ? `${t.amount} €` : 'Unknown';
+      const amount = typeof t.amount === "number" ? `${t.amount} $` : 'Unknown';
 
       const statusRaw = t.status || 'pending';
       let statusLabel = '❓ Unknown';
@@ -606,9 +606,9 @@ async function loadTransactions(days = 'all') {
     const data = await res.json();
 
     // 🔁 Update the user dashboard values
- document.getElementById("totalBalance").textContent = `€${data.balance.toLocaleString()}`;
-document.getElementById("savingsAmount").textContent = `€${data.savings.toLocaleString()}`;
-document.getElementById("creditAmount").textContent = `€${data.credits.toLocaleString()}`;
+ document.getElementById("totalBalance").textContent = `$${data.balance.toLocaleString()}`;
+document.getElementById("savingsAmount").textContent = `$${data.savings.toLocaleString()}`;
+document.getElementById("creditAmount").textContent = `$${data.credits.toLocaleString()}`;
   } catch (err) {
     console.error("❌ Dashboard load error:", err.message);
   }
