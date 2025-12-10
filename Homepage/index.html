@@ -651,7 +651,7 @@
                         <div>
                           <div className="text-sm text-gray-300">Current Account</div>
                           <div className="text-3xl md:text-4xl font-semibold text-white tabular-nums">
-                            £{balance}
+                            ${balance}
                           </div>
                         </div>
                         <div className="rounded-xl px-3 py-1 text-xs bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-400/20">+2.1% today</div>
@@ -663,11 +663,11 @@
                         </div>
                         <div className="glass rounded-xl p-3 text-center">
                           <div className="text-gray-400">Savings</div>
-                          <div className="font-semibold tabular-nums">£{savings}</div>
+                          <div className="font-semibold tabular-nums">${savings}</div>
                         </div>
                         <div className="glass rounded-xl p-3 text-center">
                           <div className="text-gray-400">Loans</div>
-                          <div className="font-semibold tabular-nums">£{loans}</div>
+                          <div className="font-semibold tabular-nums">${loans}</div>
                         </div>
                       </div>
                       <div className="mt-6 flex gap-2">
@@ -925,7 +925,7 @@
     function Fees(){
       const rows = [
         ["Domestic transfers", "Free", "Instant via faster rails"],
-        ["Cash withdrawals (domestic)", "Free up to £200/month", "Then small fee"],
+        ["Cash withdrawals (domestic)", "Free up to $200/month", "Then small fee"],
         ["Card payments", "Free", "Contactless & mobile wallets"],
         ["International transfer", "Low fixed fee", "No hidden markups"],
       ];
