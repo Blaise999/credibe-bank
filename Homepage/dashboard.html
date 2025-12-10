@@ -1711,14 +1711,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 }
 // put once near the top of your main script
-const CURRENCY = "EUR";
+const CURRENCY = "USD";
 const formatMoney = (n) =>
-  new Intl.NumberFormat("en-GB", { style: "currency", currency: CURRENCY, minimumFractionDigits: 2 }).format(Number(n||0));
+  new Intl.NumberFormat("en-US", { style: "currency", currency: CURRENCY, minimumFractionDigits: 2 }).format(Number(n||0));
 
 
 (async () => {
  // Utility function to format dollar amounts
-function formatEuro(amount) {
+function formatDollar(amount) {
   return `$${Number(amount).toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
