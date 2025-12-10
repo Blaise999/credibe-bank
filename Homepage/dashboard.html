@@ -1,3975 +1,933 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- =========================================================
-       CREDIBE DASHBOARD — PIXEL-MATCHED TO REFERENCE
-       (Header kept EXACTLY as provided; main area restyled)
-       ========================================================= -->
   <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-  />
-  <title>🏦 Credibe - Dashboard</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap"
-    rel="stylesheet"
-  />
-  <link rel="icon" type="image/png" href="../favicon.png" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.0/dist/vanilla-tilt.min.js"></script>
-  <script src="https://js.stripe.com/v3/"></script>
- 
+  <title>Credibe • Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <!-- Chart.js (for spending + analytics charts) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
+  <!-- Base styles + new dashboard skin -->
   <style>
-    /* =====================================================================
-       0) GLOBALS — TYPE, THEME TOKENS, LAYERED BACKGROUND & ACCESSIBILITY
-       ===================================================================== */
-
-    :root{
-      /* Core canvas */
-      --bg-0: #0a1220;                 /* page base (dark navy)                      */
-      --bg-1: #0b1628;                 /* deeper shadow layer                        */
-      --bg-2: #0e1a2e;                 /* elevated panels                            */
-
-      /* Card surfaces (to match screenshot’s soft-glow cards) */
-      --card-0: #0f1b2f;               /* base card                                  */
-      --card-1: #12223c;               /* higher-contrast card                       */
-      --card-2: #0c1528;               /* quick actions darker container             */
-
-      /* Edges / lines */
-      --edge-0: #1c3455;               /* primary dividers                           */
-      --edge-1: #2a4a74;               /* luminous edge                              */
-      --edge-2: #0c2038;               /* inner stroke                               */
-
-      /* Text */
-      --ink:   #e8f1ff;                /* main text                                  */
-      --muted: #9fb6d6;                /* secondary text                             */
-
-      /* Brand blues (cyan/teal band just like reference) */
-      --brand-a: #00c2ee;              /* left of gradient                           */
-      --brand-b: #29b3ff;              /* right of gradient                          */
-      --brand-ink: #001723;            /* dark text on brand surfaces                */
-
-      /* Accent numbers */
-      --num-cyan: #36e4ff;             /* glowing cyan $0.00                         */
-      --num-lav:  #aeb9ff;             /* credit lavender                            */
-
-      /* Status chips */
-      --chip-cyan-bg: rgba(9, 30, 46, .88);
-      --chip-cyan-border: #234a6d;
-      --chip-cyan-text: #75f1ff;
-
-      --chip-amber-bg: rgba(48, 36, 10, .55);
-      --chip-amber-border: #3a2a0d;
-      --chip-amber-text: #ffdcb0;
-
-      /* Soft shadows for glass cards */
-      --shadow-1: 0 16px 44px rgba(0,0,0,.55);
-      --shadow-2: 0 12px 30px rgba(0,0,0,.38);
-
-      /* Radii to mimic screenshot */
-      --r-xl: 22px;
-      --r-lg: 18px;
-      --r-md: 14px;
-
-      /* Timing */
-      --t-fast: .15s;
-      --t-med: .25s;
-      --t-slow: .4s;
+    :root {
+      --bg-body: #050816;
+      --shell-bg: #050816;
+      --card-bg: #070f1f;
+      --card-elevated: #0b1629;
+      --accent: #00d4ff;
+      --accent-soft: rgba(0, 212, 255, 0.16);
+      --ink-main: #f9fbff;
+      --ink-sub: #a6b4d5;
+      --ink-muted: #6b7280;
+      --border-card: rgba(255, 255, 255, 0.04);
+      --radius-lg: 22px;
+      --radius-md: 18px;
+      --shadow-card: 0 18px 45px rgba(0, 0, 0, 0.7);
     }
 
-    /* Base type + background layering (subtle radial wash like the image) */
-    html,body{
-      height:100%;
+    * {
+      box-sizing: border-box;
     }
-    body{
-      font-family:'Poppins',sans-serif;
-      color:var(--ink);
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
       background:
-        radial-gradient(900px 600px at -12% -20%, #13233b 0%, transparent 60%),
-        radial-gradient(1000px 620px at 112% -10%, #0c1830 0%, transparent 55%),
-        linear-gradient(180deg, #0a1220 0%, #090f1b 100%);
-      background-color: var(--bg-0);
+        radial-gradient(circle at top, #111827 0, #050816 52%) fixed;
+      color: var(--ink-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Inter", sans-serif;
     }
 
-    /* =====================================================================
-       1) KEEP EXISTING HEADER FEEL — ONLY COSMETIC PROTECTION
-       (You asked not to touch the header area’s structure.)
-       ===================================================================== */
-
-    .header{
-      background: rgba(15, 23, 42, .92) !important;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--edge-0);
-      box-shadow: 0 2px 0 rgba(255,255,255,.02), 0 10px 24px rgba(0,0,0,.35);
-      transition: background-color var(--t-med) ease, border-color var(--t-med) ease;
-    }
-    .header:hover{
-      background: rgba(18, 28, 48, .96) !important;
-    }
-    .header-accent::after{ display:none !important; }
-    #menu-toggle{
-      background:transparent !important;
-      border:none !important;
-      color:var(--ink) !important;
-      box-shadow:none !important;
-      filter:none !important;
+    .hidden {
+      display: none !important;
     }
 
-    /* =====================================================================
-       2) PANELS / CARDS — EXACT TONE & SHARPNESS LIKE THE REFERENCE SHOT
-       ===================================================================== */
-
-    .panel{
-      /* dual-tone vertical gradient + faint inner glow + crisp border */
-      background:
-        linear-gradient(180deg, rgba(20, 34, 58, .96) 0%, rgba(12, 22, 38, .96) 100%),
-        linear-gradient(0deg, rgba(255,255,255,.04), rgba(255,255,255,.04));
-      border: 1px solid rgba(42, 74, 116, .88);
-      border-radius: var(--r-xl);
-      box-shadow: var(--shadow-1), inset 0 1px 0 rgba(255,255,255,.05);
-      position: relative;
-      overflow: hidden;
-      isolation: isolate;
-    }
-    .panel::before{
-      /* subtle cyan top-edge to mimic that frosted lip */
-      content:"";
-      position:absolute;
-      inset:0 0 auto 0;
-      height:1px;
-      background:linear-gradient(90deg, transparent 0%, rgba(100,210,255,.35) 35%, rgba(0,180,216,.35) 65%, transparent 100%);
-      opacity:.7;
-      pointer-events:none;
+    /* Shell */
+    .app-shell {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
-    .panel--soft{
-      background:
-        linear-gradient(180deg, rgba(17, 28, 48, .94) 0%, rgba(13, 24, 42, .94) 100%);
-      border-color: rgba(42, 74, 116, .68);
-      box-shadow: var(--shadow-2), inset 0 1px 0 rgba(255,255,255,.04);
+    .app-main {
+      flex: 1;
+      padding: 20px 16px 32px;
     }
 
-    /* Frosted “tile” used for secondary action blocks */
-    .tile{
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.08);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      border-radius: var(--r-lg);
-      transition: transform var(--t-med) ease, background var(--t-med) ease, border-color var(--t-med) ease;
-    }
-    .tile:hover{
-      transform: translateY(-2px);
-      background: rgba(255,255,255,.07);
-      border-color: rgba(255,255,255,.14);
+    /* Top bar */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px 6px;
     }
 
-    /* =====================================================================
-       3) LABELS / NUMBERS — HIERARCHY & COLOR EXACTNESS
-       ===================================================================== */
-
-    .h-label{
-      color: var(--muted);
-      letter-spacing: .08em;
-      font-weight: 700;
-      text-transform: none;
-      opacity: .95;
+    .top-brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 15px;
+      font-weight: 600;
     }
-    .num{
-      font-weight: 900;
-      letter-spacing: .2px;
-      line-height: 1.05;
-      text-shadow:
-        0 0 0 rgba(0,0,0,0),
-        0 10px 22px rgba(0,0,0,.25);
-    }
-    .num--cyan{ color: var(--num-cyan); }
-    .num--lav{  color: var(--num-lav);  }
 
-    /* Inline “chips” in the cards (Spent $240, $400) */
-    .chip{
-      display:inline-flex;
-      align-items:center;
-      gap:.4rem;
-      height:26px;
-      line-height:24px;
-      padding:0 .68rem;
+    .top-logo {
+      width: 18px;
+      height: 18px;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+    }
+
+    .top-menu {
+      width: 30px;
+      height: 30px;
       border-radius: 999px;
-      font-size:.78rem;
-      font-weight:700;
-      letter-spacing:.02em;
-      user-select:none;
-      white-space:nowrap;
-    }
-    .chip--cyan{
-      color: var(--chip-cyan-text);
-      background: var(--chip-cyan-bg);
-      border: 1px solid var(--chip-cyan-border);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
-    }
-    .chip--amber{
-      color: var(--chip-amber-text);
-      background: var(--chip-amber-bg);
-      border: 1px solid var(--chip-amber-border);
+      border: 1px solid var(--border-card);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
     }
 
-    /* =====================================================================
-       4) PRIMARY BUTTONS — GRADIENT CTA & DARK SECONDARY
-       ===================================================================== */
-
-    .btn-grad{
-      background: linear-gradient(90deg, var(--brand-a) 0%, var(--brand-b) 100%);
-      color: var(--brand-ink);
-      border: 1px solid rgba(255,255,255,.06);
-      border-radius: var(--r-md);
-      box-shadow: 0 14px 30px rgba(0, 194, 238, .28);
-      transition: transform var(--t-fast) ease, filter var(--t-fast) ease, box-shadow var(--t-fast) ease;
-      font-weight: 900;
-      letter-spacing: .02em;
-    }
-    .btn-grad:hover{
-      filter: brightness(.98);
-      transform: translateY(-1px);
-      box-shadow: 0 18px 38px rgba(0, 194, 238, .32);
-    }
-    .btn-dark{
-      background: rgba(18,27,45,.92);
-      border: 1px solid rgba(42, 74, 116, .85);
-      color: var(--ink);
-      border-radius: var(--r-md);
-      transition: filter var(--t-fast) ease, transform var(--t-fast) ease;
-      font-weight: 700;
-      letter-spacing: .01em;
-    }
-    .btn-dark:hover{
-      filter: brightness(1.07);
-      transform: translateY(-1px);
+    .top-menu span {
+      width: 15px;
+      height: 1.5px;
+      background: var(--ink-main);
+      border-radius: 999px;
+      position: relative;
     }
 
-    /* =====================================================================
-       5) ICONS — TRANSFERS ARROWS (CRISP LIKE THE REFERENCE)
-       ===================================================================== */
-
-    .icon{
-      width: 1.25rem; height: 1.25rem;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      flex-shrink: 0;
-    }
-    .icon--lg{ width: 1.5rem; height: 1.5rem; }
-    .icon--xl{ width: 1.75rem; height: 1.75rem; }
-    .icon--dim{ color: rgba(255,255,255,.86); }
-    .icon--brand{ color: var(--brand-a); }
-
-    /* Special tweak for the arrows-right-left icon path rendering */
-    .icon-transfer path{
-      vector-effect: non-scaling-stroke;
-      shape-rendering: geometricPrecision;
+    .top-menu span::before,
+    .top-menu span::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      width: 15px;
+      height: 1.5px;
+      border-radius: 999px;
+      background: var(--ink-main);
     }
 
-    /* =====================================================================
-       6) SKELETONS (LOADING PLACEHOLDERS)
-       ===================================================================== */
-
-    .skeleton{
-      animation: pulse 1.6s ease-in-out infinite;
-      background: #0f1a2e;
-      border-radius: var(--r-lg);
-    }
-    @keyframes pulse{
-      0%{opacity:1}
-      50%{opacity:.45}
-      100%{opacity:1}
+    .top-menu span::before {
+      top: -4px;
     }
 
-    /* =====================================================================
-       7) RESPONSIVE REFINEMENTS
-       ===================================================================== */
-
-    .bounds{ max-width: 1120px; margin-left:auto; margin-right:auto; }
-
-    @media (min-width: 640px){
-      .num{ letter-spacing:.25px; }
+    .top-menu span::after {
+      top: 4px;
     }
 
-    @media (min-width: 1024px){
-      .panel{ border-radius: var(--r-xl); }
-      .btn-grad, .btn-dark{ border-radius: 16px; }
+    /* Pages */
+    .page {
+      display: none;
     }
 
-    /* =====================================================================
-       8) UTILITY PIPS / SMALL UI ELEMENTS
-       ===================================================================== */
-
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:.35rem;
-      padding:.18rem .6rem;
-      border-radius:12px;
-      border:1px solid rgba(42,74,116,.85);
-      background: rgba(16,25,41,.9);
-      color: var(--muted);
-      font-size:.76rem;
-      line-height:1rem;
-      user-select:none;
+    .page-active {
+      display: block;
     }
 
-    /* =====================================================================
-       9) PRESERVE YOUR ORIGINAL MINI RULES (for parity with your file)
-       ===================================================================== */
+    /* Dashboard header */
+    .dash-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
 
-    .chart-container{ animation: fadeIn 1s ease-in-out; }
-    @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+    .dash-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
 
-    .mobile-menu{ transition: transform .3s ease-in-out; }
-    .mobile-menu.open{ transform: translateX(0); }
-    .mobile-menu.closed{ transform: translateX(-100%); }
+    .dash-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--ink-main);
+    }
 
-    .fade-in{ opacity:0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
-    .fade-in.visible{ opacity:1; transform: translateY(0); }
+    .dash-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 1px solid var(--border-card);
+      background: radial-gradient(circle at top left, #111827, #020617);
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      color: var(--ink-main);
+    }
 
-    input:focus + span, select:focus + span{ opacity:1 !important; }
+    .dash-shell {
+      margin-top: 6px;
+    }
 
-    .bg-card{ background-color: var(--card-0); }
-    .bg-elev{ background-color: var(--card-2); }
-    .text-ink{ color: var(--ink); }
-    .text-brand{ color: var(--brand-a); }
-    .border-edge{ border-color: var(--edge-0); }
+    /* Summary card */
+    .summary-card {
+      margin-top: 16px;
+      padding: 18px 16px 16px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-card);
+      background:
+        radial-gradient(circle at top left, #111827, #020617 70%);
+      box-shadow: var(--shadow-card);
+    }
 
-    .page{ padding-top:0 !important; margin-top:0 !important; }
-    .page > :first-child{ margin-top:0 !important; }
-    .page > br:first-child{ display:none !important; }
-    header{ margin-bottom:0 !important; }
-    main{ margin-top:0 !important; padding-top:0 !important; }
+    .summary-label {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+
+    .summary-value {
+      margin-top: 6px;
+      font-size: 26px;
+      font-weight: 650;
+    }
+
+    .summary-sub {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--ink-sub);
+    }
+
+    .summary-breakdown {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--ink-muted);
+    }
+
+    /* Pill buttons */
+    .summary-actions {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill-btn {
+      border-radius: 999px;
+      font-size: 13px;
+      padding: 8px 14px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--ink-main);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .pill-primary {
+      background: linear-gradient(135deg, #00b4d8, #00e0ff);
+      color: #020617;
+      box-shadow: 0 12px 30px rgba(0, 208, 255, 0.4);
+    }
+
+    .pill-secondary {
+      border-color: var(--accent-soft);
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    .pill-ghost {
+      border-color: transparent;
+      color: var(--ink-sub);
+    }
+
+    /* Accounts */
+    .accounts-stack {
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .account-card {
+      border-radius: var(--radius-md);
+      background: var(--card-bg);
+      border: 1px solid var(--border-card);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .account-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .account-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 12px;
+      background: #020617;
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+    }
+
+    .account-icon-green {
+      background: rgba(34, 197, 94, 0.15);
+    }
+
+    .account-icon-orange {
+      background: rgba(249, 115, 22, 0.16);
+    }
+
+    .account-label {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .account-sub {
+      font-size: 11px;
+      color: var(--ink-muted);
+    }
+
+    .account-right {
+      text-align: right;
+    }
+
+    .account-amount {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .account-meta {
+      font-size: 11px;
+      color: var(--ink-muted);
+      word-break: break-all;
+    }
+
+    /* Chart card */
+    .chart-card {
+      margin-top: 18px;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chart-sub {
+      margin-top: 2px;
+      font-size: 11px;
+      color: var(--ink-muted);
+    }
+
+    .chart-badge {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--accent-soft);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--ink-main);
+    }
+
+    .chart-body {
+      margin-top: 10px;
+      height: 160px;
+    }
+
+    .chart-link {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--accent);
+      background: transparent;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    /* Recent activity / transactions */
+    .section-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .section-sub {
+      font-size: 11px;
+      color: var(--ink-muted);
+    }
+
+    .filter-select {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 999px;
+      border: 1px solid var(--border-card);
+      color: var(--ink-sub);
+      font-size: 11px;
+      padding: 4px 8px;
+    }
+
+    .txn-columns {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .txn-block-title {
+      font-size: 12px;
+      color: var(--ink-muted);
+      margin-bottom: 6px;
+    }
+
+    .txn-table-wrapper {
+      display: none; /* mobile: hide table, show cards */
+    }
+
+    .txn-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .txn-table th,
+    .txn-table td {
+      padding: 6px 4px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+      text-align: left;
+    }
+
+    .txn-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .empty-state {
+      font-size: 12px;
+      color: var(--ink-muted);
+      margin-top: 6px;
+    }
+
+    /* badges from JS */
+    .px-2 {
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+    }
+    .py-1 {
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+    }
+    .rounded-full {
+      border-radius: 999px;
+    }
+    .text-xs {
+      font-size: 0.75rem;
+    }
+    .font-semibold {
+      font-weight: 600;
+    }
+    .bg-green-500\/15 {
+      background-color: rgba(34, 197, 94, 0.15);
+    }
+    .bg-yellow-500\/15 {
+      background-color: rgba(234, 179, 8, 0.15);
+    }
+    .bg-red-500\/15 {
+      background-color: rgba(239, 68, 68, 0.15);
+    }
+    .text-green-400 {
+      color: #4ade80;
+    }
+    .text-yellow-300 {
+      color: #fde047;
+    }
+    .text-red-400 {
+      color: #f87171;
+    }
+    .border {
+      border-width: 1px;
+    }
+    .border-green-500\/20 {
+      border-color: rgba(34, 197, 94, 0.2);
+    }
+    .border-yellow-500\/20 {
+      border-color: rgba(234, 179, 8, 0.2);
+    }
+    .border-red-500\/20 {
+      border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    /* Analytics page */
+    .analytics-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .kpi-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .kpi-card {
+      flex: 1 1 45%;
+      min-width: 150px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      background: var(--card-bg);
+      border: 1px solid var(--border-card);
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      color: var(--ink-muted);
+    }
+
+    .kpi-value {
+      margin-top: 4px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .kpi-extra {
+      margin-top: 2px;
+      font-size: 11px;
+      color: var(--ink-sub);
+    }
+
+    /* Bottom tab bar */
+    .tab-bar {
+      position: sticky;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 8px 0 10px;
+      background: linear-gradient(
+        to top,
+        rgba(5, 8, 22, 0.98),
+        rgba(5, 8, 22, 0.85),
+        transparent
+      );
+      display: flex;
+      justify-content: center;
+    }
+
+    .tab-inner {
+      width: 100%;
+      max-width: 480px;
+      padding: 0 16px;
+    }
+
+    .tab-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 6px 8px;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    .tab-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      font-size: 10px;
+      color: var(--ink-muted);
+      padding: 4px 0;
+      cursor: pointer;
+      border-radius: 999px;
+    }
+
+    .tab-item-active {
+      background: rgba(0, 212, 255, 0.16);
+      color: var(--ink-main);
+    }
+
+    .tab-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
+    @media (min-width: 640px) {
+      .txn-table-wrapper {
+        display: block;
+      }
+    }
   </style>
 </head>
-
-<body class="min-h-screen flex flex-col overflow-x-hidden">
-
-  <!-- =========================================================
-       HEADER (UNCHANGED STRUCTURE — as requested)
-       ========================================================= -->
-  <header class="header p-3 sm:p-6 flex items-center justify-between sticky top-0 z-50 w-full shadow-md border-b border-edge header-accent h-14 sm:h-16">
-    <div class="flex items-center space-x-2">
-      <button id="menu-toggle" class="text-ink text-2xl md:hidden focus:outline-none" aria-label="Toggle mobile menu">☰</button>
-      <span id="mobile-greeting" class="text-ink/80 text-base md:hidden"></span>
-    </div>
-
-    <!-- 🏦 Logo + Text Right -->
-    <div class="flex items-center space-x-4 ml-auto h-14 sm:h-16">
-      <a href="index.html" class="flex items-center gap-2 group" aria-label="Credibe – banking, beautifully simple">
-        <!-- Bank / finance icon -->
-        <svg class="h-5 w-5 sm:h-6 sm:w-6 text-brand shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5"
-             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <!-- roof -->
-          <path d="M3 10L12 4l9 6" />
-          <!-- base -->
-          <path d="M4 20h16" />
-          <!-- columns -->
-          <path d="M6 10v8M10 10v8M14 10v8M18 10v8" />
-        </svg>
-
-        <!-- Wordmark + tagline -->
-        <span class="flex flex-col leading-tight">
-          <span class="text-2xl sm:text-3xl font-extrabold text-brand tracking-tight transition group-hover:opacity-90">
-            Credibe
-          </span>
-          <span class="text-[9px] sm:text-[11px] italic text-[#A9C0DF]/80 -mt-1">
-            Smart. Secure. Seamless
-          </span>
-        </span>
-      </a>
-
-      <!-- unchanged greeting chip beside logo -->
-      <div class="hidden sm:flex items-center space-x-2">
-        <span class="text-ink text-base sm:text-lg font-medium bg-elev px-3 py-1 rounded-full border border-edge/60">
-          👋 Welcome back
-        </span>
+<body>
+  <div class="app-shell">
+    <!-- Top bar -->
+    <header class="top-bar">
+      <div class="top-brand">
+        <div class="top-logo">€</div>
+        <span>Credibe</span>
       </div>
-    </div>
-  </header>
+      <button class="top-menu" type="button">
+        <span></span>
+      </button>
+    </header>
 
-  <!-- =========================================================
-       MAIN LAYOUT (SIDEBAR + CONTENT). GREETING NOT REPEATED INSIDE.
-       ========================================================= -->
-  <div class="flex flex-1 w-full">
-    <!-- Sidebar Navigation (PC Only) -->
-    <aside class="fixed top-[4rem] left-0 h-[calc(100vh-4rem)] bg-card w-64 p-2 sm:p-4 space-y-2 hidden md:block z-30 border-r border-edge">
-      <nav class="space-y-1">
-        <a href="#" data-page="dashboard"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">🏠 Dashboard</a>
-        <a href="#" data-page="accounts"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">💳 Accounts</a>
-        <a href="#" data-page="transfers"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">💸 Transfers</a>
-        <a href="#" data-page="transactions"  class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">📄 Transactions</a>
-        <a href="#" data-page="analytics"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">📊 Analytics</a>
-        <a href="#" data-page="security"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">🔒 Security</a>
-        <a href="#" data-page="settings"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">⚙️ Settings</a>
-      </nav>
-    </aside>
-
-    <!-- Mobile Menu -->
-    <nav id="mobile-menu" class="mobile-menu fixed top-[4rem] left-0 w-64 bg-card h-[calc(100vh-4rem)] p-2 space-y-2 transform transition-transform duration-300 ease-in-out md:hidden closed z-40 border-r border-edge">
-      <a href="#" data-page="dashboard"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">🏠 Dashboard</a>
-      <a href="#" data-page="accounts"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">💳 Accounts</a>
-      <a href="#" data-page="transfers"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">💸 Transfers</a>
-      <a href="#" data-page="transactions"  class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">📄 Transactions</a>
-      <a href="#" data-page="analytics"     class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">📊 Analytics</a>
-      <a href="#" data-page="security"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">🔒 Security</a>
-      <a href="#" data-page="settings"      class="nav-link block p-2 rounded-lg hover:bg-elev hover:text-brand transition flex items-center gap-2 text-ink">⚙️ Settings</a>
-    </nav>
-
-    <!-- =======================================================
-         MAIN CONTENT (Dashboard exact look; NO extra greeting)
-         ======================================================= -->
-    <main class="flex-1 p-2 sm:p-4 w-full md:ml-64">
-      <div id="dashboard-page" class="page">
-        <!-- Keep title element for semantics; visually it’s not in the mock, so we hide it off-screen for readers -->
-        <h1 class="sr-only">Dashboard</h1>
-
-        <div x-data="{ loading:false }" class="bounds space-y-4 sm:space-y-6">
-
-          <!-- Loading placeholders (kept for parity) -->
-          <div x-show="loading" class="grid grid-cols-1 gap-3 sm:gap-4">
-            <div class="skeleton h-20 sm:h-24"></div>
-            <div class="skeleton h-20 sm:h-24"></div>
-            <div class="skeleton h-20 sm:h-24"></div>
+    <!-- Main content -->
+    <main class="app-main">
+      <!-- DASHBOARD PAGE -->
+      <section id="dashboard-page" class="page page-active">
+        <div class="dash-header">
+          <div>
+            <p class="dash-eyebrow">Welcome back,</p>
+            <h1 class="dash-title" id="welcome-user">Blaise Idoko</h1>
           </div>
+          <button class="dash-avatar" type="button">
+            <span class="avatar-initial">B</span>
+          </button>
+        </div>
 
-          <!-- =========================
-               BALANCE CARDS (TOP ROW)
-               ========================= -->
-          <div x-show="!loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            <!-- Total Balance -->
-            <section class="panel p-5 sm:p-6">
-              <div class="flex items-start justify-between">
-                <span class="h-label text-xs sm:text-sm">TOTAL BALANCE</span>
-              </div>
-              <p id="totalBalance" class="num num--cyan text-4xl sm:text-5xl mt-2">€0.00</p>
-            </section>
+        <div class="dash-shell">
+          <!-- Total assets card -->
+          <section class="summary-card">
+            <p class="summary-label">Total assets</p>
+            <p class="summary-value" id="totalBalance">€0.00</p>
+            <p class="summary-sub">
+              Combined balances across fiat and crypto accounts.
+            </p>
+            <p class="summary-breakdown">
+              Fiat: <span id="fiatBalance">€0.00</span> · Crypto:
+              <span id="cryptoBalance">€0.00</span>
+            </p>
 
-            <!-- Savings -->
-            <section class="panel p-5 sm:p-6">
-              <span class="h-label text-xs sm:text-sm">SAVINGS</span>
-              <p id="savingsAmount" class="num num--cyan text-4xl sm:text-5xl mt-2">€0.00</p>
-            </section>
-
-            <!-- Credit -->
-            <section class="panel p-5 sm:p-6">
-              <div class="flex items-start justify-between">
-                <h3 class="h-label text-xs sm:text-sm">Credit</h3>
-              </div>
-              <p id="creditAmount" class="num num--lav text-4xl sm:text-5xl mt-2">€0.00</p>
-            </section>
-          </div>
-
-          <!-- =========================
-               QUICK ACTIONS CARD
-               ========================= -->
-          <section class="panel panel--soft p-5 sm:p-6">
-            <h2 class="text-xl sm:text-2xl font-semibold tracking-tight">Quick Actions</h2>
-
-            <!-- Primary actions (exact layout like reference) -->
-            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <!-- Transfers — keep link/redirect; icon updated to match picture -->
-              <a href="#" data-page="transfers" class="nav-link block" aria-label="Transfer Money">
-                <div class="btn-grad w-full px-5 py-4 sm:py-5 rounded-xl flex items-center justify-center shadow">
-                  <svg class="icon icon--xl icon-transfer mr-2" viewBox="0 0 24 24" aria-hidden="true">
-                    <!-- arrows-right-left (clean, crisp; geometric precision) -->
-                    <path d="M3 7h13" />
-                    <path d="M16 7l-4-4" />
-                    <path d="M16 7l-4 4" />
-                    <path d="M21 17H8" />
-                    <path d="M8 17l4 4" />
-                    <path d="M8 17l4-4" />
-                  </svg>
-                  <span class="text-base sm:text-lg font-extrabold">Transfers</span>
-                </div>
-              </a>
-
-              <!-- Pay Bills -->
-              <a href="pay-bills.html" class="block" aria-label="Pay Bills">
-                <div class="btn-dark w-full px-5 py-4 sm:py-5 rounded-xl flex items-center justify-center shadow">
-                  <svg class="icon icon--xl mr-2 icon--dim" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M4 6h16" />
-                    <path d="M4 10h16" />
-                    <path d="M9 14h6" />
-                    <path d="M4 18h16" />
-                  </svg>
-                  <span class="text-base font-semibold">Pay Bills</span>
-                </div>
-              </a>
-            </div>
-
-            <!-- Divider like reference -->
-            <div class="mt-4 mb-3 h-px bg-[rgba(42,74,116,.5)]"></div>
-
-            <!-- Secondary actions (three tiles) -->
-            <div class="grid grid-cols-3 gap-2 sm:gap-3">
-              <!-- Loans -->
-              <a href="mortgageds.html" class="block" aria-label="Apply for Mortgage">
-                <div class="tile p-4 rounded-xl flex flex-col items-center justify-center min-h-[92px]">
-                  <svg class="icon icon--lg text-purple-300" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M3 10l9-7 9 7" />
-                    <path d="M4 10v10a1 1 0 001 1h3" />
-                    <path d="M20 10v11a1 1 0 001 1h3" />
-                  </svg>
-                  <span class="mt-2 text-[15px] font-semibold">Loans</span>
-                  <span class="text-[11px] opacity-70 -mt-0.5">Explore your options</span>
-                </div>
-              </a>
-
-              <!-- Add Beneficiary -->
-              <a href="add-beneficiary.html" class="block" aria-label="Add Beneficiary">
-                <div class="tile p-4 rounded-xl flex flex-col items-center justify-center min-h-[92px]">
-                  <svg class="icon icon--lg text-indigo-300" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12 14a5 5 0 100-10 5 5 0 000 10z" />
-                    <path d="M2 20a10 10 0 0120 0" />
-                  </svg>
-                  <span class="mt-2 text-[15px] font-semibold text-center">Add Beneficiary</span>
-                  <span class="text-[11px] opacity-70 -mt-0.5 text-center">Quickly add newpee</span>
-                </div>
-              </a>
-
-              <!-- Check Deposits -->
-              <a href="check.html" class="block" aria-label="Check Deposits">
-                <div class="tile p-4 rounded-xl flex flex-col items-center justify-center min-h-[92px]">
-                  <svg class="icon icon--lg text-yellow-300" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M3 10l9-7 9 7" />
-                    <path d="M4 10v10a1 1 0 001 1h3" />
-                    <path d="M17 14h4M17 18h4M4 22h16" />
-                  </svg>
-                  <span class="mt-2 text-[15px] font-semibold text-center">Check Deposits</span>
-                  <span class="text-[11px] opacity-70 -mt-0.5 text-center">Deposit your checks</span>
-                </div>
-              </a>
+            <div class="summary-actions">
+              <button class="pill-btn pill-secondary" data-page="add-money">
+                + Add money
+              </button>
+              <button class="pill-btn pill-primary" data-page="transfers">
+                ↗ Transfer
+              </button>
+              <button class="pill-btn pill-ghost" data-page="analytics">
+                📊 Insights
+              </button>
             </div>
           </section>
 
-          <!-- =========================
-               SPENDING OVERVIEW (LINE)
-               ========================= -->
-          <section class="panel p-5 sm:p-6">
-            <div class="flex items-center justify-between mb-2">
-              <h2 class="text-2xl font-semibold tracking-tight">Spending Overview</h2>
-              <span class="pill">June</span>
-            </div>
+          <!-- Accounts stack -->
+          <section class="accounts-stack">
+            <article class="account-card">
+              <div class="account-left">
+                <div class="account-icon">💳</div>
+                <div>
+                  <p class="account-label">Checking</p>
+                  <p class="account-sub">Everyday spending account</p>
+                </div>
+              </div>
+              <div class="account-right">
+                <p class="account-amount" id="user-balance">€0.00</p>
+                <p class="account-meta" id="checking-iban">—</p>
+              </div>
+            </article>
 
-            <div class="w-full h-36 sm:h-60 md:max-h-80">
+            <article class="account-card">
+              <div class="account-left">
+                <div class="account-icon account-icon-green">💰</div>
+                <div>
+                  <p class="account-label">Savings</p>
+                  <p class="account-sub">4.5% APY</p>
+                </div>
+              </div>
+              <div class="account-right">
+                <p class="account-amount" id="savingsAmount">€0.00</p>
+                <p class="account-meta" id="savings-iban">—</p>
+              </div>
+            </article>
+
+            <article class="account-card">
+              <div class="account-left">
+                <div class="account-icon account-icon-orange">₿</div>
+                <div>
+                  <p class="account-label">Crypto</p>
+                  <p class="account-sub">Spot &amp; custodial wallets</p>
+                </div>
+              </div>
+              <div class="account-right">
+                <p class="account-amount" id="creditAmount">€0.00</p>
+                <p class="account-meta">Updated just now</p>
+              </div>
+            </article>
+          </section>
+
+          <!-- Spending overview chart -->
+          <section class="summary-card chart-card">
+            <header class="chart-header">
+              <div>
+                <p class="summary-label">Spending overview</p>
+                <p class="chart-sub">Last 6 months</p>
+              </div>
+              <span class="chart-badge">June</span>
+            </header>
+            <div class="chart-body">
               <canvas id="spending-chart"></canvas>
             </div>
-
-            <!-- keep your deep-link behavior -->
-            <a
-              href="#"
-              class="nav-link block text-sm text-[var(--brand-a)] hover:opacity-90 mt-3 text-center"
-              data-page="analytics"
-              data-scroll="#analytics-top"
-            >
-              View Details
-            </a>
+            <button class="chart-link" data-page="analytics">
+              View details
+            </button>
           </section>
 
+          <!-- Recent activity (transactions) -->
+          <section class="summary-card" style="margin-top: 18px;">
+            <div class="section-title-row">
+              <div>
+                <p class="section-title">Recent activity</p>
+                <p class="section-sub">Sent and received transactions</p>
+              </div>
+              <select id="transaction-filter" class="filter-select">
+                <option value="7">Last 7 days</option>
+                <option value="30" selected>Last 30 days</option>
+                <option value="90">Last 90 days</option>
+                <option value="all">All time</option>
+              </select>
+            </div>
+
+            <div class="txn-columns">
+              <!-- Money out -->
+              <div>
+                <p class="txn-block-title">Money out</p>
+
+                <div class="txn-table-wrapper">
+                  <table class="txn-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>To</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="transactions-table-sent"></tbody>
+                  </table>
+                </div>
+
+                <div id="transactions-cards-sent" class="txn-cards"></div>
+                <p class="empty-state empty-state-sent hidden">
+                  You haven’t sent any money yet.
+                </p>
+              </div>
+
+              <!-- Money in -->
+              <div>
+                <p class="txn-block-title" style="margin-top: 4px;">Money in</p>
+
+                <div class="txn-table-wrapper">
+                  <table class="txn-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>From</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="transactions-table-received"></tbody>
+                  </table>
+                </div>
+
+                <div id="transactions-cards-received" class="txn-cards"></div>
+                <p class="empty-state empty-state-received hidden">
+                  No incoming payments yet.
+                </p>
+              </div>
+            </div>
+          </section>
         </div>
-      </div>
-<!-- Accounts Page (Modern Card UI) -->
-<div id="accounts-page" class="page hidden">
-  <h1 class="text-2xl sm:text-3xl font-bold text-ink mb-3 sm:mb-6">Accounts</h1>
+      </section>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5">
-    <!-- Checking Card -->
-    <article
-      class="relative overflow-hidden rounded-2xl bg-card border border-edge shadow-xl p-4 sm:p-5 flex flex-col justify-between min-h-[190px]">
-      <!-- decorative blobs -->
-      <div class="pointer-events-none absolute -top-8 -right-8 w-40 h-40 rounded-full opacity-20"
-           style="background: radial-gradient(circle at center, var(--brand) 0%, transparent 60%);"></div>
-      <div class="pointer-events-none absolute -bottom-10 -left-10 w-44 h-44 rounded-full opacity-10"
-           style="background: radial-gradient(circle at center, #2B74B3 0%, transparent 60%);"></div>
-
-      <!-- top row -->
-      <div class="flex items-center justify-between">
-        <span class="text-xs tracking-widest uppercase text-muted-ink">Checking</span>
-        <span class="inline-flex items-center gap-1 text-xs font-semibold bg-green-500/15 text-green-400 border border-green-500/20 px-2 py-1 rounded-full">
-          <span class="h-2 w-2 rounded-full bg-green-400"></span> Active
-        </span>
-      </div>
-
-      <!-- brand + chip -->
-      <div class="mt-3 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <!-- chip -->
-          <svg class="h-8 w-10 text-ink/70" viewBox="0 0 48 32" fill="none">
-            <rect x="1" y="1" width="46" height="30" rx="4" stroke="currentColor" stroke-width="2"/>
-            <path d="M16 1v30M32 1v30M1 16h46" stroke="currentColor" stroke-width="2" opacity=".6"/>
-          </svg>
-          <!-- contactless -->
-          <svg class="h-5 w-5 text-ink/50" viewBox="0 0 24 24" fill="none">
-            <path d="M7 8c2 2 2 6 0 8M11 6c3.5 3.5 3.5 8.5 0 12M15 4c5 5 5 11 0 16"
-                  stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="text-right">
-          <div class="text-brand font-extrabold text-lg tracking-tight">Credibe</div>
-          <div class="text-xs text-muted-ink/80 italic">Everyday Money, Elevated</div>
-        </div>
-      </div>
-
-      <!-- masked number -->
-      <div class="mt-5 font-mono tracking-widest text-lg text-ink/95">
-        •••• •••• •••• <span class="font-bold">7034</span>
-      </div>
-
-      <!-- meta -->
-      <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-ink/90">
-        <div>
-          <div class="text-muted-ink uppercase tracking-wider">IBAN</div>
-          <div class="mt-0.5 font-semibold">BE68 5390 0754 7034</div>
-        </div>
-        <div class="text-right">
-          <div class="text-muted-ink uppercase tracking-wider">Created</div>
-          <div class="mt-0.5 font-semibold">2024-01-15</div>
-        </div>
-      </div>
-    </article>
-
-    <!-- Savings Card -->
-    <article
-      class="relative overflow-hidden rounded-2xl bg-card border border-edge shadow-xl p-4 sm:p-5 flex flex-col justify-between min-h-[190px]">
-      <!-- decorative blobs -->
-      <div class="pointer-events-none absolute -top-8 -right-8 w-40 h-40 rounded-full opacity-20"
-           style="background: radial-gradient(circle at center, #2B74B3 0%, transparent 60%);"></div>
-      <div class="pointer-events-none absolute -bottom-10 -left-10 w-44 h-44 rounded-full opacity-10"
-           style="background: radial-gradient(circle at center, var(--brand) 0%, transparent 60%);"></div>
-
-      <!-- top row -->
-      <div class="flex items-center justify-between">
-        <span class="text-xs tracking-widest uppercase text-muted-ink">Savings</span>
-        <span class="inline-flex items-center gap-1 text-xs font-semibold bg-green-500/15 text-green-400 border border-green-500/20 px-2 py-1 rounded-full">
-          <span class="h-2 w-2 rounded-full bg-green-400"></span> Active
-        </span>
-      </div>
-
-      <!-- brand + chip -->
-      <div class="mt-3 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <!-- chip -->
-          <svg class="h-8 w-10 text-ink/70" viewBox="0 0 48 32" fill="none">
-            <rect x="1" y="1" width="46" height="30" rx="4" stroke="currentColor" stroke-width="2"/>
-            <path d="M16 1v30M32 1v30M1 16h46" stroke="currentColor" stroke-width="2" opacity=".6"/>
-          </svg>
-          <!-- contactless -->
-          <svg class="h-5 w-5 text-ink/50" viewBox="0 0 24 24" fill="none">
-            <path d="M7 8c2 2 2 6 0 8M11 6c3.5 3.5 3.5 8.5 0 12M15 4c5 5 5 11 0 16"
-                  stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="text-right">
-          <div class="text-brand font-extrabold text-lg tracking-tight">Credibe</div>
-          <div class="text-xs text-muted-ink/80 italic">Grow smart. Save bright.</div>
-        </div>
-      </div>
-
-      <!-- masked number -->
-      <div class="mt-5 font-mono tracking-widest text-lg text-ink/95">
-        •••• •••• •••• <span class="font-bold">6400</span>
-      </div>
-
-      <!-- meta -->
-      <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-ink/90">
-        <div>
-          <div class="text-muted-ink uppercase tracking-wider">IBAN</div>
-          <div class="mt-0.5 font-semibold">NL91 ABNA 0417 1643 00</div>
-        </div>
-        <div class="text-right">
-          <div class="text-muted-ink uppercase tracking-wider">Created</div>
-          <div class="mt-0.5 font-semibold">2023-06-20</div>
-        </div>
-      </div>
-    </article>
-  </div>
-
-  <!-- Optional small legend / helper -->
-  <p class="mt-3 text-xs text-muted-ink">
-    Tip: Long-press a card to copy the IBAN on mobile. (Desktop: drag to select and copy.)
-  </p>
-</div>
-
-
-<!-- Transfers Page -->
-<div id="transfers-page" class="page hidden">
-  <!-- Section Title + Tabs -->
-  <div class="text-center mb-6">
-    <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2">Transfers</h1>
-    <div class="flex justify-center space-x-2">
-      <!-- Local Tab (active) -->
-      <a href="#" class="bg-[#00b4d8] text-white font-medium px-4 py-2 rounded-lg shadow-md">
-        Local Transfer
-      </a>
-      <!-- International Tab -->
-      <a href="intl.html" class="bg-[#1a1a1a] border border-[#00b4d8] hover:bg-[#00b4d8]/10 text-[#00b4d8] font-medium px-4 py-2 rounded-lg shadow-md transition-all">
-        International Transfer
-      </a>
-    </div>
-  </div>
-
-  <!-- Local Transfer Form -->
-  <div class="flex justify-center w-full">
-    <form id="transfer-form" class="bg-[#1f2937]/50 backdrop-blur-md p-4 sm:p-6 rounded-lg sm:rounded-2xl shadow-md space-y-4 w-full max-w-md">
-
-      <!-- Recipient Name -->
-      <div>
-        <label for="recipient-name" class="block text-sm text-[#e0e0e0]">Recipient Name</label>
-        <input type="text" id="recipient-name" required class="w-full bg-[#1a1a1a]/50 text-[#e0e0e0] border border-[#444] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="e.g. Emma Dupont">
-      </div>
-
-      <!-- SWIFT/BIC -->
-      <div>
-        <label for="swift" class="block text-sm text-[#e0e0e0]">SWIFT/BIC</label>
-        <input type="text" id="swift" required class="w-full bg-[#1a1a1a]/50 text-[#e0e0e0] border border-[#444] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="e.g. BBRUBEBB">
-      </div>
-
-      <!-- Amount -->
-      <div>
-        <label for="amount" class="block text-sm text-[#e0e0e0]">Amount (€)</label>
-        <input type="number" id="amount" required step="0.01" min="0.01" class="w-full bg-[#1a1a1a]/50 text-[#e0e0e0] border border-[#444] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="e.g. 2500">
-      </div>
-
-      <!-- IBAN (Optional) -->
-      <div>
-        <label for="iban" class="block text-sm text-[#e0e0e0]">IBAN (optional)</label>
-        <input type="text" id="iban" class="w-full bg-[#1a1a1a]/50 text-[#e0e0e0] border border-[#444] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="e.g. BE68 5390 0754 7034">
-      </div>
-
-      <!-- Reference -->
-      <div>
-        <label for="reference" class="block text-sm text-[#e0e0e0]">Reference</label>
-        <input type="text" id="reference" class="w-full bg-[#1a1a1a]/50 text-[#e0e0e0] border border-[#444] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="e.g. Invoice #2349">
-      </div>
-
-    <!-- OTP Section (hidden initially) -->
-<div id="transferOtpSection" class="hidden">
-  <label for="transfer-otp" class="block text-sm text-[#e0e0e0]">OTP</label>
-  <input
-    type="text"
-    id="transfer-otp"
-    name="otp"
-    class="w-full bg-[#1a1a1a]/50 text-[#e0e0e0] border border-[#444] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#00b4d8]"
-    placeholder="Enter OTP sent to your email"
-  >
-</div>
-      <!-- Submit Button -->
-      <button type="submit" id="submit-transfer" class="bg-[#00b4d8] text-white w-full rounded-lg px-4 py-2 text-sm flex items-center justify-center hover:bg-[#00b4d8]/90 transition">
-        <span id="submitText">Send Now</span>
-        <svg id="submitSpinner" class="hidden animate-spin h-4 w-4 ml-2 text-white" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-        </svg>
-      </button>
-    </form>
-  </div>
-</div>
-      <!-- Transactions Page -->
-<div id="transactions-page" class="page hidden">
-  <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-3 sm:mb-6">Transactions</h1>
-
-  <div x-data="{ loading:false, activeTab:'sent' }" class="space-y-4 sm:space-y-6">
-    <!-- Controls -->
-    <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-      <!-- Tabs -->
-      <div class="w-full sm:w-auto bg-[#111827] rounded-xl p-1 flex gap-1">
-        <button
-          @click="activeTab='sent'"
-          :class="activeTab==='sent' ? 'bg-[#00b4d8] text-white shadow' : 'text-[#cfd3d7]'"
-          class="w-1/2 sm:w-auto px-4 py-2 rounded-lg text-sm font-semibold transition"
-        >
-          Sent
-        </button>
-        <button
-          @click="activeTab='received'"
-          :class="activeTab==='received' ? 'bg-[#00b4d8] text-white shadow' : 'text-[#cfd3d7]'"
-          class="w-1/2 sm:w-auto px-4 py-2 rounded-lg text-sm font-semibold transition"
-        >
-          Received
-        </button>
-      </div>
-      <!-- Filter + Clear -->
-      <div class="flex items-center gap-2 sm:ml-auto">
-        <select
-          id="transaction-filter"
-          class="bg-[#111827] text-[#e5e7eb] border border-[#00b4d8]/60 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00b4d8]"
-        >
-          <option value="7">Last 7 days</option>
-          <option value="30">Last 30 days</option>
-          <option value="90">Last 90 days</option>
-          <option value="all">All</option>
-        </select>
-        <button id="clear-transactions"
-          class="hidden sm:inline-flex bg-red-600 hover:bg-red-700 text-white text-sm px-3 py-2 rounded-lg">
-          Clear All
-        </button>
-      </div>
-    </div>
-
-    <!-- Loading skeleton -->
-    <div x-show="loading" class="grid grid-cols-1 gap-3">
-      <div class="h-16 rounded-xl bg-[#1f2937] animate-pulse"></div>
-      <div class="h-16 rounded-xl bg-[#1f2937] animate-pulse"></div>
-      <div class="h-16 rounded-xl bg-[#1f2937] animate-pulse"></div>
-    </div>
-
-    <!-- ===== SENT ===== -->
-    <div x-show="!loading && activeTab==='sent'" class="bg-[#111827] p-3 sm:p-5 rounded-2xl shadow-sm">
-      <h2 class="text-lg sm:text-xl font-semibold text-white mb-3">Sent</h2>
-
-      <!-- Mobile cards -->
-      <div id="transactions-cards-sent" class="sm:hidden space-y-2">
-        <div class="hidden empty-state-sent rounded-xl border border-white/5 bg-[#0b1220] p-4 text-center">
-          <p class="text-[#9ca3af] text-sm">No sent transactions yet.</p>
-        </div>
-      </div>
-
-      <!-- Desktop table -->
-      <div class="hidden sm:block overflow-hidden rounded-xl border border-white/5">
-        <table class="w-full text-left">
-          <thead class="bg-[#0b1220]">
-            <tr class="text-[#9ca3af] text-sm">
-              <th class="p-3">Date</th>
-              <th class="p-3">Recipient</th>
-              <th class="p-3">Amount</th>
-              <th class="p-3">Status</th>
-            </tr>
-          </thead>
-          <tbody id="transactions-table-sent" class="divide-y divide-white/5 bg-[#0e1526]">
-            <!-- rows via JS -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ===== RECEIVED ===== -->
-    <div x-show="!loading && activeTab==='received'" class="bg-[#111827] p-3 sm:p-5 rounded-2xl shadow-sm">
-      <h2 class="text-lg sm:text-xl font-semibold text-white mb-3">Received</h2>
-
-      <!-- Mobile cards -->
-      <div id="transactions-cards-received" class="sm:hidden space-y-2">
-        <div class="hidden empty-state-received rounded-xl border border-white/5 bg-[#0b1220] p-4 text-center">
-          <p class="text-[#9ca3af] text-sm">No incoming transactions yet.</p>
-        </div>
-      </div>
-
-      <!-- Desktop table -->
-      <div class="hidden sm:block overflow-hidden rounded-xl border border-white/5">
-        <table class="w-full text-left">
-          <thead class="bg-[#0b1220]">
-            <tr class="text-[#9ca3af] text-sm">
-              <th class="p-3">Date</th>
-              <th class="p-3">Sender</th>
-              <th class="p-3">Amount</th>
-              <th class="p-3">Status</th>
-            </tr>
-          </thead>
-          <tbody id="transactions-table-received" class="divide-y divide-white/5 bg-[#0e1526]">
-            <!-- rows via JS -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-
-  <!-- Analytics Page -->
-<div id="analytics-page" class="page hidden">
-  <!-- Header + Range -->
-  <div class="flex items-center justify-between mb-3 sm:mb-5">
-    <h1 class="text-2xl sm:text-3xl font-bold text-ink">Analytics</h1>
-    <select id="analytics-range"
-            class="bg-elev text-ink border border-edge rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand)]">
-      <option value="3m">Last 3 months</option>
-      <option value="6m" selected>Last 6 months</option>
-      <option value="12m">Last 12 months</option>
-    </select>
-  </div>
-
-  <!-- KPI Cards -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-3 sm:mb-5">
-    <div class="bg-card border border-edge rounded-xl p-3 sm:p-4">
-      <p class="text-xs text-[var(--muted-ink)] tracking-wider">Total Spent</p>
-      <p id="kpi-total" class="text-xl sm:text-2xl font-bold text-ink mt-1">€8,900</p>
-      <p id="kpi-total-diff" class="text-xs mt-1 text-green-400">▲ 12% vs prev</p>
-    </div>
-    <div class="bg-card border border-edge rounded-xl p-3 sm:p-4">
-      <p class="text-xs text-[var(--muted-ink)] tracking-wider">Avg Transaction</p>
-      <p id="kpi-avg" class="text-xl sm:text-2xl font-bold text-ink mt-1">€148</p>
-      <p id="kpi-avg-count" class="text-xs mt-1 text-[var(--muted-ink)]">60 txns</p>
-    </div>
-    <div class="bg-card border border-edge rounded-xl p-3 sm:p-4">
-      <p class="text-xs text-[var(--muted-ink)] tracking-wider">Top Category</p>
-      <p id="kpi-topcat" class="text-xl sm:text-2xl font-bold text-ink mt-1">Groceries</p>
-      <p id="kpi-topcat-share" class="text-xs mt-1 text-[var(--muted-ink)]">32% of spend</p>
-    </div>
-    <div class="bg-card border border-edge rounded-xl p-3 sm:p-4">
-      <p class="text-xs text-[var(--muted-ink)] tracking-wider">MoM Change</p>
-      <p id="kpi-mom" class="text-xl sm:text-2xl font-bold text-ink mt-1">+€420</p>
-      <p id="kpi-mom-desc" class="text-xs mt-1 text-yellow-300">Spend rising</p>
-    </div>
-  </div>
-
-  <!-- Charts -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-4">
-    <!-- Monthly Spending -->
-    <div class="bg-card border border-edge rounded-2xl p-3 sm:p-4">
-      <div class="flex items-center justify-between mb-2 sm:mb-3">
-        <h2 class="text-lg sm:text-xl font-semibold text-ink">Monthly Spending</h2>
-        <span class="text-xs text-[var(--muted-ink)]">EUR</span>
-      </div>
-      <div class="w-full h-44 sm:h-64 md:h-72">
-        <canvas id="monthly-spending-chart"></canvas>
-      </div>
-    </div>
-
-    <!-- Category Split -->
-    <div class="bg-card border border-edge rounded-2xl p-3 sm:p-4">
-      <div class="flex items-center justify-between mb-2 sm:mb-3">
-        <h2 class="text-lg sm:text-xl font-semibold text-ink">Spending by Category</h2>
-        <span class="text-xs text-[var(--muted-ink)]">Share</span>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 sm:gap-4">
-        <div class="sm:col-span-3 w-full h-44 sm:h-64 md:h-72">
-          <canvas id="category-spending-chart"></canvas>
-        </div>
-        <!-- Compact legend/list -->
-        <ul class="sm:col-span-2 space-y-2">
-          <li class="flex items-center justify-between">
-            <span class="text-ink text-sm">Groceries</span>
-            <span class="text-ink/70 text-sm" id="cat-gro">32%</span>
-          </li>
-          <li class="flex items-center justify-between">
-            <span class="text-ink text-sm">Bills</span>
-            <span class="text-ink/70 text-sm" id="cat-bil">24%</span>
-          </li>
-          <li class="flex items-center justify-between">
-            <span class="text-ink text-sm">Entertainment</span>
-            <span class="text-ink/70 text-sm" id="cat-ent">18%</span>
-          </li>
-          <li class="flex items-center justify-between">
-            <span class="text-ink text-sm">Travel</span>
-            <span class="text-ink/70 text-sm" id="cat-tra">15%</span>
-          </li>
-          <li class="flex items-center justify-between">
-            <span class="text-ink text-sm">Other</span>
-            <span class="text-ink/70 text-sm" id="cat-oth">11%</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
-
-         <!-- Security Page -->
-<div id="security-page" class="page hidden">
-  <div class="flex items-center justify-between mb-3 sm:mb-6">
-    <h1 class="text-2xl sm:text-3xl font-bold text-ink">Security</h1>
-    <span class="hidden sm:inline-flex items-center gap-2 text-xs px-3 py-1 rounded-full border border-edge text-ink/80 bg-elev">
-      🔐 Account protection
-    </span>
-  </div>
-
-  <!-- Top KPIs -->
-  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-    <!-- Risk score ring -->
-    <div class="bg-card border border-edge rounded-2xl p-4 flex items-center gap-4">
-      <div class="relative h-14 w-14 shrink-0 rounded-full"
-           style="--p:76; background:
-             conic-gradient(var(--brand) calc(var(--p)*1%), rgba(255,255,255,.08) 0);
-             ">
-        <div class="absolute inset-[4px] rounded-full bg-elev grid place-items-center text-ink text-xs font-semibold">
-          76%
-        </div>
-      </div>
-      <div>
-        <p class="text-xs tracking-wider text-[var(--muted-ink)]">RISK SCORE</p>
-        <p class="text-ink font-semibold">Low exposure</p>
-      </div>
-    </div>
-
-    <!-- Sessions today -->
-    <div class="bg-card border border-edge rounded-2xl p-4 flex items-center gap-4">
-      <div class="h-10 w-10 rounded-xl grid place-items-center bg-elev border border-edge text-brand">📊</div>
-      <div>
-        <p class="text-xs tracking-wider text-[var(--muted-ink)]">SESSIONS TODAY</p>
-        <p id="sec-sessions-today" class="text-ink font-semibold">2</p>
-      </div>
-    </div>
-
-    <!-- New devices (30d) -->
-    <div class="bg-card border border-edge rounded-2xl p-4 flex items-center gap-4">
-      <div class="h-10 w-10 rounded-xl grid place-items-center bg-elev border border-edge text-brand">🖥️</div>
-      <div>
-        <p class="text-xs tracking-wider text-[var(--muted-ink)]">NEW DEVICES • 30D</p>
-        <p id="sec-new-devices" class="text-ink font-semibold">1</p>
-      </div>
-    </div>
-
-    <!-- 2FA status -->
-    <div class="bg-card border border-edge rounded-2xl p-4 flex items-center gap-4">
-      <div class="h-10 w-10 rounded-xl grid place-items-center bg-elev border border-edge text-brand">✅</div>
-      <div>
-        <p class="text-xs tracking-wider text-[var(--muted-ink)]">2FA STATUS</p>
-        <p id="sec-2fa-status" class="text-ink font-semibold">Disabled</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Controls + Timeline -->
-  <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-    <!-- Controls card -->
-    <div class="bg-card border border-edge rounded-2xl p-4 sm:p-6 space-y-4 lg:col-span-1">
-      <p class="text-xs tracking-wider text-[var(--muted-ink)]">CONTROLS</p>
-
-      <div class="flex items-center justify-between">
-        <label class="text-ink text-sm">Enable 2FA</label>
-        <!-- keep your existing ID -->
-        <input type="checkbox" id="enable-2fa"
-               class="h-5 w-5 rounded bg-elev border border-edge accent-[var(--brand)]">
-      </div>
-
-      <div class="flex items-center justify-between">
-        <label class="text-ink text-sm">Show Last Login</label>
-        <!-- keep your existing ID -->
-        <input type="checkbox" id="show-last-login" checked
-               class="h-5 w-5 rounded bg-elev border border-edge accent-[var(--brand)]">
-      </div>
-
-      <div class="flex items-center justify-between">
-        <label class="text-ink text-sm">Login Alerts (email)</label>
-        <input type="checkbox" id="login-alerts" checked
-               class="h-5 w-5 rounded bg-elev border border-edge accent-[var(--brand)]">
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-        <button type="button" id="change-password"
-                class="w-full bg-[var(--brand)] hover:brightness-95 text-[var(--brand-ink)] rounded-lg px-4 py-2 text-sm font-semibold transition">
-          Change Password
-        </button>
-        <button type="button" id="verify-identity"
-                class="w-full bg-[var(--brand)]/90 hover:bg-[var(--brand)] text-[var(--brand-ink)] rounded-lg px-4 py-2 text-sm font-semibold transition">
-          Verify Identity
-        </button>
-      </div>
-
-      <!-- Password strength (visual only) -->
-      <div class="pt-2">
-        <div class="flex items-center justify-between mb-1">
-          <span class="text-xs text-[var(--muted-ink)]">PASSWORD HEALTH</span>
-          <span id="pw-health-label" class="text-xs text-ink/80">Good</span>
-        </div>
-        <div class="h-2 w-full rounded-full bg-elev border border-edge overflow-hidden">
-          <div id="pw-health-bar" class="h-full bg-[var(--brand)]" style="width: 68%"></div>
-        </div>
-        <p class="text-[11px] text-[var(--muted-ink)] mt-1">Use at least 12 chars + symbols. Rotate every 90 days.</p>
-      </div>
-    </div>
-
-    <!-- Activity & devices -->
-    <div class="space-y-4 lg:col-span-2">
-      <!-- Active sessions -->
-      <div class="bg-card border border-edge rounded-2xl p-4 sm:p-6">
-        <div class="flex items-center justify-between mb-3">
-          <h2 class="text-lg font-semibold text-ink">Active Sessions</h2>
-          <span class="text-xs text-[var(--muted-ink)]">Real-time</span>
-        </div>
-        <div class="overflow-hidden rounded-xl border border-edge">
-          <table class="w-full text-left">
-            <thead class="bg-elev">
-              <tr class="text-[var(--muted-ink)] text-xs">
-                <th class="p-3">Device</th>
-                <th class="p-3">Location</th>
-                <th class="p-3">IP</th>
-                <th class="p-3">Last Activity</th>
-                <th class="p-3 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-[var(--blue-edge)] bg-[rgba(14,21,38,0.75)]">
-              <tr class="text-ink text-sm">
-                <td class="p-3">Chrome • Windows</td>
-                <td class="p-3">Brussels, BE</td>
-                <td class="p-3">192.168.1.1</td>
-                <td class="p-3">3 mins ago</td>
-                <td class="p-3 text-right">
-                  <button class="text-xs px-3 py-1 rounded-lg border border-edge bg-elev hover:opacity-90">Sign out</button>
-                </td>
-              </tr>
-              <tr class="text-ink text-sm">
-                <td class="p-3">Safari • iPhone</td>
-                <td class="p-3">Antwerp, BE</td>
-                <td class="p-3">192.168.1.2</td>
-                <td class="p-3">2 hrs ago</td>
-                <td class="p-3 text-right">
-                  <button class="text-xs px-3 py-1 rounded-lg border border-edge bg-elev hover:opacity-90">Sign out</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Login history (your existing table, restyled) -->
-      <div class="bg-card border border-edge rounded-2xl p-4 sm:p-6">
-        <h2 class="text-lg font-semibold text-ink mb-3">Login History</h2>
-        <div class="overflow-hidden rounded-xl border border-edge">
-          <table class="w-full text-left">
-            <thead class="bg-elev">
-              <tr class="text-[var(--muted-ink)] text-xs">
-                <th class="p-3">Date</th>
-                <th class="p-3">Device</th>
-                <th class="p-3">IP Address</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-[var(--blue-edge)] bg-[rgba(14,21,38,0.75)]">
-              <tr class="text-ink text-sm">
-                <td class="p-3">2025-07-02 15:20</td>
-                <td class="p-3">Chrome (Windows)</td>
-                <td class="p-3">192.168.1.1</td>
-              </tr>
-              <tr class="text-ink text-sm">
-                <td class="p-3">2025-06-30 09:15</td>
-                <td class="p-3">Safari (iPhone)</td>
-                <td class="p-3">192.168.1.2</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Recommendations -->
-      <div class="bg-card border border-edge rounded-2xl p-4 sm:p-6">
-        <h2 class="text-lg font-semibold text-ink mb-3">Recommendations</h2>
-        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-          <li class="flex items-start gap-2"><span class="text-brand mt-0.5">✔</span><span>Turn on 2FA to harden sign-in.</span></li>
-          <li class="flex items-start gap-2"><span class="text-brand mt-0.5">✔</span><span>Add a recovery phone & email.</span></li>
-          <li class="flex items-start gap-2"><span class="text-brand mt-0.5">✔</span><span>Revoke sessions you don’t recognize.</span></li>
-          <li class="flex items-start gap-2"><span class="text-brand mt-0.5">✔</span><span>Use a unique 12+ char password.</span></li>
-        </ul>
-      </div>
-    </div>
-  </section>
-</div>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const twofa = document.getElementById('enable-2fa');
-  const status = document.getElementById('sec-2fa-status');
-
-  function sync2fa() {
-    status.textContent = twofa.checked ? 'Enabled' : 'Disabled';
-  }
-  twofa?.addEventListener('change', sync2fa);
-  sync2fa();
-
-  // If you ever compute a dynamic score, set --p on the ring container (0–100).
-  // document.querySelector('[style*="--p"]').style.setProperty('--p', 84);
-});
-</script>
-
-   <!-- Settings Page -->
-<div id="settings-page" class="page hidden">
-  <div class="flex items-center justify-between mb-4 sm:mb-6">
-    <h1 class="text-2xl sm:text-3xl font-bold text-ink">Settings</h1>
-    <span class="hidden sm:inline-flex items-center gap-2 text-xs px-3 py-1 rounded-full border border-edge text-ink/80 bg-elev">
-      🔒 Secure area
-    </span>
-  </div>
-
-  <div class="mx-auto w-full max-w-2xl"> <!-- wider for nicer balance -->
-    <!-- Card -->
-    <form id="settings-form" action="/settings" method="POST"
-          class="bg-card border border-edge rounded-2xl p-5 sm:p-6 shadow-xl space-y-6">
-
-      <!-- Header row -->
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-xs tracking-wider text-[var(--muted-ink)]">PROFILE</p>
-          <p class="text-sm text-ink/80">Manage your personal details</p>
-        </div>
-        <div class="h-10 w-10 rounded-xl grid place-items-center bg-elev border border-edge text-brand">
-          ⚙️
-        </div>
-      </div>
-
-      <div class="h-px bg-[var(--blue-edge)]/60"></div>
-
-      <!-- Profile image block (bigger + defined) -->
-      <div class="flex items-center gap-5 sm:gap-6">
-        <!-- Preview -->
-        <div class="relative shrink-0">
-          <img
-            id="profile-avatar"
-            src="/assets/default-avatar.png"
-            alt="Profile picture"
-            class="h-28 w-28 sm:h-32 sm:w-32 rounded-full object-cover border-2 border-edge
-                   ring-4 ring-[rgba(0,180,216,0.22)] shadow-lg bg-elev"
-          />
-          <!-- tiny accent badge -->
-          <span class="absolute -bottom-1 -right-1 h-6 w-6 rounded-full grid place-items-center text-xs
-                       bg-[rgba(0,180,216,0.9)] text-[var(--brand-ink)] border border-edge shadow">
-            ✦
-          </span>
-        </div>
-
-        <div class="flex-1">
-          <p class="text-xs tracking-wider text-[var(--muted-ink)] mb-2">PROFILE IMAGE</p>
-          <div class="flex flex-wrap items-center gap-2">
-            <button type="button" id="avatar-choose"
-                    class="btn-grad px-3 py-2 rounded-lg text-sm font-bold">
-              Upload…
-            </button>
-            <button type="button" id="avatar-remove"
-                    class="btn-dark px-3 py-2 rounded-lg text-sm">
-              Remove
-            </button>
-            <span id="avatar-hint" class="text-[11px] text-[var(--muted-ink)]">
-              JPG/PNG/WebP, ≤ 3 MB
-            </span>
+      <!-- ANALYTICS PAGE -->
+      <section id="analytics-page" class="page">
+        <div class="dash-header">
+          <div>
+            <p class="dash-eyebrow">Insights</p>
+            <h1 class="dash-title">Spending analytics</h1>
           </div>
         </div>
 
-        <!-- Hidden file input -->
-        <input id="avatar-file" type="file" accept="image/*" class="hidden">
+        <div class="analytics-grid">
+          <div class="summary-card">
+            <div class="section-title-row">
+              <div>
+                <p class="section-title">Overview</p>
+                <p class="section-sub">Rolling vs previous period</p>
+              </div>
+              <select id="analytics-range" class="filter-select">
+                <option value="3m">3 months</option>
+                <option value="6m" selected>6 months</option>
+                <option value="12m">12 months</option>
+              </select>
+            </div>
+
+            <div class="kpi-row">
+              <div class="kpi-card">
+                <p class="kpi-label">Total spent</p>
+                <p class="kpi-value" id="kpi-total">€0</p>
+                <p class="kpi-extra" id="kpi-total-diff">—</p>
+              </div>
+
+              <div class="kpi-card">
+                <p class="kpi-label">Average ticket</p>
+                <p class="kpi-value" id="kpi-avg">€0</p>
+                <p class="kpi-extra">
+                  <span id="kpi-avg-count">0 txns</span>
+                </p>
+              </div>
+
+              <div class="kpi-card">
+                <p class="kpi-label">Top category</p>
+                <p class="kpi-value" id="kpi-topcat">—</p>
+                <p class="kpi-extra" id="kpi-topcat-share">—</p>
+              </div>
+
+              <div class="kpi-card">
+                <p class="kpi-label">MoM change</p>
+                <p class="kpi-value" id="kpi-mom">€0</p>
+                <p class="kpi-extra" id="kpi-mom-desc">—</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="summary-card chart-card">
+            <header class="chart-header">
+              <div>
+                <p class="summary-label">Monthly trend</p>
+                <p class="chart-sub">Bar chart of monthly spend</p>
+              </div>
+            </header>
+            <div class="chart-body" style="height: 190px;">
+              <canvas id="monthly-spending-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="summary-card chart-card">
+            <header class="chart-header">
+              <div>
+                <p class="summary-label">By category</p>
+                <p class="chart-sub">Share of spend by category</p>
+              </div>
+            </header>
+            <div class="chart-body" style="height: 200px;">
+              <canvas id="category-spending-chart"></canvas>
+            </div>
+            <div style="margin-top: 8px; font-size: 11px; color: var(--ink-muted); display: flex; flex-wrap: wrap; gap: 6px;">
+              <span>Groceries: <strong id="cat-gro">32%</strong></span>
+              <span>Bills: <strong id="cat-bil">24%</strong></span>
+              <span>Entertainment: <strong id="cat-ent">18%</strong></span>
+              <span>Travel: <strong id="cat-tra">15%</strong></span>
+              <span>Other: <strong id="cat-oth">11%</strong></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LOGOUT PAGE (simple) -->
+      <section id="logout-page" class="page">
+        <div class="dash-header">
+          <div>
+            <p class="dash-eyebrow">Account</p>
+            <h1 class="dash-title">Sign out</h1>
+          </div>
+        </div>
+
+        <section class="summary-card" style="margin-top: 20px;">
+          <p class="summary-sub">
+            You’re about to log out of your Credibe account on this device.
+          </p>
+          <button
+            id="confirm-logout"
+            class="pill-btn pill-primary"
+            style="margin-top: 16px;"
+          >
+            Log out
+          </button>
+        </section>
+      </section>
+    </main>
+
+    <!-- Bottom tab bar -->
+    <nav class="tab-bar">
+      <div class="tab-inner">
+        <div class="tab-nav">
+          <button
+            class="tab-item tab-item-active"
+            type="button"
+            data-page-target="dashboard-page"
+          >
+            <span>Home</span>
+            <span class="tab-dot"></span>
+          </button>
+          <button
+            class="tab-item"
+            type="button"
+            data-page-target="analytics-page"
+          >
+            <span>Insights</span>
+          </button>
+          <button
+            class="tab-item"
+            type="button"
+            data-page-target="logout-page"
+          >
+            <span>Logout</span>
+          </button>
+        </div>
       </div>
-
-      <div class="h-px bg-[var(--blue-edge)]/60"></div>
-
-      <!-- Inputs (tidier grid on larger screens) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <!-- Full Name -->
-        <label class="block">
-          <span class="block text-sm text-ink mb-1">Full Name</span>
-          <div class="relative">
-            <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink/60">👤</span>
-            <input type="text" id="full-name" name="full_name"
-                   class="w-full bg-elev text-ink border border-edge rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[rgba(0,180,216,0.6)]"
-                   placeholder="Enter full name" value="">
-          </div>
-        </label>
-
-        <!-- Email -->
-        <label class="block">
-          <span class="block text-sm text-ink mb-1">Email</span>
-          <div class="relative">
-            <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink/60">📧</span>
-            <input type="email" id="email" name="email"
-                   class="w-full bg-elev text-ink border border-edge rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[rgba(0,180,216,0.6)]"
-                   placeholder="Enter email" value="">
-          </div>
-        </label>
-
-        <!-- Phone (span full width on small, half on sm+) -->
-        <label class="block sm:col-span-1">
-          <span class="block text-sm text-ink mb-1">Phone</span>
-          <div class="relative">
-            <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink/60">📱</span>
-            <input type="tel" id="phone" name="phone"
-                   class="w-full bg-elev text-ink border border-edge rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[rgba(0,180,216,0.6)]"
-                   placeholder="+44 123 456 7890" value="">
-          </div>
-        </label>
-
-        <!-- spacer to keep grid aligned nicely on two columns -->
-        <div class="hidden sm:block"></div>
-
-        <!-- Language -->
-        <label class="block">
-          <span class="block text-sm text-ink mb-1">Language</span>
-          <div class="relative">
-            <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink/60">🌐</span>
-            <select id="language" name="language"
-                    class="w-full bg-elev text-ink border border-edge rounded-lg pl-9 pr-8 py-2 text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-[rgba(0,180,216,0.6)]">
-              <option value="en">English</option>
-              <option value="fr">French</option>
-              <option value="de">German</option>
-            </select>
-            <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink/60">▾</span>
-          </div>
-        </label>
-
-        <!-- Time Zone -->
-        <label class="block">
-          <span class="block text-sm text-ink mb-1">Time Zone</span>
-          <div class="relative">
-            <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink/60">🕒</span>
-            <select id="timezone" name="timezone"
-                    class="w-full bg-elev text-ink border border-edge rounded-lg pl-9 pr-8 py-2 text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-[rgba(0,180,216,0.6)]">
-              <option value="UTC">UTC</option>
-              <option value="CET">CET (UTC+1)</option>
-            </select>
-            <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink/60">▾</span>
-          </div>
-        </label>
-      </div>
-
-      <!-- Actions -->
-      <div class="h-px bg-[var(--blue-edge)]/60"></div>
-      <div class="flex flex-col sm:flex-row gap-2">
-        <a href="#" data-page="logout"
-           class="w-full inline-flex items-center justify-center gap-2 bg-[rgba(0,180,216,0.9)] hover:brightness-95 text-[var(--brand-ink)] font-semibold rounded-lg px-4 py-2 text-sm transition">
-          🚪 Logout
-        </a>
-        <button type="submit"
-                class="w-full inline-flex items-center justify-center btn-grad rounded-lg px-4 py-2 text-sm font-bold">
-          Save Changes
-        </button>
-      </div>
-
-      <!-- Tiny helper -->
-      <p class="text-[10px] text-[var(--muted-ink)] text-center">
-        Changes are synced securely. Some updates may require re-verification.
-      </p>
-    </form>
+    </nav>
   </div>
-</div>
 
-<!-- Logout Page -->
-<div id="logout-page" class="page hidden">
-  <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Logout</h1>
-  <div class="flex justify-center w-full">
-    <div class="bg-[#1f2937] p-2 sm:p-4 sm:p-6 rounded-lg sm:rounded-2xl drop-shadow-md max-w-xs sm:max-w-md w-full">
-      <p class="text-[#e0e0e0] mb-1 sm:mb-4 text-sm sm:text-base" id="logout-message">Are you sure you want to log out</p>
-      <button id="confirm-logout" class="w-full bg-[#00b4d8] text-white rounded-lg px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base hover:opacity-90 transition duration-300 ease-in-out">Confirm Logout</button>
-    </div>
-  </div>
-</div>
+  <!-- JS: transaction logic + main dashboard logic -->
+  <script src="js/dashboard-transactions.js" defer></script>
+  <script src="js/dashboard-main.js" defer></script>
 
-
-       <!-- Buy Crypto Page -->
-<div id="buy-crypto-page" class="page hidden">
-    <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Buy Crypto</h1>
-    <form id="buy-crypto-form" action="down.html" method="get" class="bg-[#1f2937]/50 backdrop-blur-md p-2 sm:p-6 rounded-lg sm:rounded-2xl drop-shadow-md space-y-4 sm:space-y-6 w-full max-w-xs sm:max-w-md">
-        <div class="relative">
-            <label for="crypto-amount" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Amount (€)</label>
-            <input type="number" id="crypto-amount" name="amount" step="0.01" min="0.01" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter amount" required>
-            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">€</span>
-        </div>
-        <div class="relative">
-            <label for="crypto-currency" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Currency</label>
-            <select id="crypto-currency" name="currency" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]">
-                <option value="BTC">Bitcoin (BTC)</option>
-                <option value="ETH">Ethereum (ETH)</option>
-            </select>
-            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300">💰</span>
-        </div>
-        <div class="relative">
-            <label for="wallet-address" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Wallet Address (Optional)</label>
-            <input type="text" id="wallet-address" name="wallet_address" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter wallet address">
-            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">📍</span>
-        </div>
-        <button type="submit" id="submit-crypto" class="w-full bg-[#00b4d8] text-white rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base hover:bg-[#00b4d8]/90 transition-all flex items-center justify-center gradient-border">
-            <span id="submit-text">Buy Now</span>
-            <svg id="submit-spinner" class="hidden animate-spin h-3 sm:h-4 w-3 sm:w-4 mr-1 sm:mr-2 text-white" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-        </button>
-        <div id="confirmation" class="hidden text-center text-green-400">
-            <p>Transaction Successful!</p>
-            <p>Tx Hash: <span id="tx-hash"></span></p>
-        </div>
-    </form>
-</div>
-
-<!-- Pay Bills Page -->
-<div id="pay-bills-page" class="page hidden">
-    <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Pay Bills</h1>
-    <form id="pay-bills-form" action="down.html" method="get" class="bg-[#1f2937]/50 backdrop-blur-md p-2 sm:p-6 rounded-lg sm:rounded-2xl drop-shadow-md space-y-4 sm:space-y-6 w-full max-w-xs sm:max-w-md">
-        <div class="relative">
-            <label for="biller-name" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Biller Name</label>
-            <input type="text" id="biller-name" name="biller_name" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter biller name" required>
-            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">🏢</span>
-        </div>
-        <div class="relative">
-            <label for="category" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Category</label>
-            <select id="category" name="category" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]">
-                <option value="utilities">Utilities</option>
-                <option value="internet">Internet</option>
-                <option value="rent">Rent</option>
-            </select>
-            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300">📋</span>
-        </div>
-        <div class="relative">
-            <label for="bill-amount" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Amount (€)</label>
-            <input type="number" id="bill-amount" name="amount" step="0.01" min="0.01" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter amount" required>
-            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">€</span>
-        </div>
-        <div class="relative">
-            <label for="description" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Description (Optional)</label>
-            <input type="text" id="description" name="description" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter description">
-            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">📝</span>
-        </div>
-        <button type="submit" id="submit-bill" class="w-full bg-[#00b4d8] text-white rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base hover:bg-[#00b4d8]/90 transition-all flex items-center justify-center gradient-border">
-            <span id="submit-text">Pay Now</span>
-            <svg id="submit-spinner" class="hidden animate-spin h-3 sm:h-4 w-3 sm:w-4 mr-1 sm:mr-2 text-white" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-        </button>
-        <div id="confirmation" class="hidden text-center text-green-400">
-            <p>Payment Successful!</p>
-        </div>
-    </form>
-</div>
-
-<!-- Add Beneficiary Page -->
-<div id="add-beneficiary-page" class="page hidden">
-    <h1 class="text-2xl sm:text-3xl font-bold text-[#e0e0e0] mb-2 sm:mb-6">Add Beneficiary</h1>
-    <form id="addBeneficiaryForm" action="down.html" method="get" class="bg-[#1f2937]/50 backdrop-blur-md p-2 sm:p-6 rounded-lg sm:rounded-2xl drop-shadow-md space-y-4 sm:space-y-6 w-full max-w-xs sm:max-w-md">
-        <div class="relative">
-            <label for="full-name" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Full Name</label>
-            <input type="text" id="full-name" name="full_name" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter full name" required>
-            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">👤</span>
-        </div>
-        <div class="relative">
-            <label for="iban" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">IBAN</label>
-            <input type="text" id="iban" name="iban" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="e.g., BE68 5390 0754 7034" required>
-            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">🏦</span>
-        </div>
-        <div class="relative">
-            <label for="bank-name" class="block text-[#e0e0e0] mb-1 sm:mb-2 text-sm sm:text-base">Bank Name</label>
-            <input type="text" id="bank-name" name="bank_name" class="w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" placeholder="Enter bank name" required>
-            <span class="absolute right-3 top-10 text-[#00b4d8] opacity-0 transition-opacity duration-300 focus-within:opacity-100">🏦</span>
-        </div>
-        <button type="submit" id="submit-beneficiary" class="w-full bg-[#00b4d8] text-white rounded-lg px-3 sm:px-4 py-2 text-sm sm:text-base hover:bg-[#00b4d8]/90 transition-all flex items-center justify-center gradient-border">
-            <span id="submit-text">Add Beneficiary</span>
-            <svg id="submit-spinner" class="hidden animate-spin h-3 sm:h-4 w-3 sm:w-4 mr-1 sm:mr-2 text-white" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-        </button>
-        <div id="confirmation" class="hidden text-center text-green-400">
-            <p>Beneficiary Added Successfully!</p>
-        </div>
-    </form>
-</div>
-</main>
-</div> 
-
-    <!-- Footer -->
-  <footer class="bg-[#111] text-gray-400 text-xs text-center py-4 mt-auto">
-    © 2025 Credibe. All rights reserved. | <a href="#">Privacy</a> | <a href="#">Terms</a> | <a href="#">Support</a>
-  </footer>
-  <script>/* /assets/gtranslate-init.js */
-(function(){
-  if (window.__GT_LOADED__) return; window.__GT_LOADED__ = true;
-
-  // --- settings ---
-  var LANGS = "de,fr,es,it,pt,nl,pl,sv,da,fi,no,tr,cs,ro,hu,el,ar,ru,uk,hi,id,ms,th,vi,ja,ko,zh-CN,zh-TW";
-  var PAGE_LANG = "en"; // your default authoring language
-
-  // --- utils ---
-  function setCookie(name, value) {
-    var d = new Date(); d.setTime(d.getTime() + 365*24*60*60*1000);
-    var expires = "expires=" + d.toUTCString();
-    document.cookie = name + "=" + value + "; " + expires + "; path=/";
-    try {
-      var dot = "." + location.hostname.replace(/^www\./,'');
-      document.cookie = name + "=" + value + "; " + expires + "; domain=" + dot + "; path=/";
-    } catch(e){}
-  }
-  function getSaved(){
-    try {
-      var v = localStorage.getItem("g_lang"); if (v) return v;
-      var m = document.cookie.match(/(?:^|;\s*)googtrans=([^;]+)/);
-      if (m && m[1]) return (m[1].split("/").pop()||"").trim();
-    } catch(e){}
-    return "";
-  }
-  function apply(lang){
-    var sel = document.querySelector("select.goog-te-combo");
-    if (!sel) return false;
-    if (sel.value !== lang) {
-      sel.value = lang;
-      sel.dispatchEvent(new Event("change"));
-    }
-    return true;
-  }
-
-  // --- public API so your own buttons can call it: GTranslate.set('de') ---
-  window.GTranslate = {
-    set: function(lang){
-      if (!lang) return;
-      setCookie("googtrans", "/" + PAGE_LANG + "/" + lang);
-      try { localStorage.setItem("g_lang", lang); } catch(e){}
-      if (!apply(lang)) {
-        var tries = 0, t = setInterval(function(){
-          if (apply(lang) || ++tries > 40) clearInterval(t);
-        }, 250);
-      }
-      try { window.dispatchEvent(new CustomEvent("gtranslate:change", { detail:{lang} })); } catch(e){}
-      try { document.documentElement.setAttribute("lang", lang); } catch(e){}
-    },
-    get: function(){ return getSaved() || PAGE_LANG; }
-  };
-
-  // --- add container (bottom-right bubble) ---
-  var wrap = document.getElementById("gtranslate_container");
-  if (!wrap) {
-    wrap = document.createElement("div");
-    wrap.id = "gtranslate_container";
-    wrap.style.cssText = "position:fixed;right:16px;bottom:16px;z-index:999999;background:#12161f;"+
-                         "border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:8px 10px;color:#fff;"+
-                         "box-shadow:0 10px 24px rgba(0,0,0,.35);font:13px system-ui,-apple-system,Segoe UI,Roboto,sans-serif";
-    wrap.innerHTML = '<div id="gtranslate_widget" style="display:flex;align-items:center;gap:8px">'+
-                     '  <span style="opacity:.8">🌐</span>'+
-                     '  <div id="gtranslate_mount"></div>'+
-                     '</div>';
-    document.documentElement.appendChild(wrap);
-  }
-
-  // --- init callback required by Google ---
-  window.googleTranslateElementInit = function(){
-    new google.translate.TranslateElement({
-      pageLanguage: PAGE_LANG,
-      includedLanguages: LANGS,
-      layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-      autoDisplay: false // no auto-banner on first load unless user picks a language
-    }, "gtranslate_mount");
-
-    // Re-apply saved language after widget renders (persisted by us)
-    var saved = getSaved();
-    if (saved && saved !== PAGE_LANG) {
-      setTimeout(function(){ window.GTranslate.set(saved); }, 400);
-    }
-
-    // Keep branding minimal but DO NOT hide the top banner so users can close it.
-    // (Remove only small gadget text; leave banner visible and functional.)
-    var css = document.createElement("style");
-    css.textContent =
-      /* DO NOT hide .goog-te-banner-frame; let users click ✕ themselves */
-      ".goog-te-gadget span{display:none!important}" +
-      ".goog-logo-link{display:none!important}";
-      // Note: we also don't force body{top:0} so the banner can push content down until closed.
-    document.head.appendChild(css);
-  };
-
-  // --- load Google script once ---
-  var s = document.createElement("script");
-  s.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-  s.async = true;
-  document.head.appendChild(s);
-
-  // --- if your pages dynamically change content (SPAs), re-apply on mutations ---
-  try {
-    var mo = new MutationObserver(function(){
-      var saved = getSaved();
-      if (saved && saved !== PAGE_LANG) apply(saved);
-    });
-    mo.observe(document.body, { childList: true, subtree: true });
-  } catch(e){}
-})();
-</script>
-<script>
-
-(function(){
-  // --- Elements from your Settings page (already in your HTML) ---
-  const img  = document.getElementById("profile-avatar");  // <img> preview
-  const pick = document.getElementById("avatar-choose");   // "Upload…" button
-  const file = document.getElementById("avatar-file");     // hidden <input type=file>
-  const rm   = document.getElementById("avatar-remove");   // "Remove" button
-  const hint = document.getElementById("avatar-hint");     // small status text
-  if (!img || !pick || !file || !rm) return;               // exit if settings not on page
-
-  // --- 🔧 EDIT THESE FOR YOUR CLOUDINARY ACCOUNT ---
-  const CLOUD_NAME    = "dclqipy7a";     // e.g. "credibe-cloud"
-  const UPLOAD_PRESET = "credibe_unsigned";    // your unsigned preset name
-  const FOLDER        = "credibe/avatars";     // optional tidy folder in Cloudinary
-
-  // --- Your API ---
-  const API_BASE = "https://credibe-backends.onrender.com";
-  const token    = localStorage.getItem("userToken");
-  const AUTH     = token ? { Authorization: `Bearer ${token}` } : {};
-
-  // --- Limits ---
-  const MAX_BYTES = 3 * 1024 * 1024; // 3MB
-
-  // A) Load and show current avatar when Settings is opened
-  (async () => {
-    try {
-      const r = await fetch(`${API_BASE}/api/user/me`, { headers: AUTH });
-      if (!r.ok) return;
-      const me = await r.json();
-      img.src = me.avatarUrl || "/assets/default-avatar.png";
-    } catch {}
-  })();
-
-  // B) Open file picker
-  pick.addEventListener("click", () => file.click());
-
-  // C) Upload flow: preview → Cloudinary → save URL to backend → show
-  file.addEventListener("change", async () => {
-    const f = file.files?.[0];
-    if (!f) return;
-
-    // Validate
-    if (!/^image\//.test(f.type)) {
-      alert("Pick an image (jpg/png/webp).");
-      file.value = "";
-      return;
-    }
-    if (f.size > MAX_BYTES) {
-      alert("Max 3 MB");
-      file.value = "";
-      return;
-    }
-
-    // Instant local preview while uploading
-    const tmpUrl = URL.createObjectURL(f);
-    img.src = tmpUrl;
-    if (hint) hint.textContent = "Uploading…";
-
-    // Upload to Cloudinary (UNSIGNED)
-    const fd = new FormData();
-    fd.append("file", f);
-    fd.append("upload_preset", UPLOAD_PRESET);
-    fd.append("folder", FOLDER);
-
-    try {
-      const up = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-        method: "POST",
-        body: fd
+  <!-- Small helper to switch pages using data-page-target (you can move this into dashboard-main.js later) -->
+  <script>
+    function showPage(id) {
+      document.querySelectorAll(".page").forEach(p => {
+        p.classList.toggle("page-active", p.id === id);
       });
-      const data = await up.json();
-      if (!up.ok || !data.secure_url) {
-        throw new Error(data.error?.message || "Upload failed");
-      }
-
-      const avatarUrl = data.secure_url; // ← final CDN URL
-
-      // Persist the URL to your backend (so it loads next time from /api/user/me)
-      const save = await fetch(`${API_BASE}/api/settings/update`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...AUTH },
-        body: JSON.stringify({ avatarUrl })
+      document.querySelectorAll(".tab-item").forEach(btn => {
+        btn.classList.toggle(
+          "tab-item-active",
+          btn.dataset.pageTarget === id
+        );
       });
-      if (!save.ok) {
-        const err = await save.json().catch(() => ({}));
-        throw new Error(err.error || "Could not save avatar URL");
-      }
-
-      // Use the final URL (replaces temp blob URL)
-      img.src = avatarUrl;
-      if (hint) hint.textContent = "Saved ✔";
-    } catch (e) {
-      alert(e.message || "Upload failed");
-      // fallback to default if needed
-      img.src = "/assets/default-avatar.png";
-      if (hint) hint.textContent = "JPG/PNG/WebP, ≤ 3 MB";
-    } finally {
-      // cleanup blob
-      setTimeout(() => URL.revokeObjectURL(tmpUrl), 1500);
-      setTimeout(() => { if (hint) hint.textContent = "JPG/PNG/WebP, ≤ 3 MB"; }, 1500);
+      window.scrollTo({ top: 0 });
     }
-  });
 
-  // D) Remove avatar (clear in backend + show default)
-  rm.addEventListener("click", async () => {
-    if (!confirm("Remove your profile image?")) return;
-    try {
-      const res = await fetch(`${API_BASE}/api/settings/update`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...AUTH },
-        body: JSON.stringify({ avatarUrl: null })
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll("[data-page-target]").forEach(btn => {
+        btn.addEventListener("click", () => showPage(btn.dataset.pageTarget));
       });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "Could not remove image");
-      }
-      img.src = "/assets/default-avatar.png";
-      if (hint) hint.textContent = "Removed ✔";
-      setTimeout(() => { if (hint) hint.textContent = "JPG/PNG/WebP, ≤ 3 MB"; }, 1500);
-    } catch (e) {
-      alert(e.message || "Remove failed");
-    }
-  });
-})();
-
-
-  async function fetchUserData() {
-  try {
-    const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
-      headers: { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
     });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (e) {
-    console.error("fetchUserData error:", e);
-    return null;
-  }
-}
-// put once near the top of your main script
-const CURRENCY = "EUR";
-const formatMoney = (n) =>
-  new Intl.NumberFormat("en-GB", { style: "currency", currency: CURRENCY, minimumFractionDigits: 2 }).format(Number(n||0));
-
-
-(async () => {
- // Utility function to format dollar amounts
-function formatEuro(amount) {
-  return `€${Number(amount).toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })}`;
-}
-
-// Ensure content starts exactly under the header on every page
-(function fixTopGap(){
-  const header = document.querySelector('header');
-  const main   = document.querySelector('main');
-  if (!header || !main) return;
-
-  function apply() {
-    const h = Math.ceil(header.getBoundingClientRect().height || 0);
-
-    // No extra top space on main
-    main.style.marginTop  = '0px';
-    main.style.paddingTop = '0px';
-
-    // Make the first visible element on each page never push down
-    document.querySelectorAll('.page > :first-child').forEach(el => {
-      el.style.marginTop = '0px';
-    });
-
-    // Smooth in-page jumps land below sticky header if you ever use anchors
-    document.querySelectorAll('.page').forEach(p => {
-      p.style.scrollMarginTop = (h + 4) + 'px';
-    });
-  }
-
-  apply();
-  window.addEventListener('resize', apply);
-})();
-
-
-  // 🔐 Check for user token
-  const token = localStorage.getItem("userToken");
-  if (!token) {
-    alert("You must be logged in to view this page.");
-    window.location.href = "login.html";
-    return;
-  }
-
-  // 🚫 Blocked User Form Protection
-  document.querySelectorAll("form").forEach(form => {
-    form.addEventListener("submit", e => {
-      const isBlocked = localStorage.getItem("isBlocked") === "true";
-      if (isBlocked) {
-        e.preventDefault();
-        window.location.href = "blocked.html";
-      }
-    });
-  });
-  
-
-/// =============================
-/// Credibe UI JS (renovated)
-/// =============================
-
-/* -------- Helpers -------- */
-const $html = document.documentElement;
-const css = (v) => getComputedStyle($html).getPropertyValue(v).trim();
-const hexToRgba = (hex, a = 1) => {
-  const m = hex.replace('#','');
-  const bigint = parseInt(m.length === 3 ? m.split('').map(x=>x+x).join('') : m, 16);
-  const r = (bigint >> 16) & 255, g = (bigint >> 8) & 255, b = bigint & 255;
-  return `rgba(${r}, ${g}, ${b}, ${a})`;
-};
-
-// theme colors from CSS variables
-const COLOR = {
-  brand: css('--brand') || '#00B4D8',
-  ink: css('--ink') || '#E8F1FF',
-  muted: css('--muted-ink') || '#A9C0DF',
-  edge: css('--blue-edge') || '#1B3A63',
-  card: css('--blue-card') || '#10243D',
-  elev: css('--blue-elev') || '#152C4D',
-};
-
-/* -------- Mobile menu toggle + tap-outside -------- */
-const mobileMenu = document.getElementById("mobile-menu");
-const menuToggle = document.getElementById("menu-toggle");
-
-if (menuToggle && mobileMenu) {
-  menuToggle.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const isOpen = mobileMenu.classList.contains("open");
-    mobileMenu.classList.toggle("open", !isOpen);
-    mobileMenu.classList.toggle("closed", isOpen);
-    menuToggle.textContent = !isOpen ? '✕' : '☰';
-    console.log(`Mobile menu toggled: ${isOpen ? "closed" : "open"}`);
-  });
-
-  document.addEventListener("click", (e) => {
-    const isMenuOpen = mobileMenu.classList.contains("open");
-    const isClickInsideMenu = mobileMenu.contains(e.target);
-    const isClickOnToggle = menuToggle.contains(e.target);
-    if (isMenuOpen && !isClickInsideMenu && !isClickOnToggle) {
-      mobileMenu.classList.remove("open");
-      mobileMenu.classList.add("closed");
-      menuToggle.textContent = '☰';
-      console.log("Mobile menu closed by tapping outside");
-    }
-  });
-}
-
-// Hide mobile menu when resizing to desktop
-window.addEventListener("resize", () => {
-  if (window.innerWidth >= 768 && mobileMenu && mobileMenu.classList.contains("open")) {
-    mobileMenu.classList.remove("open");
-    mobileMenu.classList.add("closed");
-    menuToggle && (menuToggle.textContent = '☰');
-    console.log("Mobile menu hidden on resize to desktop");
-  }
-});
-
-/* -------- Page Switching with Skeleton Loader -------- */
-const navLinks = document.querySelectorAll('.nav-link');
-const pages = document.querySelectorAll('.page');
-
-function showPage(pageId) {
-  // hide all + start skeletons if Alpine present
-  pages.forEach(page => {
-    page.classList.add('hidden');
-    if (page.__x && page.__x.$data) page.__x.$data.loading = true;
-  });
-
-  const activePage = document.getElementById(`${pageId}-page`);
-  if (activePage) {
-    setTimeout(() => {
-      activePage.classList.remove('hidden');
-      // ✅ fix: reference activePage, not "page"
-      if (activePage.__x && activePage.__x.$data) activePage.__x.$data.loading = false;
-
-      // hook: load transactions only on that page if fn exists
-      if (pageId === 'transactions' && typeof window.loadTransactions === 'function') {
-        window.loadTransactions();
-      }
-    }, 500);
-  }
-
-  // update active link styling (use theme classes, not hardcoded hex)
-  navLinks.forEach(link => link.classList.remove('bg-elev', 'text-brand'));
-  const activeLink = document.querySelector(`[data-page="${pageId}"]`);
-  if (activeLink) activeLink.classList.add('bg-elev', 'text-brand');
-
-  // close mobile menu on nav
-  if (window.innerWidth < 768 && mobileMenu) {
-    mobileMenu.classList.add('closed');
-    mobileMenu.classList.remove('open');
-    menuToggle && (menuToggle.textContent = '☰');
-  }
-
-  // subtle UX: scroll to top of main
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-
-  console.log(`Switched to page: ${pageId}`);
-}
-
-navLinks.forEach(link => {
-  link.addEventListener('click', (e) => {
-    e.preventDefault();
-    const pageId = link.getAttribute('data-page');
-    showPage(pageId);
-  });
-});
-
-/* -------- VanillaTilt (micro-interactions) -------- */
-try {
-  if (window.VanillaTilt) {
-    VanillaTilt.init(document.querySelectorAll('.card-press'), {
-      max: 4, speed: 400, glare: true, "max-glare": 0.15
-    });
-    VanillaTilt.init(document.querySelectorAll('.btn-grad'), {
-      max: 6, speed: 500, glare: true, "max-glare": 0.2
-    });
-  }
-} catch (e) { console.warn('VanillaTilt init skipped', e); }
-
-/* -------- Charts (match transaction-history look) -------- */
-function makeLineGradient(ctx, area, colorHex) {
-  const grad = ctx.createLinearGradient(0, area.bottom, 0, area.top);
-  grad.addColorStop(0, hexToRgba(colorHex, 0.05)); // near-transparent at bottom
-  grad.addColorStop(1, hexToRgba(colorHex, 0.30)); // subtle fill near top
-  return grad;
-}
-
-function buildChartColors() {
-  return {
-    border: COLOR.brand,
-    fill: hexToRgba(COLOR.brand, 0.22),
-    point: COLOR.brand,
-    tick: hexToRgba(COLOR.ink, 0.85),
-    grid: hexToRgba(COLOR.edge, 0.4),
-    bar: COLOR.brand,
-    pie: [
-      COLOR.brand,
-      '#87ceeb', '#4682b4', '#2b74b3', '#9bb8d3'
-    ],
-    borderLight: hexToRgba(COLOR.ink, 0.8),
-  };
-}
-
-(function initCharts(){
-  // Spending line chart
-  const spendingChartEl = document.getElementById('spending-chart');
-  if (spendingChartEl) {
-    try {
-      const ctx = spendingChartEl.getContext('2d');
-      const C = buildChartColors();
-      let gradientFill;
-
-      const chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-          datasets: [{
-            label: 'Spending',
-            data: [1200, 1900, 1500, 2200, 1800, 2500],
-            borderColor: C.border,
-            backgroundColor: (context) => {
-              const { chart } = context;
-              const { ctx, chartArea } = chart;
-              if (!chartArea) return C.fill; // initial
-              gradientFill = makeLineGradient(ctx, chartArea, COLOR.brand);
-              return gradientFill;
-            },
-            borderWidth: 2,
-            fill: true,
-            tension: 0.35,
-            pointBackgroundColor: C.point,
-            pointBorderColor: C.borderLight,
-            pointRadius: 4,
-            pointHoverRadius: 6,
-            pointBorderWidth: 2,
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          layout: { padding: { left: 4, right: 8, top: 8, bottom: 4 } },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: { color: C.tick, font: { size: 10 } },
-              grid: { color: C.grid },
-            },
-            x: {
-              ticks: { color: C.tick, font: { size: 10 } },
-              grid: { color: hexToRgba(COLOR.edge, 0.25) },
-            }
-          },
-          plugins: {
-            legend: { labels: { color: C.tick, font: { size: 12 } } },
-            tooltip: {
-              backgroundColor: COLOR.card,
-              titleColor: COLOR.ink,
-              bodyColor: COLOR.ink,
-              borderColor: COLOR.edge,
-              borderWidth: 1
-            }
-          },
-          animation: { duration: 900, easing: 'easeInOutQuad' }
-        }
-      });
-
-      console.log('Spending chart initialized');
-    } catch (error) {
-      console.error('Error initializing spending chart:', error);
-    }
-  }
-  })();
-
-  // Monthly spending bar chart
-  const monthlySpendingChartCtx = document.getElementById('monthly-spending-chart');
-  if (monthlySpendingChartCtx) {
-    try {
-      const C = buildChartColors();
-      new Chart(monthlySpendingChartCtx.getContext('2d'), {
-        type: 'bar',
-        data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-          datasets: [{
-            label: 'Monthly Spending',
-            data: [100000, 150000, 120000, 180000, 160000, 200000],
-            backgroundColor: hexToRgba(COLOR.brand, 0.75),
-            borderColor: C.border,
-            borderWidth: 1,
-            borderRadius: 6,
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: { beginAtZero: true, ticks: { color: hexToRgba(COLOR.ink,0.85), font: { size: 10 } }, grid: { color: hexToRgba(COLOR.edge, 0.35) } },
-            x: { ticks: { color: hexToRgba(COLOR.ink,0.85), font: { size: 10 } }, grid: { color: hexToRgba(COLOR.edge, 0.2) } }
-          },
-          plugins: { legend: { labels: { color: hexToRgba(COLOR.ink,0.9), font: { size: 12 } } } },
-          animation: { duration: 900, easing: 'easeInOutQuad' }
-        }
-      });
-      console.log('Monthly spending chart initialized');
-    } catch (error) {
-      console.error('Error initializing monthly spending chart:', error);
-    }
-  }
-
-  // Category spending pie chart
-  const categorySpendingChartCtx = document.getElementById('category-spending-chart');
-  if (categorySpendingChartCtx) {
-    try {
-      const C = buildChartColors();
-      new Chart(categorySpendingChartCtx.getContext('2d'), {
-        type: 'pie',
-        data: {
-          labels: ['Groceries', 'Bills', 'Entertainment', 'Travel', 'Other'],
-          datasets: [{
-            data: [30, 25, 20, 15, 10],
-            backgroundColor: C.pie,
-            borderColor: hexToRgba(COLOR.card, 1),
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { labels: { color: hexToRgba(COLOR.ink,0.92), font: { size: 12 } } },
-            tooltip: {
-              backgroundColor: COLOR.card,
-              titleColor: COLOR.ink,
-              bodyColor: COLOR.ink,
-              borderColor: COLOR.edge,
-              borderWidth: 1
-            }
-          },
-          animation: { duration: 900, easing: 'easeInOutQuad' }
-        }
-      });
-      console.log('Category spending chart initialized');
-    } catch (error) {
-      console.error('Error initializing category spending chart:', error);
-    }
-}
-
-
-  // Transfer Form
-  const transferForm = document.getElementById('transfer-form');
-  const transferOtpSection = document.getElementById('transferOtpSection');
-  const sendTransferOtpPhone = document.getElementById('send-transfer-otp-phone');
-  const sendTransferOtpEmail = document.getElementById('send-transfer-otp-email');
-  const submitTransfer = document.getElementById('submit-transfer');
-  const submitText = document.getElementById('submitText');
-  const submitSpinner = document.getElementById('submitSpinner');
-
-  if (transferForm) {
-    const transferRecipientName = document.getElementById('recipient-name');
-    const transferRecipientEmail = document.getElementById('recipient-email');
-    const transferRecipientIban = document.getElementById('recipient-iban');
-
-    // Load beneficiaries if available
-    if (transferRecipientName && transferRecipientEmail && transferRecipientIban) {
-      const beneficiaries = JSON.parse(localStorage.getItem('beneficiaries') || '[]');
-      if (beneficiaries.length > 0) {
-        const select = document.createElement('select');
-        select.id = 'beneficiary-select';
-        select.className = 'w-full bg-[#1a1a1a]/50 border border-[#444] text-[#e0e0e0] rounded-lg px-3 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#00b4d8] mb-2';
-        select.innerHTML = `<option value="">Select a beneficiary</option>` + 
-          beneficiaries.map(b => `<option value="${b.email}">${b.fullName} (${b.email}, ${b.iban})</option>`).join('');
-        transferRecipientName.parentElement.insertBefore(select, transferRecipientName);
-        select.addEventListener('change', () => {
-          const selected = beneficiaries.find(b => b.email === select.value);
-          transferRecipientName.value = selected ? selected.fullName : '';
-          transferRecipientEmail.value = selected ? selected.email : '';
-          transferRecipientIban.value = selected ? selected.iban : '';
-        });
-      }
-    }
-
-    // 🔹 Send Transfer OTP to Your Own Email
-    if (sendTransferOtpEmail) {
-      sendTransferOtpEmail.addEventListener('click', async () => {
-        const userEmailField = document.getElementById('user-email');
-        if (!userEmailField) return alert("Your email input is missing.");
-
-        const email = userEmailField.value.trim();
-        if (!email) return alert("Please enter your email to receive OTP.");
-
-        console.log('🧪 Sending OTP request:', { email, timestamp: new Date().toISOString() });
-
-        if (transferOtpSection) transferOtpSection.classList.remove('hidden');
-
-        try {
-          const res = await fetch('https://credibe-backends.onrender.com/api/transfer/send-direct-otp', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              email,
-              type: "transfer"
-            })
-          });
-
-          const data = await res.json();
-          console.log('🧪 OTP response:', { status: res.status, data });
-          if (!res.ok) throw new Error(data.error || "OTP error");
-
-          alert("OTP sent to your email ✔️");
-        } catch (err) {
-          console.error("❌ OTP send error:", err.message, { email });
-          alert(err.message || "Something went wrong.");
-        }
-      });
-    }
-
-    // 🔹 Submit Transfer (CREDIBE IBAN-ONLY SYSTEM)
-    transferForm.addEventListener('submit', async function (e) {
-      e.preventDefault();
-
-      const recipientNameField = document.getElementById('recipient-name');
-      const swiftField = document.getElementById('swift');
-      const amountField = document.getElementById('amount');
-      const ibanField = document.getElementById('iban');
-      const referenceField = document.getElementById('reference');
-      const otpField = document.getElementById('transfer-otp');
-
-      if (!recipientNameField || !swiftField || !amountField || !referenceField) {
-        alert('One or more required fields are missing.');
-        return;
-      }
-
-      const recipientName = recipientNameField.value.trim();
-      const swift = swiftField.value.trim();
-      const amount = parseFloat(amountField.value);
-      const recipientIban = ibanField?.value.trim() || '';
-      const reference = referenceField.value.trim();
-      const otp = otpField?.value.trim() || '';
-
-      if (!recipientName || !swift || isNaN(amount)) {
-        alert('Please fill all required fields (Name, SWIFT, Amount).');
-        return;
-      }
-
-      if (!/^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2,5}$/.test(swift)) {
-        alert('Invalid SWIFT format (must be 8 or 11 uppercase letters/digits).');
-        return;
-      }
-
-      if (recipientIban && !/^[A-Z]{2}\d{2}[A-Z0-9]{4,30}$/.test(recipientIban.replace(/\s/g, ''))) {
-        alert('Invalid IBAN. Must be valid format or left blank.');
-        return;
-      }
-
-      if (amount <= 0 || !Number.isFinite(amount)) {
-        alert('Amount must be greater than 0.');
-        return;
-      }
-
-      // ✅ Step 1: Send OTP if hidden
-      if (!otp && transferOtpSection && transferOtpSection.classList.contains('hidden')) {
-        try {
-          const res = await fetch('https://credibe-backends.onrender.com/api/transfer/send-otp', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ type: 'transfer' })
-          });
-
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || 'OTP send failed');
-
-          transferOtpSection.classList.remove('hidden');
-          alert('OTP sent to your registered email. Please enter it to continue.');
-        } catch (err) {
-          alert(err.message || 'Failed to send OTP.');
-        }
-        return;
-      }
-
-      // ✅ Step 2: Must include OTP
-      if (!otp) {
-        alert('Please enter the OTP sent to your email.');
-        return;
-      }
-
-      // UI loading
-      submitText.textContent = 'Processing...';
-      submitSpinner.classList.remove('hidden');
-      submitTransfer.disabled = true;
-
-      try {
-        const payload = {
-          recipient: recipientName,
-          swift,
-          toIban: recipientIban || undefined,
-          amount,
-          note: reference,
-          otp
-        };
-
-        const res = await fetch('https://credibe-backends.onrender.com/api/transfer/initiate', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-
-        if (res.ok && data.transactionId) {
-          alert('Transfer submitted successfully! (Pending approval)');
-          transferForm.reset();
-          transferOtpSection.classList.add('hidden');
-
-          localStorage.setItem('pendingTransfer', JSON.stringify({
-            recipientName,
-            swift,
-            recipientIban,
-            amount,
-            note: reference,
-            transferId: data.transactionId
-          }));
-
-          window.location.href = 'transfer-pending.html';
-        } else {
-          alert(data.error || `Transfer failed. Status: ${res.status}`);
-        }
-      } catch (error) {
-        console.error('❌ Transfer error:', error.message);
-        alert('Something went wrong. Please try again.');
-      } finally {
-        submitText.textContent = 'Send Now';
-        submitSpinner.classList.add('hidden');
-        submitTransfer.disabled = false;
-      }
-    });
-  }
-
-/// =============================
-// =============================
-// =============================
-// =============================
-// =============================
-// CONFIG (safe storage reads)
-// =============================
-const API_BASE = "https://credibe-backends.onrender.com";
-
-let _userToken = "";
-let _userId = "";
-try {
-  _userToken = localStorage.getItem("userToken") || "";
-  _userId    = localStorage.getItem("userId") || "";
-} catch (e) {
-  console.warn("localStorage unavailable:", e?.message);
-}
-
-const userToken  = _userToken;
-const userId     = _userId;
-const AUTH_HDR   = userToken ? { Authorization: `Bearer ${userToken}` } : {};
-const FREEZE_CAP = new Date("2025-03-26T23:59:59"); // legacy (unchanged)
-
-// 🔒 Hard cap user: last tx must be exactly on 21 Nov 2024, and nothing after.
-const HARD_CAP_USER  = "68c1c45057a7c7822e2d8a9e";
-const HARD_CAP_DATE  = new Date("2024-11-21T23:59:59Z");       // inclusive cap (UTC)
-const HARD_CAP_DAY   = "2024-11-21";                           // yyyy-mm-dd (UTC day string)
-const HARD_CAP_NOONZ = "2024-11-21T12:00:00Z";                 // default time to inject cap-day tx
-
-
-// =============================
-// UTILS
-// =============================
-async function safeFetchJSON(url) {
-  try {
-    const res  = await fetch(url, { headers: { ...AUTH_HDR } });
-    const text = await res.text();
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${text}`);
-    return JSON.parse(text);
-  } catch (err) {
-    console.error("❌ safeFetchJSON:", err.message);
-    return [];
-  }
-}
-
-function fmtDate(d) {
-  const dt = new Date(d);
-  return isNaN(dt)
-    ? "Unknown"
-    : dt.toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      });
-}
-
-function fmtAmount(n, sign) {
-  const num = Number(n);
-  if (!isFinite(num)) return "€0";
-  const f = new Intl.NumberFormat("en-GB").format(num);
-  if (sign === "-") return `-€${f}`;
-  if (sign === "+") return `+€${f}`;
-  return `€${f}`;
-}
-
-// Puts custom (pinned) first, then by date desc
-function customFirstDesc(a, b) {
-  const aC = !!a.isCustom;
-  const bC = !!b.isCustom;
-  if (aC !== bC) return bC - aC;
-  const ad = new Date(a.date || a.createdAt);
-  const bd = new Date(b.date || b.createdAt);
-  return bd - ad;
-}
-
-function txnStatusBadge(status) {
-  const base = "px-2 py-1 rounded-full text-xs font-semibold";
-  const map = {
-    approved: "bg-green-500/15 text-green-400 border border-green-500/20",
-    pending : "bg-yellow-500/15 text-yellow-300 border border-yellow-500/20",
-    rejected: "bg-red-500/15 text-red-400 border border-red-500/20",
-  };
-  return `<span class="${base} ${map[status] || "text-gray-400"}">${status}</span>`;
-}
-
-// helpers for date/day comparisons in UTC
-function dayKeyUTC(dateLike) {
-  const d = new Date(dateLike);
-  if (isNaN(d)) return "";
-  return d.toISOString().slice(0, 10); // yyyy-mm-dd
-}
-
-
-// =============================
-// RENDER HELPERS
-// =============================
-function renderTxnRow(tx, view) {
-  return `
-    <tr class="text-[#e5e7eb]">
-      <td class="p-3 text-sm">${fmtDate(tx.date)}</td>
-      <td class="p-3 text-sm">${tx.party}</td>
-      <td class="p-3 text-sm font-semibold">${fmtAmount(
-        tx.amount,
-        view === "sent" ? "-" : "+"
-      )}</td>
-      <td class="p-3 text-sm">${txnStatusBadge(tx.status)}</td>
-    </tr>`;
-}
-
-function renderTxnCard(tx, view) {
-  return `
-    <article class="rounded-xl border border-white/5 bg-[#0e1526] p-3 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-lg bg-[#0b1220] grid place-items-center text-sm">
-          ${view === "sent" ? "↗" : "↙"}
-        </div>
-        <div>
-          <div class="text-white text-sm font-semibold">${tx.party}</div>
-          <div class="text-xs text-[#9ca3af]">${fmtDate(tx.date)}</div>
-        </div>
-      </div>
-      <div class="text-right">
-        <div class="text-sm font-bold ${
-          view === "sent" ? "text-red-400" : "text-green-400"
-        }">
-          ${fmtAmount(tx.amount, view === "sent" ? "-" : "+")}
-        </div>
-        <div class="mt-1">${txnStatusBadge(tx.status)}</div>
-      </div>
-    </article>`;
-}
-
-
-/* ======================================================================
-   🎯 FREEZE RULES (per-user per-stream caps + per-user anchors)
-   ====================================================================== */
-/**
- * For these users, hide any transactions after the cutoff date UNTIL the local anchor
- * (the first time this script ran on that browser). Anything newer than the anchor is allowed,
- * so brand-new real transfers still show up top.
- *
- * Backdated to "late last year, 2024" as requested.
- */
-const FREEZE_RULES = {
-  // You asked to backdate this one to late 2024
-  "68bd382f2d14412466be2387": {
-    sent:     new Date("2024-11-30T23:59:59Z"), // no SENT after Nov 30, 2024 (until anchor)
-    received: new Date("2024-12-20T23:59:59Z"), // no RECEIVED after Dec 20, 2024 (until anchor)
-  },
-  // And also backdate this one to late 2024
-  "68be26592fdca996014886a1": {
-    sent:     new Date("2024-11-30T23:59:59Z"),
-    received: new Date("2024-12-20T23:59:59Z"),
-  },
-  // New: for 68c873044b9fc118eae4918b, last sent Aug 2 2025, last received July 31 2025
-  "68c873044b9fc118eae4918b": {
-    sent:     new Date("2025-08-02T23:59:59Z"),
-    received: new Date("2025-07-31T23:59:59Z"),
-  },
-  // New: for 69297b4bf57a8962d1a82739, freeze both streams at Oct 31, 2025
-  "69297b4bf57a8962d1a82739": {
-    sent:     new Date("2025-10-24T23:59:59Z"),
-    received: new Date("2025-10-22T23:59:59Z"),
-  }, 
-
-  "692adb4a0e800ae335ba6d64": {
-    sent:     new Date("2025-10-23T23:59:59Z"),
-    received: new Date("2025-10-23T23:59:59Z"),
-  },  
-};
-
-// Per-user anchor: only defined if current user is in FREEZE_RULES
-const ANCHOR_VERSION = "v1";
-function getUserAnchor(uid) {
-  if (!FREEZE_RULES[uid]) return null;
-  const key = `txnFreezeAnchor_${uid}_${ANCHOR_VERSION}`;
-  try {
-    const ex = localStorage.getItem(key);
-    if (ex) return new Date(ex);
-  } catch {}
-  const now = new Date();
-  try { localStorage.setItem(key, now.toISOString()); } catch {}
-  return now;
-}
-const FREEZE_ANCHOR = getUserAnchor(userId);
-
-// Hide if date is between stream freeze and anchor (these target users only)
-// Also: enforce HARD_CAP for HARD_CAP_USER (absolute, inclusive).
-function hiddenByUserFreeze(dateLike, txnType) {
-  const d = new Date(dateLike);
-  if (isNaN(d)) return false;
-
-  // 🔒 Absolute inclusive cap for the special hard-cap user
-  if (userId === HARD_CAP_USER) {
-    return d > HARD_CAP_DATE; // allow anything <= cap date (incl. Nov 21)
-  }
-
-  // Per-stream freeze for configured users
-  const rule = FREEZE_RULES[userId];
-  if (!rule || !FREEZE_ANCHOR) return false;
-
-  const freezeDate = txnType === "debit" ? rule.sent : rule.received;
-  return d > freezeDate && d < FREEZE_ANCHOR;
-}
-
-
-/* ======================================================================
-   🔹 STATIC FAKE TXNS
-   ====================================================================== */
-// Per-user cache so fakes respect user-specific rules (esp. HARD_CAP_USER)
-const FAKE_KEY = `fakePairedTxns_v8_${userId || "anon"}_${userId === HARD_CAP_USER ? "cap1121" : "std"}`;
-const RECEIVED_CUTOFF = new Date("2025-08-15T23:59:59Z"); // for non-target users
-
-function randomDateISOWithin(days) {
-  const d = new Date();
-  d.setDate(d.getDate() - Math.floor(Math.random() * days));
-  return d.toISOString();
-}
-function randomDateISOBeforeCutoff(cutoff, spanDaysBack = 180) {
-  const max = new Date(cutoff);
-  const min = new Date(max);
-  min.setDate(min.getDate() - spanDaysBack);
-  return new Date(min.getTime() + Math.random() * (max - min)).toISOString();
-}
-
-function generatePairedFakeTransactions(count = 25) {
-  const cached = localStorage.getItem(FAKE_KEY);
-  if (cached) { 
-    try { return JSON.parse(cached); } 
-    catch { localStorage.removeItem(FAKE_KEY); } 
-  }
-
-  const poolSent = [
-    "ING Bank","BNP Paribas","KBC Group","Belfius","ABN AMRO",
-    "Carrefour","Colruyt","Delhaize","Bol.com","Coolblue",
-    "MediaMarkt","Zalando","IKEA Belgium","Proximus","Telenet",
-    "Esso","TotalEnergies","Q8 Belgium","NMBS/SNCB","De Lijn"
-  ];
-  const poolRecv = [
-    "Stripe Payouts","PayPal Settlement","Wise Incoming","Revolut Ltd",
-    "Société Générale","Deutsche Bank","Heineken NV","Unilever EU",
-    "Coca-Cola Europacific","Jupiler NV","Nestlé Belgium","Orange SA",
-    "AXA Belgium","DPD Belgium","Bpost Incoming","Klarna Refunds"
-  ];
-
-  // compute earliest pinned dates so fakes are always earlier (sit under pins)
-  let earliestPinnedSent = null, earliestPinnedRecv = null;
-  if (userId && CUSTOM_TXNS[userId]) {
-    const cs = CUSTOM_TXNS[userId].sent || [];
-    const cr = CUSTOM_TXNS[userId].received || [];
-    if (cs.length) earliestPinnedSent = cs.map(x => new Date(x.date)).filter(d=>!isNaN(d)).sort((a,b)=>a-b)[0];
-    if (cr.length) earliestPinnedRecv = cr.map(x => new Date(x.date)).filter(d=>!isNaN(d)).sort((a,b)=>a-b)[0];
-  }
-
-  // Choose cutoff for fakes:
-  // - If user has pins, fake dates land before the earliest pin
-  // - Else, for freeze-rule users, fake dates land before the freeze dates
-  const rule = FREEZE_RULES[userId];
-  const sentCutoff = earliestPinnedSent || (rule ? rule.sent : null);
-  const recvCutoff = earliestPinnedRecv || (rule ? rule.received : null);
-
-  const dateForFakeSent = () => {
-    if (sentCutoff) return randomDateISOBeforeCutoff(sentCutoff, 200);
-    return randomDateISOWithin(60);
-  };
-  const dateForFakeRecv = () => {
-    if (recvCutoff) return randomDateISOBeforeCutoff(recvCutoff, 200);
-    return randomDateISOWithin(60);
-  };
-
-  const sent = Array.from({ length: count }, (_, i) => ({
-    _id: `fake-sent-${i}`,
-    date: dateForFakeSent(),
-    recipient: poolSent[i % poolSent.length],
-    amount: Math.floor(Math.random() * 1900 + 100), // €100–€2000
-    status: "approved",
-    type: "debit",
-    isFake: true
-  }));
-
-  const received = Array.from({ length: count }, (_, i) => ({
-    _id: `fake-recv-${i}`,
-    date: dateForFakeRecv(),
-    from: { name: poolRecv[i % poolRecv.length] },
-    amount: Math.floor(Math.random() * 1900 + 100),
-    status: "approved",
-    type: "credit",
-    isFake: true
-  }));
-
-  const paired = { sent, received };
-  localStorage.setItem(FAKE_KEY, JSON.stringify(paired));
-  return paired;
-}
-
-
-/* ======================================================================
-   🔸 CUSTOM PINS GENERATOR FOR USER 6930239551fd7e53f2ecf10a
-   ====================================================================== */
-
-/**
- * Build a stacked US-style spending/income profile for:
- *   userId = "6930239551fd7e53f2ecf10a"
- *
- * - Period: Dec 2024 → Dec 2025 (13 months)
- * - Each month:
- *    • 12 random SENT (debits) to US companies
- *    • 12 random RECEIVED (credits) from US sources
- *    • 1 fixed paycheck on the 7th from "Charles McJonas" of 15,000
- *  => 25 txns/month ≈ 325 total custom txns
- */
-function buildStackedCustomTxnsFor6930() {
-  const userId = "6930239551fd7e53f2ecf10a";
-
-  const US_SENT_RECIPIENTS = [
-    "Amazon.com Services LLC",
-    "Apple Online Store USA",
-    "Tesla Motors Finance",
-    "Netflix Inc.",
-    "Google Cloud Services",
-    "Starbucks Coffee Company",
-    "Walmart Supercenter",
-    "Target Corporation",
-    "Home Depot USA",
-    "Costco Wholesale",
-    "Best Buy USA",
-    "Uber Technologies Inc.",
-    "Lyft Rideshare LLC",
-    "Delta Air Lines",
-    "United Airlines",
-    "American Airlines",
-    "Marriott Hotels & Resorts",
-    "Hilton Worldwide",
-    "Chase Credit Card",
-    "Bank of America Card Services",
-    "Citibank N.A.",
-    "Wells Fargo Home Mortgage",
-    "Comcast Xfinity",
-    "AT&T Wireless",
-    "Verizon Wireless",
-    "T-Mobile USA",
-    "Whole Foods Market",
-    "Trader Joe's",
-    "DoorDash USA",
-    "Grubhub Inc.",
-    "Airbnb Payments Inc.",
-    "Chewy Pet Supplies",
-    "Nike USA Inc.",
-    "Adidas America Inc.",
-    "Spotify USA",
-    "Hulu LLC",
-    "Adobe Systems Inc.",
-    "Microsoft Store USA"
-  ];
-
-  const US_RECEIVED_SOURCES = [
-    "Liberty Consulting Group LLC",
-    "Hudson Valley Investments",
-    "Pacific Ridge Capital",
-    "Manhattan Creative Studio",
-    "Golden Gate Advisory",
-    "Empire State Holdings",
-    "Lone Star Energy Partners",
-    "Silicon Valley Media Co.",
-    "Blue Harbor Logistics USA",
-    "Maple Leaf Trading (US)",
-    "Redwood Venture Partners",
-    "Crescent Bay Real Estate",
-    "Summit Peak Management",
-    "Riverbend Legal Services",
-    "Atlantic Coast Shipping",
-    "Sequoia Health Systems",
-    "Cobalt Manufacturing USA",
-    "Silverline Pharmaceuticals US",
-    "Harborstone Financial LLC",
-    "Evergreen Property Group",
-    "Northbridge Tech Labs",
-    "Ironwood Capital Advisors",
-    "Phoenix Talent Agency",
-    "Beacon Ridge Marketing",
-    "Skyline Architecture Studio",
-    "Canyon Creek Engineering",
-    "New York Media Network",
-    "Sunrise Entertainment Group",
-    "Crossroads Trading LLC",
-    "Oceanview Investments",
-    "Broadway Creative Agency",
-    "Cedar Grove Analytics",
-    "Crown City Production Co.",
-    "Highline Strategy Partners",
-    "BlueSky Fintech USA",
-    "Frontier Digital Labs",
-    "Vertex Holdings LLC",
-    "Oakmont Advisory Inc."
-  ];
-
-  const sent = [];
-  const received = [];
-
-  // helper for random int in [min, max]
-  const randInt = (min, max) =>
-    Math.floor(Math.random() * (max - min + 1)) + min;
-
-  // Dec 2024 (month index 11) → Dec 2025 (index 11 + 12)
-  for (let offset = 0; offset < 13; offset++) {
-    const base = new Date(Date.UTC(2024, 11 + offset, 1, 9, 0, 0));
-    const year = base.getUTCFullYear();
-    const monthIndex = base.getUTCMonth(); // 0–11
-    const monthStr = String(monthIndex + 1).padStart(2, "0");
-
-    // last day of this month
-    const lastDay = new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
-
-    // 12 random SENT txns in this month
-    for (let i = 0; i < 12; i++) {
-      const day = randInt(1, lastDay);
-      const hour = randInt(8, 20);
-      const minute = randInt(0, 59);
-      const second = randInt(0, 59);
-
-      const dt = new Date(Date.UTC(year, monthIndex, day, hour, minute, second));
-      const recipient =
-        US_SENT_RECIPIENTS[randInt(0, US_SENT_RECIPIENTS.length - 1)];
-      const amount = randInt(40, 9500); // 40–9500
-
-      sent.push({
-        _id: `u6930-sent-${year}-${monthStr}-${String(i + 1).padStart(2, "0")}`,
-        date: dt.toISOString(),
-        recipient,
-        amount,
-        status: "approved",
-        type: "debit",
-        isCustom: true
-      });
-    }
-
-    // 12 random RECEIVED txns in this month
-    for (let j = 0; j < 12; j++) {
-      const day = randInt(1, lastDay);
-      const hour = randInt(8, 20);
-      const minute = randInt(0, 59);
-      const second = randInt(0, 59);
-
-      const dt = new Date(Date.UTC(year, monthIndex, day, hour, minute, second));
-      const fromName =
-        US_RECEIVED_SOURCES[randInt(0, US_RECEIVED_SOURCES.length - 1)];
-      const amount = randInt(120, 22000); // 120–22000
-
-      received.push({
-        _id: `u6930-recv-${year}-${monthStr}-${String(j + 1).padStart(2, "0")}`,
-        date: dt.toISOString(),
-        from: { name: fromName },
-        amount,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      });
-    }
-
-    // Fixed paycheck on 7th of every month from Charles McJonas – 15k
-    const paycheckDate = new Date(Date.UTC(year, monthIndex, 7, 9, 0, 0));
-    received.push({
-      _id: `u6930-paycheck-${year}-${monthStr}-07`,
-      date: paycheckDate.toISOString(),
-      from: { name: "Charles McJonas" },
-      amount: 15000,
-      status: "approved",
-      type: "credit",
-      isCustom: true
-    });
-  }
-
-  return { sent, received };
-}
-
-
-/* ======================================================================
-   🔸 CUSTOM PINS (existing + generator-based for 6930…)
-   ====================================================================== */
-const CUSTOM_TXNS = {
-  // example other user (kept)
-  "686cdaadbcd60c61f026f6b6": {
-    received: [
-      {
-        _id: "manual-rx-2025-08-13-nexora",
-        date: "2025-08-13T10:30:00Z",
-        from: { name: "Nexora Real Estate" },
-        amount: 164000,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      }
-    ],
-    sent: []
-  },
-
-  // Backdated pins for 68bd382f2d14412466be2387
-  "68bd382f2d14412466be2387": {
-    sent: [
-      {
-        _id: "pinned-sent-2024-11-28",
-        date: "2024-11-28T10:15:00Z",
-        recipient: "Luxury Fashion House",
-        amount: 2000,
-        status: "approved",
-        type: "debit",
-        isCustom: true
-      },
-      {
-        _id: "pinned-sent-2024-11-26",
-        date: "2024-11-26T09:25:00Z",
-        recipient: "Fuel Depot Services",
-        amount: 1720,
-        status: "approved",
-        type: "debit",
-        isCustom: true
-      }
-    ],
-    received: [
-      {
-        _id: "pinned-recv-2024-12-18",
-        date: "2024-12-18T12:05:00Z",
-        from: { name: "Global Tech Freelance" },
-        amount: 3500,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned-recv-2024-12-05",
-        date: "2024-12-05T16:35:00Z",
-        from: { name: "Euro Investments Group" },
-        amount: 4200,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      }
-    ]
-  },
-
-  // Backdated pins for 68be26592fdca996014886a1
-  "68be26592fdca996014886a1": {
-    sent: [
-      {
-        _id: "pinned2-sent-2024-11-30",
-        date: "2024-11-30T14:40:00Z",
-        recipient: "Furniture World BE",
-        amount: 3000,
-        status: "approved",
-        type: "debit",
-        isCustom: true
-      },
-      {
-        _id: "pinned2-sent-2024-11-22",
-        date: "2024-11-22T11:00:00Z",
-        recipient: "ElectroTech Repairs",
-        amount: 2370,
-        status: "approved",
-        type: "debit",
-        isCustom: true
-      }
-    ],
-    received: [
-      {
-        _id: "pinned2-recv-2024-12-19",
-        date: "2024-12-19T08:50:00Z",
-        from: { name: "Belgium Tax Authority" },
-        amount: 1660,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned2-recv-2024-12-10",
-        date: "2024-12-10T15:20:00Z",
-        from: { name: "Corporate Services Inc" },
-        amount: 2100,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      }
-    ]
-  },
-
-  // New backdated pins for 68c873044b9fc118eae4918b (sent up to Aug 2 2025, received up to July 2025)
-  "68c873044b9fc118eae4918b": {
-    sent: [
-      {
-        _id: "pinned3-sent-2025-08-02",
-        date: "2025-08-02T14:30:00Z",
-        recipient: "High-End Electronics",
-        amount: 5000,
-        status: "approved",
-        type: "debit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-sent-2025-07-28",
-        date: "2025-07-28T09:45:00Z",
-        recipient: "Premium Auto Services",
-        amount: 8000,
-        status: "approved",
-        type: "debit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-sent-2025-07-20",
-        date: "2025-07-20T16:20:00Z",
-        recipient: "Gourmet Foods Import",
-        amount: 2000,
-        status: "approved",
-        type: "debit",
-        isCustom: true
-      }
-    ],
-    received: [
-      {
-        _id: "pinned3-recv-2025-07-30",
-        date: "2025-07-30T11:10:00Z",
-        from: { name: "International Consulting Firm" },
-        amount: 18500,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-07-15",
-        date: "2025-07-15T13:55:00Z",
-        from: { name: "Real Estate Dividends" },
-        amount: 24300,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-07-05",
-        date: "2025-07-05T10:25:00Z",
-        from: { name: "Investment Portfolio Payout" },
-        amount: 27000,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-06-29",
-        date: "2025-06-29T09:12:00Z",
-        from: { name: "Blue Harbor Logistics" },
-        amount: 35800,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-06-24",
-        date: "2025-06-24T14:45:00Z",
-        from: { name: "Aurora Tech Labs" },
-        amount: 49250,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-06-18",
-        date: "2025-06-18T11:05:00Z",
-        from: { name: "Cedar Ridge Partners" },
-        amount: 33100,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-06-12",
-        date: "2025-06-12T16:30:00Z",
-        from: { name: "Summit Energy Group" },
-        amount: 60800,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-06-07",
-        date: "2025-06-07T08:20:00Z",
-        from: { name: "Marigold Media" },
-        amount: 44500,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-05-29",
-        date: "2025-05-29T10:10:00Z",
-        from: { name: "Northvale Holdings" },
-        amount: 37700,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-05-22",
-        date: "2025-05-22T13:50:00Z",
-        from: { name: "Pioneer Realty Trust" },
-        amount: 52500,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-05-17",
-        date: "2025-05-17T15:05:00Z",
-        from: { name: "Golden Elm Investments" },
-        amount: 30900,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-05-10",
-        date: "2025-05-10T09:40:00Z",
-        from: { name: "Atlas Supply Co." },
-        amount: 68900,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-05-03",
-        date: "2025-05-03T12:25:00Z",
-        from: { name: "Silverline Pharmaceuticals" },
-        amount: 36250,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-04-28",
-        date: "2025-04-28T11:15:00Z",
-        from: { name: "Harborview Consulting" },
-        amount: 41500,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-04-21",
-        date: "2025-04-21T17:55:00Z",
-        from: { name: "Orchid Financial" },
-        amount: 53700,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-04-14",
-        date: "2025-04-14T08:05:00Z",
-        from: { name: "Cobalt Manufacturing" },
-        amount: 32400,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-04-07",
-        date: "2025-04-07T14:00:00Z",
-        from: { name: "Nebula Creative Studio" },
-        amount: 47120,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-03-30",
-        date: "2025-03-30T10:30:00Z",
-        from: { name: "Hearthstone Logistics" },
-        amount: 38900,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-03-19",
-        date: "2025-03-19T09:50:00Z",
-        from: { name: "Vanguard AgriCorp" },
-        amount: 55800,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-03-11",
-        date: "2025-03-11T16:20:00Z",
-        from: { name: "Lumen Advisory" },
-        amount: 30250,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-02-26",
-        date: "2025-02-26T13:35:00Z",
-        from: { name: "EchoWave Technologies" },
-        amount: 64300,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-02-14",
-        date: "2025-02-14T11:11:00Z",
-        from: { name: "Crescent Maritime" },
-        amount: 33000,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      },
-      {
-        _id: "pinned3-recv-2025-01-30",
-        date: "2025-01-30T15:45:00Z",
-        from: { name: "Ironwood Ventures" },
-        amount: 57750,
-        status: "approved",
-        type: "credit",
-        isCustom: true
-      }
-    ]
-  },
-
-  // MASS STACKED PROFILE FOR 6930239551fd7e53f2ecf10a
-  "6930239551fd7e53f2ecf10a": buildStackedCustomTxnsFor6930()
-};
-
-
-/* ======================================================================
-   FILTERING
-   ====================================================================== */
-function filterTxns(txns, days) {
-  const now = new Date();
-  return (txns || []).filter(t => {
-    if (!t) return false;
-
-    const isCustom = !!t.isCustom;
-    const isFake   = !!t.isFake;
-    const rawDate  = t.date || t.createdAt;
-    const d        = new Date(rawDate);
-    if (isNaN(d) || d > now) return false;
-
-    // Hide based on per-user freeze/cap rules,
-    // BUT let real (non-fake, non-custom) txns through for HARD_CAP_USER
-    if (!(userId === HARD_CAP_USER && !isFake && !isCustom)) {
-      if (hiddenByUserFreeze(rawDate, t.type)) return false;
-    }
-
-    // ✅ Pins always show (except for specific user)
-    if (isCustom && userId !== "68c873044b9fc118eae4918b") return true;
-
-    // ✅ Let fakes bypass the days filter for both special cases (except for specific user)
-    if ((FREEZE_RULES[userId] || userId === HARD_CAP_USER) && isFake && userId !== "68c873044b9fc118eae4918b") return true;
-
-    if (days === "all") return true;
-    return (now - d) / 86400000 <= parseInt(days, 10);
-  });
-}
-
-
-/* ======================================================================
-   LOAD + RENDER
-   ====================================================================== */
-async function loadTransactions(days = "all") {
-  const base = `${API_BASE}/api/user/transactions/${userId}`;
-
-  // real data
-  const [sentReal, receivedReal] = await Promise.all([
-    safeFetchJSON(`${base}?type=sent${days !== "all" ? `&days=${days}` : ""}`),
-    safeFetchJSON(`${base}?type=received${days !== "all" ? `&days=${days}` : ""}`)
-  ]);
-
-  // fakes
-  const { sent: sentFake, received: recvFakeRaw } = generatePairedFakeTransactions(25);
-
-  // pins
-  const custom = CUSTOM_TXNS[userId] || { sent: [], received: [] };
-
-  /* ----- SENT ----- */
-  let sentCombined = [...(sentReal || []), ...sentFake, ...custom.sent];
-
-  if (userId === HARD_CAP_USER) {
-    // Cap only fakes/pins; allow real API txns beyond cap
-    sentCombined = sentCombined.filter(t => {
-      const d = new Date(t.date || t.createdAt);
-      if (isNaN(d)) return false;
-      if (t.isFake || t.isCustom) return d <= HARD_CAP_DATE; // cap synthetic
-      return true; // real txn passes regardless of date
-    });
-
-    // Only consider synthetic items when deciding to inject the cap-day marker
-    const hasCapDay = sentCombined.some(t =>
-      (t.isFake || t.isCustom) && dayKeyUTC(t.date || t.createdAt) === HARD_CAP_DAY
-    );
-    if (!hasCapDay) {
-      // inject a single fake at cap day (kept synthetic)
-      sentCombined.push({
-        _id: "cap-sent-2024-11-21",
-        date: HARD_CAP_NOONZ,
-        recipient: "IKEA Belgium",
-        amount: 1431,
-        status: "approved",
-        type: "debit",
-        isFake: true
-      });
-    }
-  } else if (FREEZE_RULES[userId]) {
-    // per-stream freeze (between freeze-date and anchor)
-    const rule = FREEZE_RULES[userId];
-    sentCombined = sentCombined.filter(t => {
-      const d = new Date(t.date || t.createdAt);
-      return !(d > rule.sent && d < FREEZE_ANCHOR);
-    });
-  }
-
-  const sentTxns = filterTxns(sentCombined, days)
-    .sort(customFirstDesc) // pins first, then newest
-    .map(t => ({
-      date  : t.date || t.createdAt,
-      party : t.recipient || t.to?.email || t.to?.name || t.toIban || "Recipient",
-      amount: t.amount,
-      status: t.status || "approved",
-      view  : "sent",
-      isCustom: !!t.isCustom
-    }));
-
-  /* ----- RECEIVED ----- */
-  let receivedAll;
-  if (userId === "68c873044b9fc118eae4918b") {
-    receivedAll = custom.received || [];
-  } else {
-    receivedAll = [
-      ...(receivedReal || []),
-      ...(recvFakeRaw || []),
-      ...(custom.received || [])
-    ];
-  }
-
-  if (userId === HARD_CAP_USER) {
-    // Cap only fakes/pins; allow real API txns beyond cap
-    receivedAll = receivedAll.filter(t => {
-      const d = new Date(t.date || t.createdAt);
-      if (isNaN(d)) return false;
-      if (t.isFake || t.isCustom) return d <= HARD_CAP_DATE; // cap synthetic
-      return true; // real txn
-    });
-
-    const hasCapDay = receivedAll.some(t =>
-      (t.isFake || t.isCustom) && dayKeyUTC(t.date || t.createdAt) === HARD_CAP_DAY
-    );
-    if (!hasCapDay) {
-      receivedAll.push({
-        _id: "cap-recv-2024-11-21",
-        date: HARD_CAP_NOONZ,
-        from: { name: "Stripe Payouts" },
-        amount: 2100,
-        status: "approved",
-        type: "credit",
-        isFake: true
-      });
-    }
-  } else if (FREEZE_RULES[userId]) {
-    const rule = FREEZE_RULES[userId];
-    receivedAll = receivedAll.filter(t => {
-      const d = new Date(t.date || t.createdAt);
-      return !(d > rule.received && d < FREEZE_ANCHOR);
-    });
-  } else {
-    // old global cutoff for others – but keep custom pins visible beyond cutoff
-    receivedAll = receivedAll.filter(t => {
-      const d = new Date(t.date || t.createdAt);
-      if (isNaN(d)) return false;
-      if (t.isCustom) return true;
-      return d <= RECEIVED_CUTOFF;
-    });
-  }
-
-  const recvTxns = filterTxns(receivedAll, days)
-    .sort(customFirstDesc)
-    .map(t => ({
-      date  : t.date || t.createdAt,
-      party : t.from?.name || t.from?.email || "Incoming",
-      amount: t.amount,
-      status: t.status || "approved",
-      view  : "received",
-      isCustom: !!t.isCustom
-    }));
-
-  renderTransactions(sentTxns, "sent");
-  renderTransactions(recvTxns, "received");
-}
-
-
-/* ======================================================================
-   RENDER
-   ====================================================================== */
-function renderTransactions(list, view) {
-  const tableId = view === "sent" ? "transactions-table-sent" : "transactions-table-received";
-  const cardsId = view === "sent" ? "transactions-cards-sent" : "transactions-cards-received";
-  const emptySel = view === "sent" ? ".empty-state-sent" : ".empty-state-received";
-
-  const table = document.getElementById(tableId);
-  const cards = document.getElementById(cardsId);
-  const empty = document.querySelector(emptySel);
-
-  if (!table || !cards) return;
-
-  table.innerHTML = "";
-  cards.innerHTML = "";
-
-  if (!list.length) {
-    if (empty) empty.classList.remove("hidden");
-    return;
-  }
-  if (empty) empty.classList.add("hidden");
-
-  table.innerHTML = list.map(tx => renderTxnRow(tx, view)).join("");
-  cards.innerHTML = list.map(tx => renderTxnCard(tx, view)).join("");
-}
-
-
-// =============================
-// INIT (only run on dashboard + when userId exists)
-// =============================
-document.addEventListener("DOMContentLoaded", () => {
-  // Only initialize if we’re on a page that actually has transaction UI
-  const hasTxnUI =
-    document.getElementById("transactions-table-sent") ||
-    document.getElementById("transactions-table-received") ||
-    document.getElementById("transactions-cards-sent") ||
-    document.getElementById("transactions-cards-received");
-
-  if (!hasTxnUI) return; // not the dashboard → do nothing
-  if (!userId) return;    // not logged in yet → do nothing
-
-  const ddl = document.getElementById("transaction-filter");
-  if (ddl) ddl.addEventListener("change", e => loadTransactions(e.target.value));
-  loadTransactions(ddl ? ddl.value : "all");
-});
-
-// ✅ Populate form + dashboard
-async function fetchUserData() {
-  const token = localStorage.getItem("userToken");
-  if (!token) return null;
-
-  try {
-    const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error("Failed to fetch user data");
-    return await res.json();
-  } catch (err) {
-    console.error("⚠️ fetchUserData error:", err);
-    return null;
-  }
-}
-(async () => {
-  const data = await fetchUserData();
-  if (!data) return;
-
-    // ⚙️ Prefill settings
-    if (document.getElementById("full-name")) {
-      document.getElementById("full-name").value = data.name || "";
-      document.getElementById("email").value = data.email || "";
-      document.getElementById("phone").value = data.phone || "";
-    }
-    // 👋 Show greeting using name from settings
-const greet = document.getElementById("mobile-greeting");
-const fullNameInput = document.getElementById("full-name");
-
-if (greet && fullNameInput) {
-  const fullName = fullNameInput.value.trim();
-  const firstName = fullName.split(" ")[0] || "there";
-  greet.textContent = `Hi, ${firstName}`;
-}
-
-    // 👋 Dashboard welcome message
-    const welcomeTag = document.getElementById("welcome-user");
-    if (welcomeTag) {
-      welcomeTag.textContent = `Welcome, ${data.name || "User"}`;
-    }
-
-    // 💶 Dashboard balance
-    const balanceTag = document.getElementById("user-balance");
-    if (balanceTag) {
-      balanceTag.textContent = formatMoney(data.balance);
-    }
-
-    // 🔁 Update dashboard values
-  document.getElementById("totalBalance").textContent = formatMoney(data.balance);
- document.getElementById("savingsAmount").textContent = formatMoney(data.savings);
- document.getElementById("creditAmount").textContent  = formatMoney(data.credits);
-  })();
-
-  // ✅ Populate account details
-  (async () => {
-    try {
-      const res = await fetch("https://credibe-backends.onrender.com/api/user/profile", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      const checking = data.accounts?.checking || {};
-      const savings = data.accounts?.savings || {};
-      document.getElementById("checking-iban").textContent = checking.iban || "—";
-      document.getElementById("checking-date").textContent = checking.createdAt ? new Date(checking.createdAt).toLocaleDateString() : "—";
-      document.getElementById("savings-iban").textContent = savings.iban || "—";
-      document.getElementById("savings-date").textContent = savings.createdAt ? new Date(savings.createdAt).toLocaleDateString() : "—";
-    } catch (e) {
-      console.error("IBAN Fetch Error:", e);
-    }
-  })();
-
-  // ✅ Submit settings form
-  const settingsForm = document.getElementById('settings-form');
-  if (settingsForm) {
-    settingsForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const name = document.getElementById('full-name').value;
-      const email = document.getElementById('email').value;
-      const phone = document.getElementById('phone').value;
-
-      const submitButton = settingsForm.querySelector('button[type="submit"]');
-      submitButton.disabled = true;
-
-      try {
-        const res = await fetch('https://credibe-backends.onrender.com/api/settings/update', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ name, email, phone })
-        });
-
-        const response = await res.json();
-
-        if (res.ok) {
-          alert('✅ Settings updated successfully!');
-          console.log('Updated settings:', { name, email, phone });
-
-          // 🔄 Refresh values
-          const newData = await fetchUserData();
-          if (newData) {
-            document.getElementById("full-name").value = newData.name || "";
-            document.getElementById("email").value = newData.email || "";
-            document.getElementById("phone").value = newData.phone || "";
-          }
-        } else {
-          alert(response.error || '❌ Failed to update settings.');
-        }
-      } catch (err) {
-        console.error('⚠️ Settings update error:', err);
-        alert('Something went wrong. Try again.');
-      } finally {
-        submitButton.disabled = false;
-      }
-    });
-  }
-
-  // Buy Crypto form
-  const buyCryptoForm = document.getElementById("buy-crypto-form");
-  if (buyCryptoForm) {
-    buyCryptoForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const amount = document.getElementById("crypto-amount").value;
-      const currency = document.getElementById("crypto-currency").value;
-      const wallet = document.getElementById("crypto-wallet").value;
-
-      if (!amount || amount <= 0) {
-        alert('Please enter a valid amount.');
-        return;
-      }
-      if (!currency) {
-        alert('Please select a currency.');
-        return;
-      }
-      if (!wallet) {
-        alert('Please enter a wallet address.');
-        return;
-      }
-
-      try {
-        const res = await fetch("https://credibe-backends.onrender.com/api/transfer/crypto", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({ amount, currency, wallet })
-        });
-
-        if (res.ok) {
-          alert("✅ Your crypto request has been processed. Await admin approval.");
-          buyCryptoForm.reset();
-        } else {
-          const error = await res.json();
-          alert("❌ Error: " + error.message);
-        }
-      } catch (err) {
-        alert("❌ Failed to send request.");
-      }
-    });
-  }
-
-  // Pay Bills form
-  const payBillsForm = document.getElementById("pay-bills-form");
-  if (payBillsForm) {
-    payBillsForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const biller = document.getElementById("biller-name").value;
-      const category = document.getElementById("category").value;
-      const amount = document.getElementById("bill-amount").value;
-
-      if (!biller) {
-        alert('Please enter a biller name.');
-        return;
-      }
-      if (!category) {
-        alert('Please select a category.');
-        return;
-      }
-      if (!amount || amount <= 0) {
-        alert('Please enter a valid amount.');
-        return;
-      }
-
-      try {
-        const res = await fetch("https://credibe-backends.onrender.com/api/transfer/bill", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({ biller, category, amount })
-        });
-
-        if (res.ok) {
-          alert("✅ Your bill request has been processed. Await admin approval.");
-          payBillsForm.reset();
-        } else {
-          const error = await res.json();
-          alert("❌ Error: " + error.message);
-        }
-      } catch (err) {
-        alert("❌ Failed to send request.");
-      }
-    });
-  }
-
-  // Add Beneficiary form
-  const addBeneficiaryForm = document.getElementById("addBeneficiaryForm");
-  if (addBeneficiaryForm) {
-    addBeneficiaryForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const fullName = document.getElementById("full-name").value;
-      const iban = document.getElementById("iban").value;
-      const bankName = document.getElementById("bank-name").value;
-
-      if (!fullName || !iban || !bankName) {
-        alert('Please fill all required fields.');
-        return;
-      }
-      if (!/^[A-Z]{2}\d{2}[A-Z0-9]{4,30}$/.test(iban.replace(/\s/g, ''))) {
-        alert('Invalid IBAN format.');
-        return;
-      }
-
-      try {
-        const res = await fetch("https://credibe-backends.onrender.com/api/beneficiary/add", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({ fullName, iban, bankName })
-        });
-
-        if (res.ok) {
-          alert("✅ Beneficiary added successfully. Await admin approval.");
-          addBeneficiaryForm.reset();
-        } else {
-          const error = await res.json();
-          alert("❌ Error: " + error.message);
-        }
-      } catch (err) {
-        alert("❌ Failed to send request.");
-      }
-    });
-  }
-
-  // Security Handlers
-  const changePassword = document.getElementById('change-password');
-  const verifyIdentity = document.getElementById('verify-identity');
-  if (changePassword) {
-    changePassword.addEventListener('click', () => {
-      console.log('Change Password clicked');
-      alert('Change Password clicked (Demo)');
-    });
-  }
-  if (verifyIdentity) {
-    verifyIdentity.addEventListener('click', () => {
-      console.log('Verify Identity clicked');
-      alert('Verify Identity clicked (Demo)');
-    });
-  }
-
-  // Logout Handler
-  const confirmLogout = document.getElementById('confirm-logout');
-  if (confirmLogout) {
-    confirmLogout.addEventListener('click', () => {
-      localStorage.removeItem('userToken');
-      window.location.href = 'login.html';
-      console.log('User logged out');
-    });
-  }
-
-  // Initialize Application
-  document.addEventListener("DOMContentLoaded", () => {
-    showPage('dashboard');
-    console.log("Application initialized");
-    // Fade in effect for pages
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(page => page.classList.add('fade-in', 'visible'));
-
-    // Initialize charts on page load if present
-    if (document.getElementById('spending-chart')) {
-      loadTransactions();
-    }
-  });
-
-  // Load user dashboard
-  async function loadUserDashboard() {
-    if (!token) {
-      alert("You must be logged in to view this page.");
-      window.location.href = "login.html";
-      return;
-    }
-
-    try {
-      const res = await fetch("https://credibe-backends.onrender.com/api/user/me", {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.error("❌ Failed to load user data:", errorData);
-        throw new Error(errorData.error || "Unknown error");
-      }
-
-      const data = await res.json();
-
-      // 🔁 Update the user dashboard values
-      document.getElementById("totalBalance").textContent = formatMoney(data.balance);
- document.getElementById("savingsAmount").textContent = formatMoney(data.savings);
-document.getElementById("creditAmount").textContent  = formatMoney(data.credits);
-    } catch (err) {
-      console.error("❌ Dashboard load error:", err.message);
-    }
-  }
-
-  window.onload = loadUserDashboard;
-})();
-</script>
-
-})();
-<script>
-document.addEventListener("DOMContentLoaded", async () => {
-  try {
-    const token = localStorage.getItem("userToken");
-    const res = await fetch("https://credibe-backends.onrender.com/api/user/profile", {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const data = await res.json();
-    const checking = data.accounts?.checking || {};
-    const savings = data.accounts?.savings || {};
-    document.getElementById("checking-iban").textContent = checking.iban || "—";
-    document.getElementById("checking-date").textContent = checking.createdAt ? new Date(checking.createdAt).toLocaleDateString() : "—";
-    document.getElementById("savings-iban").textContent = savings.iban || "—";
-    document.getElementById("savings-date").textContent = savings.createdAt ? new Date(savings.createdAt).toLocaleDateString() : "—";
-  } catch (e) {
-    console.error("IBAN Fetch Error:", e);
-  }
-});
-</script>
-
-
-<script>
-document.getElementById("buy-crypto-form")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const token = localStorage.getItem("userToken");
-  const amount = document.getElementById("crypto-amount").value;
-  const currency = document.getElementById("crypto-currency").value;
-  const wallet = document.getElementById("crypto-wallet").value;
-
-  try {
-    const res = await fetch("https://credibe-backends.onrender.com/api/transfer/crypto", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ amount, currency, wallet })
-    });
-
-    if (res.ok) {
-      alert("✅ Your crypto request has been processed. Await admin approval.");
-      document.getElementById("buy-crypto-form").reset();
-    } else {
-      const error = await res.json();
-      alert("❌ Error: " + error.message);
-    }
-  } catch (err) {
-    alert("❌ Failed to send request.");
-  }
-});
-</script>
-
-<script>
-  // CONFIG (safe storage reads)
-// =============================
-const API_BASE = "https://credibe-backends.onrender.com";
-
-let _userToken = "";
-let _userId = "";
-try {
-  _userToken = localStorage.getItem("userToken") || "";
-  _userId    = localStorage.getItem("userId") || "";
-} catch (e) {
-  console.warn("localStorage unavailable:", e?.message);
-}
-
-const userToken  = _userToken;
-const userId     = _userId;
-const AUTH_HDR   = userToken ? { Authorization: `Bearer ${userToken}` } : {};
-
-// =============================
-// UTILS
-// =============================
-function fmtAmount(n, sign = "") {
-  const num = Number(n);
-  if (!isFinite(num)) return "€0";
-  const f = new Intl.NumberFormat("en-GB").format(Math.abs(num));
-  if (sign === "-") return `-€${f}`;
-  if (sign === "+") return `+€${f}`;
-  return `€${f}`;
-}
-
-function getMonthLabels(count) {
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const now = new Date(2025, 8, 16); // Sep 16, 2025
-  const labels = [];
-  for (let i = count - 1; i >= 0; i--) {
-    const monthIndex = (now.getMonth() - i + 12) % 12;
-    labels.push(months[monthIndex]);
-  }
-  return labels;
-}
-
-// =============================
-// DATA
-// =============================
-const SPECIAL_USER = "68c873044b9fc118eae4918b";
-
-const categories = [
-  { name: "Groceries", share: 32, id: "cat-gro", color: "#FF6384" },
-  { name: "Bills", share: 24, id: "cat-bil", color: "#36A2EB" },
-  { name: "Entertainment", share: 18, id: "cat-ent", color: "#FFCE56" },
-  { name: "Travel", share: 15, id: "cat-tra", color: "#4BC0C0" },
-  { name: "Other", share: 11, id: "cat-oth", color: "#9966FF" }
-];
-
-function getMonthlyData() {
-  if (userId === SPECIAL_USER) {
-    return [
-      65000, 66000, 67000, 68000, 69000, 70000, // prev 6m sum ~405k
-      160000, 165000, 175000, // months 7-9 sum 500k
-      100000, 100000, 100000 // last 3m sum 300k
-    ]; // last 6m 800k, total ~1.205m
-  } else {
-    return [
-      600, 700, 800, 900, 1000, 1100,
-      1200, 1300, 1400, 1500, 1600, 1700
-    ]; // last 6m 8700, total 13800
-  }
-}
-
-// =============================
-// CHARTS
-// =============================
-let monthlySpendingChart;
-let categorySpendingChart;
-
-// =============================
-// LOAD + RENDER
-// =============================
-function loadAnalytics(range = "6m") {
-  const rangeMap = { "3m": 3, "6m": 6, "12m": 12 };
-  const n = rangeMap[range] || 6;
-
-  const allMonthly = getMonthlyData();
-  const monthly = allMonthly.slice(-n);
-  const labels = getMonthLabels(n);
-
-  const total = monthly.reduce((a, b) => a + b, 0);
-  const txnCount = n * 10;
-  const avg = Math.round(total / txnCount);
-
-  // MoM
-  const lastMonth = monthly[monthly.length - 1];
-  const prevMonth = monthly[monthly.length - 2] || 0;
-  const mom = lastMonth - prevMonth;
-  const momSign = mom > 0 ? "+" : mom < 0 ? "-" : "";
-  const momClass = mom > 0 ? "text-yellow-300" : "text-green-400";
-  const momDesc = mom > 0 ? "Spend rising" : mom < 0 ? "Spend falling" : "Spend stable";
-
-  // Total diff vs prev period
-  const prevMonthly = allMonthly.slice(-n * 2, -n);
-  const prevTotal = prevMonthly.reduce((a, b) => a + b, 0) || total;
-  const diffPct = prevTotal ? Math.round((total - prevTotal) / prevTotal * 100) : 0;
-  const diffSign = diffPct > 0 ? "▲" : diffPct < 0 ? "▼" : "—";
-  const diffAbs = Math.abs(diffPct);
-  const diffClass = diffPct > 0 ? "text-green-400" : "text-red-400";
-
-  // Update KPIs
-  document.getElementById("kpi-total").textContent = fmtAmount(total);
-  const totalDiffEl = document.getElementById("kpi-total-diff");
-  totalDiffEl.textContent = `${diffSign} ${diffAbs}% vs prev`;
-  totalDiffEl.className = `text-xs mt-1 ${diffClass}`;
-
-  document.getElementById("kpi-avg").textContent = fmtAmount(avg);
-  document.getElementById("kpi-avg-count").textContent = `${txnCount} txns`;
-
-  document.getElementById("kpi-topcat").textContent = "Groceries";
-  document.getElementById("kpi-topcat-share").textContent = "32% of spend";
-
-  const momEl = document.getElementById("kpi-mom");
-  momEl.textContent = fmtAmount(Math.abs(mom), momSign);
-  momEl.className = `text-xl sm:text-2xl font-bold text-ink mt-1 ${momClass}`;
-
-  const momDescEl = document.getElementById("kpi-mom-desc");
-  momDescEl.textContent = momDesc;
-  momDescEl.className = `text-xs mt-1 ${momClass}`;
-
-  // Update category list (shares fixed)
-  categories.forEach((c) => {
-    document.getElementById(c.id).textContent = `${c.share}%`;
-  });
-
-  // Monthly Chart
-  const maxY = Math.max(...monthly);
-  const yTickFormat = maxY > 100000 
-    ? (value) => `€${(value / 1000).toFixed(0)}k`
-    : (value) => `€${value}`;
-
-  if (monthlySpendingChart) monthlySpendingChart.destroy();
-  monthlySpendingChart = new Chart(document.getElementById("monthly-spending-chart"), {
-    type: "bar",
-    data: {
-      labels: labels,
-      datasets: [{
-        label: "Spent",
-        data: monthly,
-        backgroundColor: "#3B82F6",
-      }],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: { callback: yTickFormat },
-        },
-      },
-    },
-  });
-
-  // Category Chart
-  if (categorySpendingChart) categorySpendingChart.destroy();
-  categorySpendingChart = new Chart(document.getElementById("category-spending-chart"), {
-    type: "pie",
-    data: {
-      labels: categories.map((c) => c.name),
-      datasets: [{
-        data: categories.map((c) => c.share),
-        backgroundColor: categories.map((c) => c.color),
-      }],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: (ctx) => `${ctx.label}: ${ctx.raw}%`,
-          },
-        },
-      },
-    },
-  });
-}
-
-// =============================
-// INIT
-// =============================
-document.addEventListener("DOMContentLoaded", () => {
-  if (!document.getElementById("analytics-page")) return;
-  if (!userId) return;
-
-  const select = document.getElementById("analytics-range");
-  if (select) {
-    select.addEventListener("change", (e) => loadAnalytics(e.target.value));
-    loadAnalytics(select.value);
-  } else {
-    loadAnalytics("6m");
-  }
-});
-
-document.getElementById("pay-bills-form")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const token = localStorage.getItem("userToken");
-  const biller = document.getElementById("biller-name").value;
-  const category = document.getElementById("category").value;
-  const account = document.getElementById("account-number").value;
-  const amount = document.getElementById("bill-amount").value;
-
-  try {
-    const res = await fetch("https://credibe-backends.onrender.com/api/transfer/bill", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ biller, category, account, amount })
-    });
-
-    if (res.ok) {
-      alert("✅ Your bill request has been processed. Await admin approval.");
-      document.getElementById("pay-bills-form").reset();
-    } else {
-      const error = await res.json();
-      alert("❌ Error: " + error.message);
-    }
-  } catch (err) {
-    alert("❌ Failed to send request.");
-  }
-});
-
-  const buyCryptoForm = document.getElementById('buy-crypto-form');
-  if (buyCryptoForm) {
-    buyCryptoForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      window.location.href = 'down.html';
-    });
-  }
-
-  const payBillsForm = document.getElementById('pay-bills-form');
-  if (payBillsForm) {
-    payBillsForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      window.location.href = 'down.html';
-    });
-  }
-
-  const addBeneficiaryForm = document.getElementById('addBeneficiaryForm');
-  if (addBeneficiaryForm) {
-    addBeneficiaryForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      window.location.href = 'down.html';
-    });
-  }
-
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  // when you click the Logout link in Settings, show the Logout page
-  document.querySelectorAll('[data-page="logout"]').forEach(a => {
-    a.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (typeof showPage === 'function') showPage('logout');
-      else {
-        document.getElementById('settings-page')?.classList.add('hidden');
-        document.getElementById('logout-page')?.classList.remove('hidden');
-        window.scrollTo({ top: 0 });
-      }
-    });
-  });
-
-  // when you click Confirm Logout, clear auth + go to login
-  document.getElementById('confirm-logout')?.addEventListener('click', () => {
-    try {
-      localStorage.removeItem('userToken');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('isBlocked');
-      localStorage.removeItem('pendingTransfer');
-      localStorage.removeItem('beneficiaries');
-    } catch {}
-    window.location.replace('login.html');
-  });
-});
-</script>
+  </script>
 </body>
 </html>
