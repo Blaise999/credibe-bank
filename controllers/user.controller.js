@@ -144,7 +144,7 @@ exports.getUserTransactions = async (req, res) => {
       const bandOr = [];
       if (legBefore) bandOr.push(legBefore);
       if (legAfter) bandOr.push(legAfter);
-
+      
       if (bandOr.length > 0) {
         andConds.push({ $or: bandOr });
       }

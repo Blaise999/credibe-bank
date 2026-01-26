@@ -1,7 +1,7 @@
 // controllers/admin.controller.js (FULL EDIT)
 const mongoose = require('mongoose');
 const User = require('../models/User');
-const Transaction = require('../models/Transaction'); // ✅ make sure file name matches (see model below)
+const Transaction = require('../models/Transaction'); // ✅ sure file name matches (see model below)
 const AdminStats = require('../models/AdminStats');
 const generatePDFMonkeyPDF = require('../utils/pdfmonkey');
 const { sendOTP } = require('../utils/sendOTP');
