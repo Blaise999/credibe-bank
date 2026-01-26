@@ -1,14 +1,13 @@
-// controllers/admin.controller.js
+// controllers/admin.controller.js (FULL EDIT)
 const mongoose = require('mongoose');
 const User = require('../models/User');
-const Transaction = require('../models/Transaction'); // ✅
+const Transaction = require('../models/Transaction'); // ✅ make sure file name matches (see model below)
 const AdminStats = require('../models/AdminStats');
 const generatePDFMonkeyPDF = require('../utils/pdfmonkey');
-const { sendOTP } = require('../utils/sendOTP'); // Updated import
+const { sendOTP } = require('../utils/sendOTP');
 const TopUp = require('../models/TopUp');
 const { faker } = require('@faker-js/faker');
 
-// ⬇️ Replace the inline model with the shared one
 const TxnCap = require('../models/TxnCap'); // ✅ shared model
 
 // 📊 Dashboard statistics
@@ -61,7 +60,10 @@ exports.toggleBlockUser = async (req, res) => {
     await user.save();
     console.log('🧪 toggleBlockUser', { userId, isBlocked: user.isBlocked });
 
-    res.json({ message: `User is now ${user.isBlocked ? 'blocked' : 'unblocked'}`, user: { isBlocked: user.isBlocked } });
+    res.json({
+      message: `User is now ${user.isBlocked ? 'blocked' : 'unblocked'}`,
+      user: { isBlocked: user.isBlocked },
+    });
   } catch (err) {
     console.error('❌ Failed to update user status', { userId, error: err.message });
     res.status(500).json({ error: 'Failed to update user status' });
@@ -98,7 +100,7 @@ exports.editUserBalance = async (req, res) => {
   }
 };
 
-// 💸 Approve/Reject Transfer
+// 💸 Approve/Reject Transfer (FULL FIX: no .push/.includes, no undefined transactions crash)
 exports.handleTransaction = async (req, res) => {
   const { transactionId, action } = req.body;
 
@@ -121,9 +123,11 @@ exports.handleTransaction = async (req, res) => {
       timestamp: new Date().toLocaleString('en-US', { timeZone: 'Africa/Lagos' }),
     });
 
+    // Lock + validate txn inside session
     const transaction = await Transaction.findById(transactionId)
       .populate('from to')
       .session(session);
+
     if (!transaction || transaction.status !== 'pending') {
       console.log('🧪 handleTransaction - Invalid transaction', {
         transactionId,
@@ -140,41 +144,57 @@ exports.handleTransaction = async (req, res) => {
       return res.status(404).json({ error: 'Sender not found' });
     }
 
+    // Guard amount
+    const amt = Number(transaction.amount || 0);
+    if (!Number.isFinite(amt) || amt <= 0) {
+      console.log('🧪 handleTransaction - Invalid amount', { transactionId, amount: transaction.amount });
+      await session.abortTransaction();
+      return res.status(400).json({ error: 'Invalid amount' });
+    }
+
     let emailSubject, emailHtml;
 
     if (action === 'approve') {
-      if (sender.balance < transaction.amount) {
-        console.log('🧪 handleTransaction - Insufficient balance', {
+      // ✅ Atomic debit (prevents negative balance) + safe transaction array add
+      const debitRes = await User.updateOne(
+        { _id: sender._id, balance: { $gte: amt } },
+        {
+          $inc: { balance: -amt },
+          $addToSet: { transactions: transaction._id }, // creates array if missing
+        },
+        { session }
+      );
+
+      if (debitRes.modifiedCount === 0) {
+        console.log('🧪 handleTransaction - Insufficient balance OR sender not found', {
           transactionId,
-          senderBalance: sender.balance,
-          amount: transaction.amount,
+          senderId: sender._id,
+          amt,
         });
         await session.abortTransaction();
         return res.status(400).json({ error: 'Insufficient balance' });
       }
 
-      sender.balance -= transaction.amount;
-      transaction.status = 'approved';
-
+      // ✅ Credit receiver (if internal transfer)
       if (transaction.to) {
-        const receiver = transaction.to;
-        receiver.balance += transaction.amount;
-        receiver.transactions.push(transaction._id);
-        await receiver.save({ session });
-        console.log('🧪 handleTransaction - Receiver updated', {
-          receiverId: receiver._id,
-          transactionId,
-        });
+        const receiverId = transaction.to._id || transaction.to;
+        const creditRes = await User.updateOne(
+          { _id: receiverId },
+          {
+            $inc: { balance: amt },
+            $addToSet: { transactions: transaction._id },
+          },
+          { session }
+        );
+
+        if (creditRes.matchedCount === 0) {
+          console.log('🧪 handleTransaction - Receiver missing', { transactionId, receiverId });
+          await session.abortTransaction();
+          return res.status(404).json({ error: 'Receiver not found' });
+        }
       }
 
-      if (!sender.transactions.includes(transaction._id)) {
-        sender.transactions.push(transaction._id);
-        console.log('🧪 handleTransaction - Added to sender transactions', {
-          userId: sender._id,
-          transactionId,
-        });
-      }
-      await sender.save({ session });
+      transaction.status = 'approved';
 
       emailSubject = 'Transfer Approved - Transaction Summary';
       emailHtml = `
@@ -184,7 +204,7 @@ exports.handleTransaction = async (req, res) => {
           <p style="font-size:15px; margin:1rem 0;">Hi {{name}},</p>
           <p style="font-size:14px; line-height:1.6;">Your <strong>local transfer</strong> has been successfully approved by Credibe.</p>
           <div style="margin:1.5rem 0; padding:1rem; background:#1f1f1f; border-radius:8px; border:1px solid #444;">
-            <p><strong>💳 Amount:</strong> €{{amount}}</p>
+            <p><strong>💳 Amount:</strong> ${{amount}}</p>
             <p><strong>📨 Recipient:</strong> {{recipient}}</p>
             <p><strong>🏦 IBAN:</strong> {{iban}}</p>
             <p><strong>📝 Note:</strong> {{note}}</p>
@@ -194,19 +214,21 @@ exports.handleTransaction = async (req, res) => {
           <p style="font-size:14px;">You can view this transaction on your dashboard. If you did not authorize this, please contact <a href="mailto:support@thecredibe.com" style="color:#00b4d8;">support@thecredibe.com</a> immediately.</p>
           <hr style="border:none; border-top:1px solid #333; margin:2rem 0;" />
           <p style="font-size:12px; color:#888; text-align:center;">
-            This is a system-generated notification from Credibe (Europe HQ).<br />
+            This is a system-generated notification from Credibe (North American HQ).<br />
             <span style="font-size:11px;">Sent: {{dateTime}} | Timezone: CET (Brussels)</span>
           </p>
         </div>
       `;
     } else {
+      // reject
       transaction.status = 'rejected';
+
       emailSubject = 'Transfer Rejected';
       emailHtml = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
           <h2 style="color: #c0392b;">Transfer Rejected</h2>
           <p style="font-size: 16px; color: #34495e;">Dear {{name}},</p>
-          <p style="font-size: 16px; color: #34495e;">We regret to inform you that your transfer of <strong>€{{amount}}</strong> has been rejected.</p>
+          <p style="font-size: 16px; color: #34495e;">We regret to inform you that your transfer of <strong>${{amount}}</strong> has been rejected.</p>
           <p style="font-size: 16px; color: #34495e;">Transaction ID: {{transactionId}}</p>
           <p style="font-size: 14px; color: #7f8c8d;">If you believe this is an error or need further assistance, please contact our support team.</p>
           <p style="font-size: 14px; color: #7f8c8d;">Best regards,<br>The Transaction Team</p>
@@ -214,9 +236,11 @@ exports.handleTransaction = async (req, res) => {
       `;
     }
 
+    // Save txn status inside the same transaction
     await transaction.save({ session });
     await session.commitTransaction();
 
+    // Non-critical email (after commit)
     try {
       if (!sender.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sender.email)) {
         throw new Error('Invalid sender email');
@@ -224,12 +248,12 @@ exports.handleTransaction = async (req, res) => {
 
       const interpolatedHtml = emailHtml
         .replace(/{{name}}/g, sender.name || 'Customer')
-        .replace(/{{amount}}/g, transaction.amount != null ? transaction.amount.toFixed(2) : '0.00')
+        .replace(/{{amount}}/g, amt.toFixed(2))
         .replace(/{{recipient}}/g, transaction.recipient || 'N/A')
         .replace(/{{iban}}/g, transaction.toIban || 'N/A')
         .replace(/{{note}}/g, transaction.note || 'N/A')
         .replace(/{{transactionId}}/g, transaction._id?.toString() || 'N/A')
-        .replace(/{{date}}/g, new Date().toLocaleDateString('en-GB'))
+        .replace(/{{date}}/g, new Date(transaction.date || Date.now()).toLocaleDateString('en-GB'))
         .replace(/{{dateTime}}/g, new Date().toLocaleString('en-GB', { timeZone: 'Europe/Brussels' }));
 
       await sendOTP({
@@ -243,7 +267,7 @@ exports.handleTransaction = async (req, res) => {
     } catch (emailError) {
       console.error('❌ Non-critical email error', {
         transactionId,
-        email: sender.email,
+        email: sender?.email,
         error: emailError.message,
         stack: emailError.stack,
       });
@@ -284,7 +308,7 @@ exports.getTransferHistory = async (req, res) => {
   try {
     const history = await Transaction.find({ status: { $in: ['approved', 'rejected'] } })
       .populate('from to')
-      .sort({ date: -1, createdAt: -1 }); // ⬅️ tiny improvement
+      .sort({ date: -1, createdAt: -1 });
 
     console.log('🧪 getTransferHistory', { count: history.length });
     res.json(history);
@@ -331,7 +355,7 @@ exports.approveTopUp = async (req, res) => {
       await sendOTP({
         to: topUp.user.email,
         subject: 'Top-Up Approved',
-        body: `Your top-up request of €${topUp.amount} has been approved.`,
+        body: `Your top-up request of $${topUp.amount} has been approved.`,
         isHtml: false,
       });
       console.log('🧪 approveTopUp - Notification sent', { email: topUp.user.email });
@@ -345,7 +369,7 @@ exports.approveTopUp = async (req, res) => {
 
     res.json({ message: 'Top-up approved and balance updated' });
   } catch (err) {
-    console.error('❌ Approve Error', { id, error: err.message });
+    console.error('❌ Approve Error', { id: req.params?.id, error: err.message });
     res.status(500).json({ error: 'Failed to approve top-up' });
   }
 };
@@ -372,7 +396,7 @@ exports.rejectTopUp = async (req, res) => {
       await sendOTP({
         to: topUp.user.email,
         subject: 'Top-Up Rejected',
-        body: `Your top-up request of €${topUp.amount} has been rejected.`,
+        body: `Your top-up request of $${topUp.amount} has been rejected.`,
         isHtml: false,
       });
       console.log('🧪 rejectTopUp - Notification sent', { email: topUp.user.email });
@@ -386,7 +410,7 @@ exports.rejectTopUp = async (req, res) => {
 
     res.json({ message: 'Top-up request rejected' });
   } catch (err) {
-    console.error('❌ Reject Error', { id, error: err.message });
+    console.error('❌ Reject Error', { id: req.params?.id, error: err.message });
     res.status(500).json({ error: 'Failed to reject top-up' });
   }
 };
@@ -492,7 +516,10 @@ exports.setTxnCap = async (req, res) => {
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     if (!capDate) {
-      const fallback = (perStream && (perStream.sent || perStream.received)) ? (perStream.sent || perStream.received) : null;
+      const fallback =
+        perStream && (perStream.sent || perStream.received)
+          ? perStream.sent || perStream.received
+          : null;
       if (!fallback) {
         return res.status(400).json({ error: 'Provide capDate or perStream.sent/received' });
       }
@@ -509,7 +536,6 @@ exports.setTxnCap = async (req, res) => {
               sent: normalize(perStream.sent),
               received: normalize(perStream.received),
               inclusive: perStream.inclusive !== false,
-              // ⚠️ we don’t overwrite exceptAfter here; it’s managed by user activity
             },
           }
         : {}),
@@ -588,12 +614,10 @@ exports.adminCreateTransaction = async (req, res) => {
     const isSent = direction === 'sent';
 
     const computedRecipient = isSent
-      ? (recipient || counterparty.name || counterparty.email || 'Recipient')
-      : (primaryUser.name || primaryUser.email || 'Incoming');
+      ? recipient || counterparty.name || counterparty.email || 'Recipient'
+      : primaryUser.name || primaryUser.email || 'Incoming';
 
-    const computedIban = isSent
-      ? (toIban || counterparty.iban || 'N/A')
-      : (primaryUser.iban || 'N/A');
+    const computedIban = isSent ? toIban || counterparty.iban || 'N/A' : primaryUser.iban || 'N/A';
 
     const txnDoc = {
       from: isSent ? primaryUser._id : counterparty._id,
@@ -612,32 +636,50 @@ exports.adminCreateTransaction = async (req, res) => {
 
     if (status === 'approved') {
       if (isSent) {
-        if (primaryUser.balance < txn.amount) {
+        const ok = await User.updateOne(
+          { _id: primaryUser._id, balance: { $gte: txn.amount } },
+          { $inc: { balance: -txn.amount }, $addToSet: { transactions: txn._id } },
+          { session }
+        );
+        if (ok.modifiedCount === 0) {
           await session.abortTransaction();
           return res.status(400).json({ error: 'Insufficient balance on sender' });
         }
-        primaryUser.balance -= txn.amount;
-        counterparty.balance += txn.amount;
+
+        await User.updateOne(
+          { _id: counterparty._id },
+          { $inc: { balance: txn.amount }, $addToSet: { transactions: txn._id } },
+          { session }
+        );
       } else {
-        if (counterparty.balance < txn.amount) {
+        const ok = await User.updateOne(
+          { _id: counterparty._id, balance: { $gte: txn.amount } },
+          { $inc: { balance: -txn.amount }, $addToSet: { transactions: txn._id } },
+          { session }
+        );
+        if (ok.modifiedCount === 0) {
           await session.abortTransaction();
           return res.status(400).json({ error: 'Insufficient balance on counterparty' });
         }
-        counterparty.balance -= txn.amount;
-        primaryUser.balance += txn.amount;
+
+        await User.updateOne(
+          { _id: primaryUser._id },
+          { $inc: { balance: txn.amount }, $addToSet: { transactions: txn._id } },
+          { session }
+        );
       }
-
-      await primaryUser.save({ session });
-      await counterparty.save({ session });
-    }
-
-    if (Array.isArray(primaryUser.transactions)) {
-      primaryUser.transactions.push(txn._id);
-      await primaryUser.save({ session });
-    }
-    if (Array.isArray(counterparty.transactions)) {
-      counterparty.transactions.push(txn._id);
-      await counterparty.save({ session });
+    } else {
+      // even if pending/rejected, still attach txn id safely
+      await User.updateOne(
+        { _id: primaryUser._id },
+        { $addToSet: { transactions: txn._id } },
+        { session }
+      );
+      await User.updateOne(
+        { _id: counterparty._id },
+        { $addToSet: { transactions: txn._id } },
+        { session }
+      );
     }
 
     await session.commitTransaction();
