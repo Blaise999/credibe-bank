@@ -14,7 +14,7 @@ const allowedOrigins = [
   'http://localhost:3000',
   'https://thecredibe.com',
   'https://www.thecredibe.com',
-  'https://credibe-frontend.onrender.com',
+  'https://credibe-front.onrender.com',
 ];
 
 app.use((req, res, next) => {
