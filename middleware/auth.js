@@ -1,8 +1,12 @@
+// middleware/auth.js (FULL EDIT)
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
 // ✅ Shared token verifier (for both user and admin)
 const verifyToken = async (req, res, next) => {
+  // ✅ IMPORTANT: allow CORS preflight to pass (OPTIONS requests don't carry auth headers)
+  if (req.method === "OPTIONS") return next();
+
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -14,57 +18,65 @@ const verifyToken = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    if (!decoded.id) {
-      return res.status(401).json({ error: "Invalid token payload: missing user ID" });
+    if (!decoded?.id) {
+      return res
+        .status(401)
+        .json({ error: "Invalid token payload: missing user ID" });
     }
 
-    const user = await User.findById(decoded.id).select("email phone name role isBlocked");
+    const user = await User.findById(decoded.id).select(
+      "email phone name role isBlocked"
+    );
+
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // ✅ Only block if user is blocked AND trying to modify data
-    if (user.isBlocked && req.method !== 'GET') {
+    // ✅ Only block if user is blocked AND trying to modify data (GETs still allowed)
+    if (user.isBlocked && req.method !== "GET") {
       return res.status(403).json({ error: "User is blocked" });
     }
 
+    // ✅ keep shape consistent everywhere
     req.user = {
-      id: user._id,
+      id: user._id.toString(),
       email: user.email,
       phone: user.phone,
       name: user.name,
-      role: user.role
+      role: user.role,
+      isBlocked: !!user.isBlocked,
     };
 
-    next();
+    return next();
   } catch (err) {
     console.error("❌ Invalid token error:", err.message);
     return res.status(401).json({ error: "Invalid or expired token" });
   }
 };
 
-// ✅ Leave this unchanged (regular user protection)
+// ✅ User-only protection
 const verifyUserToken = async (req, res, next) => {
-  await verifyToken(req, res, () => {
-    if (req.user.role !== "user") {
+  return verifyToken(req, res, () => {
+    if (req.user?.role !== "user") {
       return res.status(403).json({ error: "Access denied. Users only." });
     }
-    next();
+    return next();
   });
 };
 
-// ✅ Hardened admin-only access middleware
+// ✅ Admin-only protection (NOTE: this already verifies token)
 const verifyAdminToken = async (req, res, next) => {
-  await verifyToken(req, res, async () => {
-    if (req.user.role !== "admin") {
+  return verifyToken(req, res, () => {
+    if (req.user?.role !== "admin") {
       return res.status(403).json({ error: "Access denied. Admins only." });
     }
-    next();
+    return next();
   });
 };
 
 module.exports = {
   verifyToken,
   verifyUserToken,
-  isAdmin: verifyAdminToken
+  isAdmin: verifyAdminToken, // keep your existing import name working
+  verifyAdminToken,
 };
