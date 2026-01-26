@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-// ✅ Verifies JWT and attaches req.user
+// ✅ Shared token verifier (for both user and admin)
 const verifyToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -23,8 +23,8 @@ const verifyToken = async (req, res, next) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // ✅ block only non-GET for blocked users
-    if (user.isBlocked && req.method !== "GET") {
+    // ✅ Only block if user is blocked AND trying to modify data
+    if (user.isBlocked && req.method !== 'GET') {
       return res.status(403).json({ error: "User is blocked" });
     }
 
@@ -33,7 +33,7 @@ const verifyToken = async (req, res, next) => {
       email: user.email,
       phone: user.phone,
       name: user.name,
-      role: user.role,
+      role: user.role
     };
 
     next();
@@ -43,21 +43,28 @@ const verifyToken = async (req, res, next) => {
   }
 };
 
-// ✅ Role guards (NO re-verifying token)
-const isAdmin = (req, res, next) => {
-  if (!req.user) return res.status(401).json({ error: "No token provided" });
-  if (req.user.role !== "admin") return res.status(403).json({ error: "Access denied. Admins only." });
-  next();
+// ✅ Leave this unchanged (regular user protection)
+const verifyUserToken = async (req, res, next) => {
+  await verifyToken(req, res, () => {
+    if (req.user.role !== "user") {
+      return res.status(403).json({ error: "Access denied. Users only." });
+    }
+    next();
+  });
 };
 
-const isUser = (req, res, next) => {
-  if (!req.user) return res.status(401).json({ error: "No token provided" });
-  if (req.user.role !== "user") return res.status(403).json({ error: "Access denied. Users only." });
-  next();
+// ✅ Hardened admin-only access middleware
+const verifyAdminToken = async (req, res, next) => {
+  await verifyToken(req, res, async () => {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ error: "Access denied. Admins only." });
+    }
+    next();
+  });
 };
 
 module.exports = {
   verifyToken,
-  isAdmin,
-  isUser,
+  verifyUserToken,
+  isAdmin: verifyAdminToken
 };

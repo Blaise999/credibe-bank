@@ -3,7 +3,7 @@ const router = express.Router();
 const transferController = require("../controllers/transfer.controller");
 const { verifyToken } = require("../middleware/auth");
 
-/// 🔐 Step 1: Request OTP for transfer (based on userId)
+// 🔐 Step 1: Request OTP for transfer (based on userId)
 router.post("/request-otp", transferController.requestTransferOTP);
 
 // 💸 Step 2: Initiate transfer with OTP verification
