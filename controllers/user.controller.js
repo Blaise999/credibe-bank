@@ -1,6 +1,6 @@
 // controllers/user.controller.js
 const User = require('../models/User');
-const Transaction = require('../models/Transaction');
+const Transaction = require('../models/transaction');
 const TxnCap = require('../models/TxnCap'); // ✅ shared TxnCap model
 const { sendOTP } = require("../utils/sendOTP");
 const { setOtp, getOtp, clearOtp, otpStore } = require("../utils/otpMemory");
@@ -144,7 +144,7 @@ exports.getUserTransactions = async (req, res) => {
       const bandOr = [];
       if (legBefore) bandOr.push(legBefore);
       if (legAfter) bandOr.push(legAfter);
-      
+
       if (bandOr.length > 0) {
         andConds.push({ $or: bandOr });
       }
