@@ -183,7 +183,7 @@ exports.login = async (req, res) => {
         _id: user._id,
         email: user.email,
         name: user.name,
-        avatarUrl: user.avatarUrl,   // 👈 include avatar for frontend cache
+        avatarUrl: user.avatarUrl,   // 👈 include avatar for fronted cache
         isBlocked: user.isBlocked,
       },
     });
