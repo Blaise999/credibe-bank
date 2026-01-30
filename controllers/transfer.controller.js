@@ -125,7 +125,7 @@ exports.initiateTransfer = async (req, res) => {
       body: `
 Hi ${sender.name || sender.email},
 
-Your ${type === 'international' ? 'international' : 'local'} transfer of $${amount} to ${recipient || 'Unnamed Recipient'} has been submitted and is pending admin approval.
+Your ${type === 'international' ? 'international' : 'local'} transfer of €${amount} to ${recipient || 'Unnamed Recipient'} has been submitted and is pending admin approval.
 
 🧾 Transaction ID: ${txn._id}
 🗒️ Note: ${note || "No reference provided"}

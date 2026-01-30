@@ -324,7 +324,7 @@ exports.handleTransaction = async (req, res) => {
             <h2 style="color:#00b4d8;">✅ Transfer Approved</h2>
             <p style="font-size:15px; margin:1rem 0;">Hi ${senderName || "Customer"},</p>
             <div style="margin:1.5rem 0; padding:1rem; background:#1f1f1f; border-radius:8px; border:1px solid #444;">
-              <p><strong>💳 Amount:</strong> $${amt.toFixed(2)}</p>
+              <p><strong>💳 Amount:</strong> €${amt.toFixed(2)}</p>
               <p><strong>📨 Recipient:</strong> ${transaction.recipient || "N/A"}</p>
               <p><strong>🏦 IBAN:</strong> ${transaction.toIban || "N/A"}</p>
               <p><strong>📝 Note:</strong> ${transaction.note || "N/A"}</p>
@@ -338,7 +338,7 @@ exports.handleTransaction = async (req, res) => {
           <div style="font-family:Arial, sans-serif; max-width:600px; margin:auto; padding:20px; border:1px solid #e0e0e0; border-radius:8px;">
             <h2 style="color:#c0392b;">Transfer Rejected</h2>
             <p>Dear ${senderName || "Customer"},</p>
-            <p>Your transfer of <strong>$${amt.toFixed(2)}</strong> has been rejected.</p>
+            <p>Your transfer of <strong>€${amt.toFixed(2)}</strong> has been rejected.</p>
             <p>Transaction ID: ${transaction._id}</p>
             <p style="font-size:12px;color:#777;">If you believe this is an error, contact support.</p>
           </div>
@@ -579,11 +579,19 @@ exports.getTxnCap = async (req, res) => {
 // ───────────────────────────────────────────────────────────────
 // Admin create transaction (internal)
 // ───────────────────────────────────────────────────────────────
+// ───────────────────────────────────────────────────────────────
+// Admin create transaction
+// - External by default (counterpartyUserId optional)
+// - Supports both direction: "sent" | "received"
+// - If counterpartyUserId provided => internal user-to-user
+// ───────────────────────────────────────────────────────────────
+// controllers/admin.controller.js (ADMIN CREATE TRANSACTION — FULL EDIT)
+// NOTE: This version assumes external is the default and there is NEVER a counterparty ID.
+// It supports both direction: "sent" (debit) and "received" (credit).
 exports.adminCreateTransaction = async (req, res) => {
   const {
     userId,
-    direction,
-    counterpartyUserId,
+    direction, // "sent" | "received"
     amount,
     status = "approved",
     date,
@@ -592,89 +600,98 @@ exports.adminCreateTransaction = async (req, res) => {
     recipient = "",
   } = req.body;
 
-  if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(counterpartyUserId)) {
-    return res.status(400).json({ error: "Invalid user IDs" });
+  // ✅ Validate inputs
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({ error: "Invalid user ID" });
   }
+
   if (!["sent", "received"].includes(direction)) {
-    return res.status(400).json({ error: 'direction must be "sent" or "received"' });
+    return res
+      .status(400)
+      .json({ error: 'direction must be "sent" or "received"' });
   }
-  if (amount == null || Number.isNaN(Number(amount)) || Number(amount) <= 0) {
+
+  const amt = Number(amount);
+  if (!Number.isFinite(amt) || amt <= 0) {
     return res.status(400).json({ error: "amount must be a positive number" });
+  }
+
+  if (!["pending", "approved", "rejected"].includes(status)) {
+    return res.status(400).json({ error: "Invalid status" });
+  }
+
+  if (!recipient || !toIban) {
+    return res
+      .status(400)
+      .json({ error: "recipient and toIban are required" });
   }
 
   try {
     const out = await withMongoTransaction(async (session) => {
-      const [primaryUser, counterparty] = await Promise.all([
-        session ? User.findById(userId).session(session) : User.findById(userId),
-        session ? User.findById(counterpartyUserId).session(session) : User.findById(counterpartyUserId),
-      ]);
+      const primaryUser = await (session
+        ? User.findById(userId).session(session)
+        : User.findById(userId));
 
-      if (!primaryUser || !counterparty) {
-        return { ok: false, code: 404, error: "User or counterparty not found" };
+      if (!primaryUser) {
+        return { ok: false, code: 404, error: "User not found" };
       }
 
+      // ✅ Coerce old docs to prevent $inc / $addToSet failures
       await ensureNumericAndArrayFields(primaryUser._id, session);
-      await ensureNumericAndArrayFields(counterparty._id, session);
 
       const isSent = direction === "sent";
 
-      const computedRecipient = isSent
-        ? recipient || counterparty.name || counterparty.email || "Recipient"
-        : primaryUser.name || primaryUser.email || "Incoming";
-
-      const computedIban = isSent ? toIban || counterparty.iban || "N/A" : primaryUser.iban || "N/A";
-
+      // ✅ External txn doc
       const txnDoc = {
-        from: isSent ? primaryUser._id : counterparty._id,
-        to: isSent ? counterparty._id : primaryUser._id,
-        recipient: computedRecipient,
-        toIban: computedIban,
-        amount: Number(amount),
+        from: isSent ? primaryUser._id : null, // incoming external has no internal sender
+        to: isSent ? null : primaryUser._id,   // outgoing external has no internal receiver
+        recipient: String(recipient).trim(),
+        toIban: String(toIban).trim(),
+        amount: amt,
         type: isSent ? "debit" : "credit",
         status,
         date: date ? new Date(date) : new Date(),
         note,
       };
 
-      const created = await Transaction.create([txnDoc], session ? { session } : undefined);
+      // Create transaction
+      const created = await Transaction.create(
+        [txnDoc],
+        session ? { session } : undefined
+      );
       const txn = created[0];
 
+      // Apply balance effects only if approved
       if (status === "approved") {
         if (isSent) {
-          const ok = await User.updateOne(
+          // Debit user
+          const debit = await User.updateOne(
             { _id: primaryUser._id, balance: { $gte: txn.amount } },
-            { $inc: { balance: -txn.amount }, $addToSet: { transactions: txn._id } },
+            {
+              $inc: { balance: -txn.amount },
+              $addToSet: { transactions: txn._id },
+            },
             session ? { session } : {}
           );
-          if (ok.modifiedCount === 0) return { ok: false, code: 400, error: "Insufficient balance on sender" };
 
-          await User.updateOne(
-            { _id: counterparty._id },
-            { $inc: { balance: txn.amount }, $addToSet: { transactions: txn._id } },
-            session ? { session } : {}
-          );
+          if (debit.modifiedCount === 0) {
+            return { ok: false, code: 400, error: "Insufficient balance" };
+          }
         } else {
-          const ok = await User.updateOne(
-            { _id: counterparty._id, balance: { $gte: txn.amount } },
-            { $inc: { balance: -txn.amount }, $addToSet: { transactions: txn._id } },
-            session ? { session } : {}
-          );
-          if (ok.modifiedCount === 0) return { ok: false, code: 400, error: "Insufficient balance on counterparty" };
-
+          // Credit user
           await User.updateOne(
             { _id: primaryUser._id },
-            { $inc: { balance: txn.amount }, $addToSet: { transactions: txn._id } },
+            {
+              $inc: { balance: txn.amount },
+              $addToSet: { transactions: txn._id },
+            },
             session ? { session } : {}
           );
         }
       } else {
+        // Pending/rejected: attach txn to user for history
         await User.updateOne(
           { _id: primaryUser._id },
-          { $addToSet: { transactions: txn._id } },
-          session ? { session } : {}
-        );
-        await User.updateOne(
-          { _id: counterparty._id },
           { $addToSet: { transactions: txn._id } },
           session ? { session } : {}
         );
@@ -686,9 +703,16 @@ exports.adminCreateTransaction = async (req, res) => {
 
     if (!out.ok) return res.status(out.code).json({ error: out.error });
 
-    return res.status(201).json({ message: "Transaction created", transaction: out.populated });
+    return res.status(201).json({
+      message: "Transaction created",
+      transaction: out.populated,
+    });
   } catch (err) {
-    console.error("❌ adminCreateTransaction error", { error: err.message, stack: err.stack });
+    console.error("❌ adminCreateTransaction error", {
+      error: err.message,
+      stack: err.stack,
+    });
+
     return res.status(500).json({
       error: "Failed to create transaction",
       ...(process.env.NODE_ENV === "production" ? {} : { debug: err.message }),
